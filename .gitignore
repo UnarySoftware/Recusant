@@ -35,6 +35,9 @@
 # Custom launch related file
 [Ee]ditor[Ll]aunch.json
 
+# Remove unity related meta files
+*.meta
+
 # Custom codegenned fules
 [Aa]ssets/[Ss]cripts/[Ee]ditor/[Ee]ditor.[Gg]en.cs
 [Aa]ssets/[Ss]cripts/[Ee]ditor/[Ee]ditor.[Gg]en.cs.meta
