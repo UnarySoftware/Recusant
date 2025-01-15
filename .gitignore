@@ -12,6 +12,26 @@
 /[Uu][Ii][Ee]lements[Ss]chema/
 /[Vv]anilla[Ss]aves/
 
+# Remove project files
+[Aa]ssets/[Bb]ootstrap.unity
+[Aa]ssets/[Bb]ootstrap.unity.meta
+/[Aa]ssets/[Ii]nput/
+[Aa]ssets/[Ii]nput.meta
+/[Aa]ssets/[Nn]etick/
+[Aa]ssets/[Nn]etick.meta
+/[Aa]ssets/[Pp]lugins/
+[Aa]ssets/[Pp]lugins.meta
+/[Aa]ssets/[Rr]ecusant/
+[Aa]ssets/[Rr]ecusant.meta
+/[Aa]ssets/[Tt]emp/
+[Aa]ssets/[Tt]emp.meta
+/[Aa]ssets/[Tt]hirdparty/
+[Aa]ssets/[Tt]hirdparty.meta
+/[Aa]ssets/[Uu][Ii] [Tt]oolkit/
+[Aa]ssets/[Uu][Ii] [Tt]oolkit.meta
+/[Pp]ackages/
+/[Pp]roject[Ss]ettings/
+
 # Custom launch related file
 [Ee]ditor[Ll]aunch.json
 
