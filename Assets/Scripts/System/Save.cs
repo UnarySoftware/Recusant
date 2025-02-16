@@ -1,16 +1,19 @@
 using UnityEngine;
 
-public class Save : MonoBehaviour, ISystem
+public class Save : CoreSystem<Save>
 {
-    public static Save Instance = null;
-
-    [InitDependency(typeof(Analytics), typeof(Steam))]
-    public void Initialize()
+    [InitDependency(typeof(Steam))]
+    public override void Initialize()
     {
         
     }
 
-    public void Deinitialize()
+    public override void PostInitialize()
+    {
+
+    }
+
+    public override void Deinitialize()
     {
         
     }

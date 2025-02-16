@@ -1,7 +1,17 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public static class GameObjectExtensions
 {
+    /*
+    public static void GetComponentsRecursive<T>(this GameObject target, List<T> result)
+    {
+        target.GetComponents(result);
+
+        target.GetComponentInChildren
+    }
+    */
+
     public static void SetLayersRecursive(this GameObject target, int layer)
     {
         var children = target.GetComponentsInChildren<Transform>(includeInactive: true);

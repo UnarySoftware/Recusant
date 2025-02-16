@@ -1,7 +1,12 @@
+using System;
 using UnityEngine;
 
 public abstract class BaseScriptableObject : ScriptableObject
 {
-    [HideInInspector]
-    public uint Id = uint.MaxValue;
+    public SerializableGuid UniqueId;
+
+    [NonSerialized]
+    public int IndexId = -1;
+
+    public abstract void Precache();
 }

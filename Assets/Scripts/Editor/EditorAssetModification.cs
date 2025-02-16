@@ -10,7 +10,7 @@ using UnityEngine;
 
 public class EditorAssetModification : AssetModificationProcessor
 {
-    public static int DelayMs { get; private set; } = 3000;
+    public static int DelayMs { get; private set; } = 1000;
 
     private const string AssetPath = "Assets/Recusant/ScriptableObjects/RegistryList.asset";
     private const string AssetsFolder = "Assets/Recusant/ScriptableObjects";
@@ -46,8 +46,6 @@ public class EditorAssetModification : AssetModificationProcessor
 
         List<BaseScriptableObject> NewEntries = new();
 
-        uint Counter = 0;
-
         foreach(var File in ProcessedList)
         {
             ScriptableObject TargetObject = AssetDatabase.LoadAssetAtPath<ScriptableObject>(File);
@@ -65,10 +63,9 @@ public class EditorAssetModification : AssetModificationProcessor
 
             if(TargetObject is BaseScriptableObject TargetScriptable)
             {
-                TargetScriptable.Id = Counter;
+                TargetScriptable.UniqueId = new System.Guid(AssetDatabase.GUIDFromAssetPath(File).ToString());
                 EditorUtility.SetDirty(TargetScriptable);
                 NewEntries.Add(TargetScriptable);
-                Counter++;
             }
         }
 
@@ -92,9 +89,8 @@ public class EditorAssetModification : AssetModificationProcessor
         ProcessPath(AssetName);
     }
 
-#pragma warning disable IDE0060 // Remove unused parameter
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060")]
     public static AssetDeleteResult OnWillDeleteAsset(string AssetName, RemoveAssetOptions Options)
-#pragma warning restore IDE0060 // Remove unused parameter
     {
         ProcessPath(AssetName);
         return AssetDeleteResult.DidNotDelete;

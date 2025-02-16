@@ -1,6 +1,6 @@
 using System;
 
-public class Core : UiState
+public class CoreState : UiState
 {
     public override void Initialize()
     {

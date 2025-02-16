@@ -16,6 +16,8 @@ public class PlayerInput : MonoBehaviour
     private const string VerticalInput = "Vertical";
     private const string JumpInput = "Jump";
 
+    public bool AllowInputs { get; set; } = true;
+
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -23,21 +25,10 @@ public class PlayerInput : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (AllowInputs)
         {
-            Cursor.lockState = CursorLockMode.Locked;
+            HandleCharacterInput();
         }
-        else if (Input.GetKeyDown(KeyCode.F1))
-        {
-            Cursor.lockState = CursorLockMode.None;
-        }
-
-        if (Input.GetKeyDown(KeyCode.F5))
-        {
-            RotateWithPhysicsMover.Set(!RotateWithPhysicsMover.Get());
-        }
-
-        HandleCharacterInput();
     }
 
     private Rigidbody _platformRigid = null;
@@ -94,18 +85,18 @@ public class PlayerInput : MonoBehaviour
 
     private void HandleCameraInput()
     {
-        // Create the look input vector for the camera
-        float mouseLookAxisUp = Input.GetAxisRaw(MouseYInput);
-        float mouseLookAxisRight = Input.GetAxisRaw(MouseXInput);
-        Vector2 lookInputVector = new(mouseLookAxisRight, mouseLookAxisUp);
+        Vector2 inputVector = Vector2.zero;
 
-        // Prevent moving the camera while the cursor isn't locked
-        if (Cursor.lockState != CursorLockMode.Locked)
+        if(AllowInputs && Cursor.lockState == CursorLockMode.Locked)
         {
-            lookInputVector = Vector2.zero;
+            float mouseLookAxisUp = Input.GetAxisRaw(MouseYInput);
+            float mouseLookAxisRight = Input.GetAxisRaw(MouseXInput);
+
+            inputVector.x = mouseLookAxisRight;
+            inputVector.y = mouseLookAxisUp;
         }
 
-        OrbitCamera.UpdateWithInput(lookInputVector);
+        OrbitCamera.UpdateWithInput(inputVector);
     }
 
     private void HandleCharacterInput()

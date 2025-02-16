@@ -37,13 +37,17 @@ public class BaseGameplayVariablesEditor<T> : Editor
         {
             EditorGUILayout.BeginHorizontal();
 
+            string ResultValue = GameplayShared.StringifyVariable(_values[i].GetObject(), _values[i].GetTypeEnum());
+
             if (_values[i].IsRanged())
             {
-                _contentValue = new(string.Format("{0,-20} {1}", _values[i].GetRanges(), _values[i].GetObject().ToString()));
+                string ResultRange = GameplayShared.StringifyRanges(_values[i].GetMinRange(), _values[i].GetMaxRange(), GameplayShared.GetRangeForType(_values[i].GetTypeSystem()));
+
+                _contentValue = new(string.Format("{0,-20} {1}", ResultRange, ResultValue));
             }
             else
             {
-                _contentValue = new(_values[i].GetObject().ToString());
+                _contentValue = new(ResultValue);
             }
 
             EditorGUILayout.LabelField(_contentKeys[i], _contentValue, _options);

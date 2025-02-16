@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 
-public sealed class Ui : MonoBehaviour, ISystem
+public sealed class Ui : CoreSystem<Ui>
 {
-    public static Ui Instance = null;
-
     private readonly List<UiState> _uiStatesList = new();
     private readonly Dictionary<Type, UiState> _uiStatesDict = new();
     private UiState _currentState = null;
 
     [InitDependency()]
-    public void Initialize()
+    public override void Initialize()
     {
         UiState[] targetStates = GetComponentsInChildren<UiState>();
 
@@ -22,7 +19,7 @@ public sealed class Ui : MonoBehaviour, ISystem
             Type type = state.GetType();
             _uiStatesDict[type] = state;
             _uiStatesList.Add(state);
-            if(state is MainMenu)
+            if(state is MainMenuState)
             {
                 mainMenu = state;
             }
@@ -31,7 +28,7 @@ public sealed class Ui : MonoBehaviour, ISystem
                 state.Initialize();
             }
 
-            if(state is Core)
+            if(state is CoreState)
             {
                 state.Open();
             }
@@ -49,7 +46,12 @@ public sealed class Ui : MonoBehaviour, ISystem
         }
     }
 
-    public void Deinitialize()
+    public override void PostInitialize()
+    {
+
+    }
+
+    public override void Deinitialize()
     {
         for (int i = _uiStatesList.Count - 1; i >= 0; i--)
         {

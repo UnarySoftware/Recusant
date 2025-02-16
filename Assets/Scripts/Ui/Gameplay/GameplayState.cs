@@ -1,6 +1,6 @@
 using System;
 
-public class StartClient : UiState
+public class GameplayState : UiState
 {
     public override void Initialize()
     {
@@ -24,6 +24,6 @@ public class StartClient : UiState
 
     public override Type GetBackState()
     {
-        return null;
+        return typeof(MainMenuState);
     }
 }

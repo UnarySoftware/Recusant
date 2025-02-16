@@ -1,16 +1,20 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public class LevelManager : MonoBehaviour, ISystem
+public class LevelManager : CoreSystem<LevelManager>
 {
-    public static LevelManager Instance = null;
-
-    [InitDependency(typeof(Analytics))]
-    public void Initialize()
+    [InitDependency(typeof(Logger))]
+    public override void Initialize()
     {
-        
+        SceneManager.LoadScene("Menu");
     }
 
-    public void Deinitialize()
+    public override void PostInitialize()
+    {
+
+    }
+
+    public override void Deinitialize()
     {
 
     }

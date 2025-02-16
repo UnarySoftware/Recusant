@@ -1,25 +1,55 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class Registry : MonoBehaviour, ISystem
+public class Registry : CoreSystem<Registry>
 {
-    public static Registry Instance = null;
+    private readonly Dictionary<Guid, BaseScriptableObject> _registryDictionary = new();
 
     [SerializeField]
     private RegistryList _registryList = null;
 
     [InitDependency()]
-    public void Initialize()
+    public override void Initialize()
     {
-        
+        int IdCounter = 0;
+
+        foreach (var entry in _registryList.Entries)
+        {
+            entry.IndexId = IdCounter;
+            IdCounter++;
+
+            _registryDictionary[entry.UniqueId] = entry;
+        }
     }
 
-    public void Deinitialize()
+    public override void PostInitialize()
     {
 
     }
 
-    public T GetObject<T>(int Id) where T : BaseScriptableObject
+    public override void Deinitialize()
     {
-        return (T)_registryList.Entries[Id];
+
+    }
+
+    public T GetObject<T>(int indexId) where T : BaseScriptableObject
+    {
+        if(indexId < 0 && indexId >= _registryList.Entries.Length)
+        {
+            return null;
+        }
+
+        return (T)_registryList.Entries[indexId];
+    }
+
+    public T GetObject<T>(Guid uniqueId) where T : BaseScriptableObject
+    {
+        if(_registryDictionary.TryGetValue(uniqueId, out var entry))
+        {
+            return (T)entry;
+        }
+
+        return null;
     }
 }

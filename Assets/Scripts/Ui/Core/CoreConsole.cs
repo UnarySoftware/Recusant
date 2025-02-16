@@ -10,36 +10,48 @@ public class CoreConsole : UiUnit
     private ScrollView _entryList;
     private TextField _input;
 
-    public VisualTreeAsset _consoleEntry;
+    public VisualTreeAsset ConsoleEntry;
 
     private Label[] _autocompleteLabels = new Label[MaxAutocompleteLines];
     private AbstractVariable[] _autocompleteVariables = new AbstractVariable[MaxAutocompleteLines];
+
+    public int MaxHistoryEntries = 32;
+
+    private string[] _historyArray = null;
+    private Queue<string> _history = new();
+    private int _historyIndex = -1;
 
     private int _currentConsoleLines = 0;
     public int MaxConsoleLines = 128;
 
     public const int MaxAutocompleteLines = 5;
 
-    private StringBuilder _builder = new();
+    private readonly StringBuilder _builder = new();
 
     private static List<string> GetAutocompleteMatches(string input, bool strict = false, int maxMatches = int.MaxValue)
     {
+        if (input.Contains(" "))
+        {
+            string[] spaceParts = input.ToUpper().Split(' ');
+            input = spaceParts[0];
+        }
+
         string[] inputParts = input.ToUpper().Split('.');
 
         List<string> results = new();
 
         int counter = 0;
 
-        foreach (var target in Reflector.Instance.GameplayUnits.Keys)
+        foreach (var target in GameplayExecutor.Instance.GameplayUnits.Keys)
         {
             if (counter >= maxMatches)
             {
                 break;
             }
 
-            if(strict)
+            if (strict)
             {
-                if(input.ToUpper() == target.ToUpper())
+                if (input.ToUpper() == target.ToUpper())
                 {
                     results.Add(target);
                     counter++;
@@ -115,6 +127,99 @@ public class CoreConsole : UiUnit
         return true;
     }
 
+    public void OnKeyDownEvent(KeyDownEvent evt)
+    {
+        if (evt.keyCode == KeyCode.Tab)
+        {
+            var matches = GetAutocompleteMatches(_input.value);
+
+            string commonString = GetCommonStartingSubString(matches);
+
+            if (!string.IsNullOrWhiteSpace(commonString) && !_input.value.Contains(" "))
+            {
+                _input.value = commonString;
+            }
+
+            _input.SelectRange(99999, 99999);
+
+            UpdateAutocomplete();
+
+            _input.Focus();
+
+            evt.StopPropagation();
+        }
+        else if (evt.keyCode == KeyCode.UpArrow)
+        {
+            if (_history.Count > 0)
+            {
+                if (_historyIndex == -1)
+                {
+                    _historyIndex = 0;
+                }
+                else
+                {
+                    _historyIndex++;
+
+                    if (_historyIndex == _history.Count)
+                    {
+                        _historyIndex = 0;
+                    }
+                }
+
+                _input.value = _historyArray[_historyIndex];
+
+                _input.SelectRange(99999, 99999);
+
+                UpdateAutocomplete();
+
+                _input.Focus();
+
+                evt.StopPropagation();
+            }
+        }
+        else if (evt.keyCode == KeyCode.DownArrow)
+        {
+            if (_history.Count > 0)
+            {
+                if (_historyIndex == -1)
+                {
+                    _historyIndex = _history.Count - 1;
+                }
+                else
+                {
+                    _historyIndex--;
+
+                    if (_historyIndex < 0)
+                    {
+                        _historyIndex = _history.Count - 1;
+                    }
+                }
+
+                _input.value = _historyArray[_historyIndex];
+
+                _input.SelectRange(99999, 99999);
+
+                UpdateAutocomplete();
+
+                _input.Focus();
+
+                evt.StopPropagation();
+            }
+        }
+        else
+        {
+            _historyIndex = -1;
+        }
+    }
+
+    private void OnInputEvent(InputEvent evt)
+    {
+        if (Input.GetKeyDown(KeyCode.Tilde) || Input.GetKeyDown(KeyCode.BackQuote))
+        {
+            _input.SetValueWithoutNotify(evt.previousData);
+        }
+    }
+
     public override void Initialize()
     {
         var Document = GetComponent<UIDocument>();
@@ -128,23 +233,8 @@ public class CoreConsole : UiUnit
             UpdateAutocomplete();
         });
 
-        _input.RegisterCallback<KeyDownEvent>((evt) =>
-        {
-            if (evt.keyCode == KeyCode.Tab)
-            {
-                var matches = GetAutocompleteMatches(_input.value);
-
-                _input.value = GetCommonStartingSubString(matches);
-
-                _input.SelectRange(99999, 99999);
-
-                UpdateAutocomplete();
-
-                _input.Focus();
-
-                evt.StopPropagation();
-            }
-        }, TrickleDown.TrickleDown);
+        _input.RegisterCallback<KeyDownEvent>(OnKeyDownEvent, TrickleDown.TrickleDown);
+        _input.RegisterCallback<InputEvent>(OnInputEvent, TrickleDown.TrickleDown);
 
         _root.style.display = DisplayStyle.None;
 
@@ -170,37 +260,82 @@ public class CoreConsole : UiUnit
         Logger.Instance.OnError -= OnError;
     }
 
-    private void OnPrint(string Message, Color color, Color outline)
+    private void OnPrint(string Message, string Tooltip, Color color, Color outline, Logger.Type type)
     {
         if (_currentConsoleLines >= MaxConsoleLines)
         {
             _entryList.RemoveAt(0);
         }
 
-        var NewEntry = _consoleEntry.Instantiate();
+        var NewEntry = ConsoleEntry.Instantiate();
+
         _entryList.Add(NewEntry);
-        Label NewLabel = NewEntry.Q<Label>("ConsoleEntry");
-        NewLabel.text = Message;
+
+        Foldout NewFoldout = NewEntry.Q<Foldout>("ConsoleEntry");
+
+        NewFoldout.Q(className: Foldout.inputUssClassName).pickingMode = PickingMode.Ignore;
+        NewFoldout.Q(className: Foldout.toggleUssClassName).pickingMode = PickingMode.Ignore;
+        NewFoldout.Q(className: Foldout.textUssClassName).pickingMode = PickingMode.Ignore;
+
+
+        NewFoldout.text = Message;
+        NewFoldout.style.color = color;
+        NewFoldout.style.unityTextOutlineColor = outline;
+        NewFoldout.style.unityTextOutlineWidth = 0.25f;
+
+        NewFoldout.Q(className: Foldout.contentUssClassName).style.marginLeft = 8.0f;
+
+        NewFoldout.Q(className: Foldout.checkmarkUssClassName).pickingMode = PickingMode.Position;
+
+        if (type == Logger.Type.Log)
+        {
+            NewFoldout.Q(className: Foldout.checkmarkUssClassName).pickingMode = PickingMode.Ignore;
+            NewFoldout.toggleOnLabelClick = false;
+
+            VisualElement ElementButton = NewFoldout.Q(className: Foldout.checkmarkUssClassName);
+            ElementButton.style.display = DisplayStyle.None;
+        }
+
+        Label NewLabel = NewEntry.Q<Label>("ConsoleLabel");
+        NewLabel.text = Tooltip;
         NewLabel.style.color = color;
         NewLabel.style.unityTextOutlineColor = outline;
-        NewLabel.style.unityTextOutlineWidth = 0.15f;
+        NewLabel.style.unityTextOutlineWidth = 0.25f;
 
-        _currentConsoleLines++;
+        if (_currentConsoleLines < MaxConsoleLines)
+        {
+            _currentConsoleLines++;
+        }
     }
 
-    private void OnLog(string Message, string StackTrace)
+    private void OnLog(string Message, string StackTrace, Logger.LogReciever reciever)
     {
-        OnPrint(Message, Color.white, Color.black);
+        if(reciever == Logger.LogReciever.None)
+        {
+            return;    
+        }
+
+        OnPrint(Message, "No tooltip available", Color.white, Color.black, Logger.Type.Log);
     }
 
-    private void OnWarning(string Message, string StackTrace)
+    private void OnWarning(string Message, string StackTrace, Logger.LogReciever reciever)
     {
-        OnPrint("Warning: \"" + Message + "\"\nStack trace:\n" + StackTrace, Color.yellow, Color.black);
+        if (reciever == Logger.LogReciever.None)
+        {
+            return;
+        }
+
+        OnPrint("Warning: \"" + Message, StackTrace, Color.yellow, Color.black, Logger.Type.Warning);
     }
 
-    private void OnError(string Message, string StackTrace)
+    private void OnError(string Message, string StackTrace, Logger.LogReciever reciever)
     {
-        OnPrint("Error: \"" + Message + "\"\nStack trace:\n" + StackTrace, Color.red, Color.black);
+        if (reciever == Logger.LogReciever.None)
+        {
+            return;
+        }
+
+        OnPrint("Error: \"" + Message, StackTrace, Color.red, Color.black, Logger.Type.Error);
     }
 
     public override void Open()
@@ -247,7 +382,7 @@ public class CoreConsole : UiUnit
 
         foreach (var matchedName in matches)
         {
-            Reflector.GameplayUnit unit = Reflector.Instance.GameplayUnits[matchedName];
+            GameplayExecutorShared.GameplayUnit unit = GameplayExecutor.Instance.GameplayUnits[matchedName];
 
             _builder.Clear();
 
@@ -258,10 +393,9 @@ public class CoreConsole : UiUnit
             {
                 if (unit.Variable.IsRanged())
                 {
-                    _builder.Append(unit.Variable.GetRanges());
-                    _builder.Append(" ");
+                    _builder.Append(GameplayShared.StringifyRanges(unit.Variable.GetMinRange(), unit.Variable.GetMaxRange(), GameplayShared.GetRangeForType(unit.Variable.GetTypeSystem())));
                 }
-                _builder.Append(unit.Variable.GetObject().ToString());
+                _builder.Append(GameplayShared.StringifyVariable(unit.Variable.GetObject(), unit.Variable.GetTypeEnum()));
                 _builder.Append("\n");
                 _builder.Append(unit.Variable.Description);
 
@@ -272,12 +406,17 @@ public class CoreConsole : UiUnit
             {
                 var parameters = unit.Command.Method.GetParameters();
 
-                _builder.Append("[");
-
                 int parameterCounter = 0;
 
                 foreach (var parameter in parameters)
                 {
+                    GameplayCommandRange range = unit.Command.Ranges[parameterCounter];
+
+                    if (range is not GameplayCommandIgnore)
+                    {
+                        _builder.Append(GameplayShared.StringifyRanges(range.Min, range.Max, range.Type));
+                    }
+
                     _builder.AppendFormat("{0}", GameplayShared.StringifyType(parameter.ParameterType));
 
                     if (parameterCounter < parameters.Length - 1)
@@ -288,7 +427,7 @@ public class CoreConsole : UiUnit
                     parameterCounter++;
                 }
 
-                _builder.Append("]\n");
+                _builder.Append('\n');
                 _builder.Append(unit.Command.Command.Description);
             }
 
@@ -298,30 +437,68 @@ public class CoreConsole : UiUnit
         }
     }
 
-    private void OnVariableChange(int id, int replicatedId)
+    private void OnVariableChange(int id)
     {
         UpdateAutocomplete();
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F2))
+        if (Input.GetKeyDown(KeyCode.BackQuote) || Input.GetKeyDown(KeyCode.Tilde))
         {
             if (_root.style.display == DisplayStyle.None)
             {
+                if (PlayerManager.Instance.LocalPlayer != null)
+                {
+                    PlayerManager.Instance.LocalPlayer.GetComponent<PlayerInput>().AllowInputs = false;
+                }
+
                 _root.style.display = DisplayStyle.Flex;
                 _input.Focus();
+                _input.SelectRange(99999, 99999);
                 UnityEngine.Cursor.lockState = CursorLockMode.None;
             }
             else
             {
+                if (PlayerManager.Instance.LocalPlayer != null)
+                {
+                    PlayerManager.Instance.LocalPlayer.GetComponent<PlayerInput>().AllowInputs = true;
+                }
+
                 _root.style.display = DisplayStyle.None;
                 UnityEngine.Cursor.lockState = CursorLockMode.Locked;
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.Return))
+        if (Input.GetKeyDown(KeyCode.Return) && !string.IsNullOrEmpty(_input.value) && !string.IsNullOrWhiteSpace(_input.value))
         {
+            _historyIndex = -1;
+
+            bool unique = true;
+
+            foreach (var item in _history)
+            {
+                if (item == _input.value)
+                {
+                    unique = false;
+                    break;
+                }
+            }
+
+            if (unique)
+            {
+                if (_history.Count == MaxHistoryEntries)
+                {
+                    _history.Dequeue();
+                }
+
+                _history.Enqueue(_input.value);
+
+                _historyArray = _history.ToArray();
+            }
+
+            GameplayExecutor.Instance.Execute(_input.value);
+
             _input.value = string.Empty;
             StartCoroutine(DelayFocus());
         }

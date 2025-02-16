@@ -1,6 +1,6 @@
 using System;
 
-public class StartHost : UiState
+public class StartHostState : UiState
 {
     public override void Initialize()
     {

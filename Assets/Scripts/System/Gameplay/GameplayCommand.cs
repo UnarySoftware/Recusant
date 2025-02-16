@@ -104,7 +104,6 @@ public class GameplayCommandIgnore : GameplayCommandRange
     }
 }
 
-
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
 public class GameplayCommandAttribute : Attribute
 {

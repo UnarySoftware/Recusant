@@ -1,19 +1,27 @@
 using UnityEngine;
 
-public class Steam : MonoBehaviour, ISystem
+public class Steam : CoreSystem<Steam>
 {
-    public static Steam Instance = null;
-
     public bool Initialized { get; private set; } = false;
 
-    [InitDependency(typeof(Analytics))]
-    public void Initialize()
+    [InitDependency(typeof(Logger), typeof(Launcher))]
+    public override void Initialize()
     {
-        
+
+#if UNITY_EDITOR
+        if (!Launcher.LaunchData.Online)
+        {
+            Logger.Instance.Log("Starting Steam in offline mode");
+            return;
+        }
+#endif
+
+        Logger.Instance.Log("Starting Steam in online mode");
 
         try
         {
             Steamworks.SteamClient.Init(1436420, true);
+            Initialized = true;
         }
         catch (System.Exception)
         {
@@ -21,13 +29,24 @@ public class Steam : MonoBehaviour, ISystem
         }
     }
 
-    private void Update()
+    public override void PostInitialize()
     {
-        Steamworks.SteamClient.RunCallbacks();
+
     }
 
-    public void Deinitialize()
+    public override void Deinitialize()
     {
-        Steamworks.SteamClient.Shutdown();
+        if (Initialized)
+        {
+            Steamworks.SteamClient.Shutdown();
+        }
+    }
+
+    private void Update()
+    {
+        if (Initialized)
+        {
+            Steamworks.SteamClient.RunCallbacks();
+        }
     }
 }

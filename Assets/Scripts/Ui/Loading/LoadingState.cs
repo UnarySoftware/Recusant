@@ -1,6 +1,6 @@
 using System;
 
-public class Loading : UiState
+public class LoadingState : UiState
 {
     public override void Initialize()
     {

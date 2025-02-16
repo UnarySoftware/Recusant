@@ -9,13 +9,55 @@ using UnityEngine;
 
 class SharedCodeGeneration
 {
+    public bool IsRootProject = false;
+
     public Type[] Types { get; private set; } = null;
 
     public Dictionary<Type, List<FieldInfo>> GameplayVariables { get; private set; } = new();
 
+    public void FindProject()
+    {
+        IsRootProject = File.Exists("BUILD_ID");
+    }
+
+    public void FindVersion()
+    {
+        if(!IsRootProject)
+        {
+            return;
+        }
+
+        ulong CurrentBuild;
+
+        try
+        {
+            CurrentBuild = ulong.Parse(File.ReadAllText("BUILD_ID"));
+        }
+        catch(Exception e) 
+        {
+            Debug.LogException(e);
+            return;
+        }
+
+        CurrentBuild++;
+
+        string Version = "Build: " + CurrentBuild + " Date: " + DateTime.Now.ToString("dd.MM.yy hh:mm:ss");
+
+        File.WriteAllText("BUILD_ID", CurrentBuild.ToString());
+
+        if (!Directory.Exists("../RecusantBuild"))
+        {
+            Directory.CreateDirectory("../RecusantBuild");
+        }
+
+        File.WriteAllText("../RecusantBuild/Version.txt", Version);
+
+        File.WriteAllText("Version.txt", Version);
+    }
+
     public void FindTypes()
     {
-        Types = Bootstrap.GetTypeStatic().Assembly.GetTypes();
+        Types = Core.GetTypeStatic().Assembly.GetTypes();
     }
 
     public void FindGameplayVariables()
@@ -133,6 +175,7 @@ class GameCodeGeneration : CodeGenerator
 
     public override void Write()
     {
+        Writer = string.Empty;
         WriteHeader();
         WriteConsts();
         WriteLayerMasks();
@@ -179,42 +222,34 @@ class EditorCodeGeneration : CodeGenerator
 
     public override void Write()
     {
+        Writer = string.Empty;
         WriteHeader();
         WriteGameplayVariableEditors();
         WriteEnding();
     }
 }
 
-class CodeGeneration : AssetPostprocessor
+public class CodeGeneration
 {
     private static SharedCodeGeneration Shared = null;
     private static GameCodeGeneration Game = null;
     private static EditorCodeGeneration Editor = null;
 
-    protected static void OnPostprocessAllAssets(string[] importedAssets,
-        string[] deletedAssets, string[] movedAssets,
-        string[] movedFromAssetPaths)
+    public static void PostprocessAllAssets()
     {
-        if(Shared == null)
-        {
-            Shared = new SharedCodeGeneration();
-            Shared.FindTypes();
-            Shared.FindGameplayVariables();
-        }
+        Shared ??= new SharedCodeGeneration();
+        Shared.FindProject();
+        Shared.FindVersion();
+        Shared.FindTypes();
+        Shared.FindGameplayVariables();
 
-        if (Game == null)
-        {
-            Game = new GameCodeGeneration(Shared, Application.dataPath + "/Scripts/Game.Gen.cs");
-            Game.Write();
-            Game.Finish();
-        }
+        Game ??= new GameCodeGeneration(Shared, Application.dataPath + "/Scripts/Game.Gen.cs");
+        Game.Write();
+        Game.Finish();
 
-        if (Editor == null)
-        {
-            Editor = new EditorCodeGeneration(Shared, Application.dataPath + "/Scripts/Editor/Editor.Gen.cs");
-            Editor.Write();
-            Editor.Finish();
-        }
+        Editor ??= new EditorCodeGeneration(Shared, Application.dataPath + "/Scripts/Editor/Editor.Gen.cs");
+        Editor.Write();
+        Editor.Finish();
     }
 }
 

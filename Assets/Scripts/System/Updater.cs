@@ -65,10 +65,8 @@ public sealed class UpdaterUnit
     }
 }
 
-public class Updater : MonoBehaviour, ISystem
+public class Updater : CoreSystem<Updater>
 {
-    public static Updater Instance = null;
-
     private UpdaterUnit[] FixedUpdateUnits = new UpdaterUnit[0];
     private UpdaterUnit[] UpdateUnits = new UpdaterUnit[0];
     private UpdaterUnit[] LateUpdateUnits = new UpdaterUnit[0];
@@ -76,12 +74,17 @@ public class Updater : MonoBehaviour, ISystem
     private float Timer = 0.0f;
 
     [InitDependency()]
-    public void Initialize()
+    public override void Initialize()
     {
         
     }
 
-    public void Deinitialize()
+    public override void PostInitialize()
+    {
+
+    }
+
+    public override void Deinitialize()
     {
         
     }

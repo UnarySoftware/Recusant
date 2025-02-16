@@ -47,24 +47,39 @@ public class CoreLogger : UiUnit
         Logger.Instance.OnError -= OnError;
     }
 
-    private void OnLog(string Message, string StackTrace)
+    private void OnLog(string Message, string StackTrace, Logger.LogReciever reciever)
     {
+        if (reciever == Logger.LogReciever.None)
+        {
+            return;
+        }
+
         _logCounter++;
         _logLabel.text = _logCounter.ToString();
         _logTimer = 3.0f;
         _logElement.style.opacity = 1.0f;
     }
 
-    private void OnWarning(string Message, string StackTrace)
+    private void OnWarning(string Message, string StackTrace, Logger.LogReciever reciever)
     {
+        if (reciever == Logger.LogReciever.None)
+        {
+            return;
+        }
+
         _warningCounter++;
         _warningLabel.text = _warningCounter.ToString();
         _warningTimer = 3.0f;
         _warningElement.style.opacity = 1.0f;
     }
 
-    private void OnError(string Message, string StackTrace)
+    private void OnError(string Message, string StackTrace, Logger.LogReciever reciever)
     {
+        if (reciever == Logger.LogReciever.None)
+        {
+            return;
+        }
+
         _errorCounter++;
         _errorLabel.text = _errorCounter.ToString();
         _errorTimer = 3.0f;

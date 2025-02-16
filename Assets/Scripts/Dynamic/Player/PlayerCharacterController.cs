@@ -53,7 +53,7 @@ public class PlayerCharacterController : MonoBehaviour, ICharacterController
 
     public bool CheckTeleportController()
     {
-        if(_wishTeleportController)
+        if (_wishTeleportController)
         {
             _wishTeleportController = false;
             return true;
@@ -63,7 +63,7 @@ public class PlayerCharacterController : MonoBehaviour, ICharacterController
 
     public bool CheckTeleportNetwork()
     {
-        if(_wishTeleportNetwork)
+        if (_wishTeleportNetwork)
         {
             _wishTeleportNetwork = false;
             return true;
@@ -118,7 +118,7 @@ public class PlayerCharacterController : MonoBehaviour, ICharacterController
 
         if (Input.GetKey(KeyCode.R))
         {
-            AdditiveVelocity += new Vector3(0.0f, 200.0f, 0.0f) * Time.deltaTime;
+            AdditiveVelocity += new Vector3(0.0f, 50.0f, 0.0f) * Time.deltaTime;
         }
 
         if (Input.GetKeyDown(KeyCode.Q))
@@ -159,6 +159,11 @@ public class PlayerCharacterController : MonoBehaviour, ICharacterController
 
     private void AirMove(ref Vector3 playerVelocity, float deltaTime)
     {
+        if(rightMove != 0.0f)
+        {
+            forwardMove = 0.0f;
+        }
+
         Vector3 wishdir = new(rightMove, 0.0f, forwardMove);
         wishdir = transform.TransformDirection(wishdir);
 
@@ -181,7 +186,7 @@ public class PlayerCharacterController : MonoBehaviour, ICharacterController
 
         // If the player is ONLY strafing left or right
 
-        if (forwardMove > 0.0f && rightMove != 0.0f)
+        if (forwardMove == 0.0f && rightMove != 0.0f)
         {
             if (wishspeed > sideStrafeSpeed)
             {
@@ -375,11 +380,11 @@ public class PlayerCharacterController : MonoBehaviour, ICharacterController
     {
         if (Motor.AttachedRigidbody != null)
         {
-            if(_blacklisted == Motor.AttachedRigidbody)
+            if (_blacklisted == Motor.AttachedRigidbody)
             {
                 Mover = null;
             }
-            else if(_attached == Motor.AttachedRigidbody)
+            else if (_attached == Motor.AttachedRigidbody)
             {
                 Mover = _targetMoverObject;
             }

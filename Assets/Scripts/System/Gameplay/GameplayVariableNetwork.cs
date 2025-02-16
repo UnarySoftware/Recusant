@@ -4,10 +4,10 @@ using UnityEngine;
 
 [Networked]
 [Serializable]
-public struct GameplayVariableNetwork
+public struct GameplayVariableNetwork : IEquatable<GameplayVariableNetwork>
 {
     [SerializeField]
-    public int VariableId;
+    public NetworkBool Changed;
     [SerializeField]
     public NetworkString64 String;
     [SerializeField]
@@ -20,16 +20,45 @@ public struct GameplayVariableNetwork
     public float Float2;
     [SerializeField]
     public float Float3;
+
+    public override readonly bool Equals(object obj)
+    {
+        return obj is GameplayVariableNetwork overrides && Equals(overrides);
+    }
+
+    public readonly bool Equals(GameplayVariableNetwork other)
+    {
+        return Changed == other.Changed &&
+            String == other.String &&
+            Bool == other.Bool &&
+            Double == other.Double &&
+            Float1 == other.Float1 &&
+            Float2 == other.Float2 &&
+            Float3 == other.Float3;
+    }
+
+    public override readonly int GetHashCode()
+    {
+        return HashCode.Combine(Changed, String, Bool, Double, Float1, Float2, Float3);
+    }
+
+    public static bool operator ==(GameplayVariableNetwork left, GameplayVariableNetwork right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(GameplayVariableNetwork left, GameplayVariableNetwork right)
+    {
+        return !(left == right);
+    }
 };
 
 public static class GameplayVariableExtensions
 {
     public static GameplayVariableNetwork ToNetwork(this AbstractVariable target) 
     {
-        GameplayVariableNetwork result = new()
-        {
-            VariableId = target.Id
-        };
+        GameplayVariableNetwork result = new();
+
         object targetObject = target.GetObject();
 
         switch (target.GetTypeEnum())
@@ -151,11 +180,6 @@ public static class GameplayVariableExtensions
 
     public static void FromNetwork(this AbstractVariable target, GameplayVariableNetwork value)
     {
-        if(value.VariableId != target.Id)
-        {
-            return;
-        }
-
         switch (target.GetTypeEnum())
         {
             default:

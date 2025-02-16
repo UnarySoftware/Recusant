@@ -8,158 +8,166 @@ using System.IO;
 using System.Diagnostics;
 using System.Threading;
 
-namespace SpaceRisk
+static class ToolbarStyles
 {
-    static class ToolbarStyles
+    public static readonly GUIStyle commandButtonStyle;
+
+    static void HandleOnPlayModeChanged(PlayModeStateChange playMode)
     {
-        public static readonly GUIStyle commandButtonStyle;
-        
-        static void HandleOnPlayModeChanged(PlayModeStateChange playMode)
+        if (playMode == PlayModeStateChange.ExitingPlayMode)
         {
-            if (playMode == PlayModeStateChange.ExitingPlayMode)
-            {
-                EditorSceneManager.playModeStartScene = null;
-            }
-        }
-        
-        static ToolbarStyles()
-        {
-            EditorApplication.playModeStateChanged += HandleOnPlayModeChanged;
-            commandButtonStyle = new GUIStyle("Command")
-            {
-                fontSize = 16,
-                alignment = TextAnchor.MiddleCenter,
-                imagePosition = ImagePosition.ImageAbove,
-                fontStyle = FontStyle.Bold
-            };
+            EditorSceneManager.playModeStartScene = null;
         }
     }
 
-    [InitializeOnLoad]
-    public class EditorToolbar
+    static ToolbarStyles()
     {
-        static EditorToolbar()
+        EditorApplication.playModeStateChanged += HandleOnPlayModeChanged;
+        commandButtonStyle = new GUIStyle("Command")
         {
-            ToolbarExtender.LeftToolbarGUI.Add(OnLeft);
-            ToolbarExtender.RightToolbarGUI.Add(OnRight);
-            LastTime = EditorApplication.timeSinceStartup;
-            ThisProcess = Process.GetCurrentProcess();
-            ReloadFile = "../" + ThisProcess.Id + ".reload";
-            EditorApplication.update += OnUpdate;
+            fontSize = 16,
+            alignment = TextAnchor.MiddleCenter,
+            imagePosition = ImagePosition.ImageAbove,
+            fontStyle = FontStyle.Bold
+        };
+    }
+}
+
+[InitializeOnLoad]
+public class EditorToolbar
+{
+    static EditorToolbar()
+    {
+        ToolbarExtender.LeftToolbarGUI.Add(OnLeft);
+        ToolbarExtender.RightToolbarGUI.Add(OnRight);
+        LastTime = EditorApplication.timeSinceStartup;
+        ThisProcess = Process.GetCurrentProcess();
+        ReloadFile = "../" + ThisProcess.Id + ".reload";
+        EditorApplication.update += OnUpdate;
+    }
+
+    public static double LastTime;
+    public static double Timer;
+    public static double FileCheck = 2.0;
+    public static Process ThisProcess;
+    public static string ReloadFile;
+
+    [MenuItem("Recusant/Remote Reload %r")]
+    static void RemoteReload()
+    {
+        if (!File.Exists(ReloadFile))
+        {
+            File.Create(ReloadFile).Dispose();
         }
+        AssetDatabase.Refresh();
+    }
 
-        public static double LastTime;
-        public static double Timer;
-        public static double FileCheck = 2.0;
-        public static Process ThisProcess;
-        public static string ReloadFile;
-
-        [MenuItem("SpaceRisk/Remote Reload %r")]
-        static void RemoteReload()
+    [MenuItem("Recusant/Selected Space %space")]
+    static void SelectedSpace()
+    {
+        foreach(var targetObject in Selection.gameObjects)
         {
-            if(!File.Exists(ReloadFile))
+            var executor = targetObject.GetComponent<SelectedExecutor>();
+            if(executor != null)
             {
-                File.Create(ReloadFile).Dispose();
+                executor.ExecuteOnSpace();
+                break;
             }
-            AssetDatabase.Refresh();
         }
+    }
 
-        
+    static void OnUpdate()
+    {
+        Timer += EditorApplication.timeSinceStartup - LastTime;
 
-        static void OnUpdate()
+        if (Timer >= FileCheck)
         {
-            Timer += EditorApplication.timeSinceStartup - LastTime;
+            Timer = 0.0;
 
-            if(Timer >= FileCheck)
+            string[] Files = Directory.GetFiles("..", "*.reload", SearchOption.TopDirectoryOnly);
+
+            bool ShouldReload = false;
+
+            foreach (string TargetFile in Files)
             {
-                Timer = 0.0;
+                int Pid = int.Parse(Path.GetFileNameWithoutExtension(TargetFile));
 
-                string[] Files = Directory.GetFiles("..", "*.reload", SearchOption.TopDirectoryOnly);
-
-                bool ShouldReload = false;
-
-                foreach(string TargetFile in Files)
+                if (Pid != ThisProcess.Id)
                 {
-                    int Pid = int.Parse(Path.GetFileNameWithoutExtension(TargetFile));
-
-                    if(Pid != ThisProcess.Id)
+                    ShouldReload = true;
+                    int CountUp = 0;
+                    bool ShouldDelete = true;
+                    FileInfo Info = new(TargetFile);
+                    while (Info.IsLocked())
                     {
-                        ShouldReload = true;
-                        int CountUp = 0;
-                        bool ShouldDelete = true;
-                        FileInfo Info = new(TargetFile);
-                        while (Info.IsLocked())
+                        Thread.Sleep(250);
+                        CountUp++;
+                        if (CountUp > 4)
                         {
-                            Thread.Sleep(250);
-                            CountUp++;
-                            if (CountUp > 4)
-                            {
-                                ShouldReload = false;
-                                ShouldDelete = false;
-                                break;
-                            }
-                        }
-                        if(ShouldDelete)
-                        {
-                            File.Delete(TargetFile);
+                            ShouldReload = false;
+                            ShouldDelete = false;
+                            break;
                         }
                     }
-                }
-
-                if (ShouldReload)
-                {
-                    AssetDatabase.Refresh();
+                    if (ShouldDelete)
+                    {
+                        File.Delete(TargetFile);
+                    }
                 }
             }
 
-            LastTime = EditorApplication.timeSinceStartup;
+            if (ShouldReload)
+            {
+                AssetDatabase.Refresh();
+            }
         }
 
-        static void OnLeft()
+        LastTime = EditorApplication.timeSinceStartup;
+    }
+
+    static void OnLeft()
+    {
+        GUILayout.FlexibleSpace();
+
+        if (Launcher.Instance == null)
         {
-            GUILayout.FlexibleSpace();
-
-            if (EditorLaunch.Instance == null)
-            {
-                EditorLaunch.LaunchData.Online = GUILayout.Toggle(EditorLaunch.LaunchData.Online, "< Online");
-                EditorLaunch.LaunchData.TypeSelection = EditorGUILayout.Popup("", EditorLaunch.LaunchData.TypeSelection, EditorLaunch.LaunchVariants);
-                EditorLaunch.LaunchData.Type = (EditorLaunchData.LaunchType)EditorLaunch.LaunchData.TypeSelection;
-                EditorLaunch.ChangesCheck();
-            }
-            /*
-            else
-            {
-                GUILayout.Toggle(EditorLaunch.LaunchData.Steam, "< Steam");
-                EditorGUILayout.Popup("", EditorLaunch.LaunchData.TypeSelection, EditorLaunch.LaunchVariants);
-            }
-            */
+            Launcher.LaunchData.LeaveCookHelpers = GUILayout.Toggle(Launcher.LaunchData.LeaveCookHelpers, "< Leave Cook Helpers");
+            Launcher.LaunchData.AutoLaunch = GUILayout.Toggle(Launcher.LaunchData.AutoLaunch, "< Auto Launch");
+            Launcher.LaunchData.Online = GUILayout.Toggle(Launcher.LaunchData.Online, "< Steam Online");
+            Launcher.LaunchData.TypeSelection = EditorGUILayout.Popup("", Launcher.LaunchData.TypeSelection, Launcher.LaunchVariants);
+            Launcher.LaunchData.Type = (LaunchData.LaunchType)Launcher.LaunchData.TypeSelection;
+            Launcher.ChangesCheck();
         }
+    }
 
-        static void OnRight()
+    static void OnRight()
+    {
+        if (Launcher.Instance == null)
         {
-            if (EditorLaunch.Instance == null)
+            Launcher.LaunchData.ServerSaveSelection = EditorGUILayout.Popup("", Launcher.LaunchData.ServerSaveSelection, Launcher.ServerSaves);
+            if (Launcher.ServerSaves.Length > 0)
             {
-                EditorLaunch.LaunchData.AutoLaunch = GUILayout.Toggle(EditorLaunch.LaunchData.AutoLaunch, "< AutoLaunch");
-                EditorLaunch.LaunchData.SaveSelection = EditorGUILayout.Popup("", EditorLaunch.LaunchData.SaveSelection, EditorLaunch.Saves);
-                if (EditorLaunch.Saves.Length > 0)
-                {
-                    EditorLaunch.LaunchData.Save = EditorLaunch.Saves[EditorLaunch.LaunchData.SaveSelection];
-                }
-                if (GUILayout.Button(new GUIContent("Refresh Saves", "Refresh Saves List")))
-                {
-                    EditorLaunch.RefreshSaves();
-                }
-                EditorLaunch.ChangesCheck();
+                Launcher.LaunchData.ServerSave = Launcher.ServerSaves[Launcher.LaunchData.ServerSaveSelection];
             }
-            /*
-            else
+            GUILayout.Label("< Server Save");
+            Launcher.LaunchData.ClientSaveSelection = EditorGUILayout.Popup("", Launcher.LaunchData.ClientSaveSelection, Launcher.ClientSaves);
+            if (Launcher.ClientSaves.Length > 0)
             {
-                EditorGUILayout.Popup("", EditorLaunch.LaunchData.SaveSelection, EditorLaunch.Saves);
+                Launcher.LaunchData.ClientSave = Launcher.ClientSaves[Launcher.LaunchData.ClientSaveSelection];
             }
-            */
-
-            GUILayout.FlexibleSpace();
+            GUILayout.Label("< Client Save");
+            if (GUILayout.Button(new GUIContent("Refresh Saves", "Refresh Saves List")))
+            {
+                Launcher.RefreshSaves();
+            }
+            if (GUILayout.Button(new GUIContent("Cook Level", "Cooks Info About Current Level")))
+            {
+                LevelCooker.Cook();
+            }
+            Launcher.ChangesCheck();
         }
+
+        GUILayout.FlexibleSpace();
     }
 }
 

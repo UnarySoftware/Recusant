@@ -52,6 +52,8 @@ public class PlayerNetwork : NetworkBehaviour
     private GameObject _rigidObject = null;
     private Rigidbody _rigid = null;
 
+    private Vector3 _aoiVector;
+
     [SerializeField]
     private SingleLayer _localPlayerLayer = CodeGenerated.GameObjectLayerMask.LocalPlayer;
     [SerializeField]
@@ -73,13 +75,13 @@ public class PlayerNetwork : NetworkBehaviour
     [OnChanged(nameof(Connected))]
     public void OnConnectedChanged(OnChangedData _)
     {
-        if(Connected)
+        if (Connected)
         {
             _pawnController.MeshRoot.SetActive(true);
 
             if (IsInputSource)
             {
-                Ui.Instance.GoForward(typeof(Gameplay));
+                Ui.Instance.GoForward(typeof(GameplayState));
             }
             else
             {
@@ -90,16 +92,28 @@ public class PlayerNetwork : NetworkBehaviour
 
     public override void NetworkStart()
     {
+        int cellSize = Networking.Instance.AreaOfInterestCellSize;
+
+        _aoiVector = new Vector3(cellSize * 3.0f, cellSize * 3.0f, cellSize * 3.0f);
+
         PlayerManager.Instance.AddPlayer(this);
 
         _pawnController = GetComponent<PlayerCharacterController>();
+
+        if (Sandbox.IsServer)
+        {
+            gameObject.name = "Player_" + InputSource.PlayerId.ToString();
+        }
 
         if (IsInputSource)
         {
             CameraManager.Instance.CurrentCamera = _pawnController.Head.GetComponentInChildren<Camera>();
 
             gameObject.SetLayersRecursive(_localPlayerLayer);
-            GetComponent<HighlightEffect>().highlighted = false;
+            HighlightEffect effect = GetComponent<HighlightEffect>();
+            effect.highlighted = false;
+            effect.UpdateMaterialProperties();
+            effect.UpdateVisibilityState();
 
             if (IsServer)
             {
@@ -120,7 +134,10 @@ public class PlayerNetwork : NetworkBehaviour
 
             if (Sandbox.IsServer)
             {
-                _rigidObject = new GameObject();
+                _rigidObject = new GameObject
+                {
+                    name = "Player_" + InputSource.PlayerId.ToString() + "_Physics"
+                };
                 _rigidObject.transform.parent = gameObject.transform.parent;
                 _rigidObject.layer = _proxyPhysicsMoverLayer;
 
@@ -146,6 +163,10 @@ public class PlayerNetwork : NetworkBehaviour
         PlayerManager.Instance.RemovePlayer(this);
         _connection = null;
         Sandbox.Destroy(Object);
+        if (_rigidObject != null)
+        {
+            Destroy(_rigidObject);
+        }
     }
 
     public override void NetworkUpdate()
@@ -179,7 +200,7 @@ public class PlayerNetwork : NetworkBehaviour
     {
         if (Sandbox.IsServer && FetchInput(out PlayerNetworkInput input))
         {
-            if(!Connected)
+            if (!Connected)
             {
                 Connected = true;
                 Teleporting = true;
@@ -192,7 +213,7 @@ public class PlayerNetwork : NetworkBehaviour
             Rotation = input.Rotation;
             Position = input.Position;
             Mover = input.Mover;
-            
+
             _grounded = input.Grounded;
 
             if (_connection == null)
@@ -212,7 +233,7 @@ public class PlayerNetwork : NetworkBehaviour
                 Ping = 0.0f;
             }
 
-            InputSource.AddInterestBoxArea(new Bounds(transform.position, Vector3.one));
+            InputSource.AddInterestBoxArea(new Bounds(transform.position, _aoiVector));
         }
     }
 

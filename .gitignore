@@ -10,7 +10,7 @@
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
 /[Uu][Ii][Ee]lements[Ss]chema/
-/[Vv]anilla[Ss]aves/
+/[Ss]aves/
 
 # Remove project files
 [Aa]ssets/[Bb]ootstrap.unity
@@ -31,6 +31,11 @@
 [Aa]ssets/[Uu][Ii] [Tt]oolkit.meta
 /[Pp]ackages/
 /[Pp]roject[Ss]ettings/
+
+BUILD_ID
+[Vv]ersion.txt
+app.config
+packages.config
 
 # Custom launch related file
 [Ee]ditor[Ll]aunch.json

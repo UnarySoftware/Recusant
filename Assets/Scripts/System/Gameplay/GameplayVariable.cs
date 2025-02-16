@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class AbstractVariable
 {
-    public Action<int, int> OnChanged;
+    public Action<int> OnChanged;
 
     protected int _id = -1;
 
@@ -12,14 +12,6 @@ public abstract class AbstractVariable
     {
         get { return _id; }
         set { _id = value; }
-    }
-
-    protected int _replicatedId = -1;
-
-    public int ReplicatedId
-    {
-        get { return _replicatedId; }
-        set { _replicatedId = value; }
     }
 
     protected string _name;
@@ -45,12 +37,10 @@ public abstract class AbstractVariable
     public abstract GameplayType GetTypeEnum();
     public abstract Type GetTypeSystem();
     public abstract bool IsOriginal();
+    public abstract void ResetToOriginal();
     public abstract bool IsRanged();
-    public abstract string GetRanges();
-    public virtual void Reset()
-    {
-        _id = -1;
-    }
+    public abstract double GetMinRange();
+    public abstract double GetMaxRange();
 }
 
 // We are using generics for this class to be read from as fast as possible, even if you were to do so in Update()
@@ -96,10 +86,10 @@ public class GameplayVariable<T> : AbstractVariable where T : IComparable, IComp
         return EqualityComparer<T>.Default.Equals(_currentValue, _originalValue);
     }
 
-    public override void Reset()
+    public override void ResetToOriginal()
     {
-        base.Reset();
         _currentValue = _originalValue;
+        OnChanged?.Invoke(_id);
     }
 
     public T Get()
@@ -112,11 +102,15 @@ public class GameplayVariable<T> : AbstractVariable where T : IComparable, IComp
         return value;
     }
 
+    /*
+    There REALLY shouldnt be any legitimate reason to change gameplay variables from code
+    Gameplay variables are meant to be changed only from console or from configs
     public void Set(T value)
     {
         _currentValue = ProcessValue(value);
-        OnChanged?.Invoke(_id, _replicatedId);
+        OnChanged?.Invoke(_id);
     }
+    */
 
     public override void SetObject(object value)
     {
@@ -129,8 +123,16 @@ public class GameplayVariable<T> : AbstractVariable where T : IComparable, IComp
             return;
         }
 
-        _currentValue = (T)Convert.ChangeType(value, _valueSystemType);
-        OnChanged?.Invoke(_id, _replicatedId);
+        T _newValue = ProcessValue((T)Convert.ChangeType(value, _valueSystemType));
+
+        bool changed = !EqualityComparer<T>.Default.Equals(_currentValue, _newValue);
+
+        _currentValue = _newValue;
+
+        if(changed)
+        {
+            OnChanged?.Invoke(_id);
+        }
     }
 
     public override object GetObject()
@@ -143,9 +145,14 @@ public class GameplayVariable<T> : AbstractVariable where T : IComparable, IComp
         return false;
     }
 
-    public override string GetRanges()
+    public override double GetMinRange()
     {
-        return string.Empty;
+        return 0.0;
+    }
+
+    public override double GetMaxRange()
+    {
+        return 0.0;
     }
 
     public GameplayVariable(GameplayGroup group, GameplayFlag flags, T defaultValue, string description)
@@ -166,11 +173,11 @@ public class GameplayVariable<T> : AbstractVariable where T : IComparable, IComp
         _currentValue = defaultValue;
         _originalValue = defaultValue;
 
-        if (Bootstrap.IsRuntime)
+        if (Core.IsRuntime)
         {
-            if (GetType().IsSubclassOf(typeof(GameplayVariableRanged<,>)))
+            if (!GetType().IsSubclassOf(typeof(GameplayVariableRanged<,>)))
             {
-                OnChanged?.Invoke(_id, _replicatedId);
+                OnChanged?.Invoke(_id);
             }
         }
     }
@@ -189,57 +196,24 @@ public class GameplayVariableRanged<T, U> : GameplayVariable<T>
         return true;
     }
 
-    public override string GetRanges()
+    public override double GetMinRange()
     {
         if (!_gotMinMaxes)
         {
-            return string.Empty;
+            return 0.0;
         }
 
-        switch (_valueType)
+        return _valueMin;
+    }
+
+    public override double GetMaxRange()
+    {
+        if (!_gotMinMaxes)
         {
-            case GameplayType.Short:
-                {
-                    return string.Format("[{0}, {1}]", (short)_valueMin, (short)_valueMax);
-                }
-            case GameplayType.UShort:
-                {
-                    return string.Format("[{0}, {1}]", (ushort)_valueMin, (ushort)_valueMax);
-                }
-            case GameplayType.Int:
-                {
-                    return string.Format("[{0}, {1}]", (int)_valueMin, (int)_valueMax);
-                }
-            case GameplayType.UInt:
-                {
-                    return string.Format("[{0}, {1}]", (uint)_valueMin, (uint)_valueMax);
-                }
-            case GameplayType.Long:
-                {
-                    return string.Format("[{0}, {1}]", (long)_valueMin, (long)_valueMax);
-                }
-            case GameplayType.ULong:
-                {
-                    return string.Format("[{0}, {1}]", (ulong)_valueMin, (ulong)_valueMax);
-                }
-            case GameplayType.Double:
-                {
-                    return string.Format("[{0}, {1}]", _valueMin, _valueMax);
-                }
-
-            case GameplayType.Float:
-            case GameplayType.Vector2:
-            case GameplayType.Vector3:
-            case GameplayType.Vector4:
-            case GameplayType.Color:
-                {
-                    return string.Format("[{0}, {1}]", (float)_valueMin, (float)_valueMax);
-                }
-            default:
-                {
-                    return string.Empty;
-                }
+            return 0.0;
         }
+
+        return _valueMax;
     }
 
     public override T ProcessValue(T value)
@@ -360,9 +334,9 @@ public class GameplayVariableRanged<T, U> : GameplayVariable<T>
         _originalValue = ClampWithRanges(defaultValue);
         _currentValue = ClampWithRanges(defaultValue);
 
-        if (Bootstrap.IsRuntime)
+        if (Core.IsRuntime)
         {
-            OnChanged?.Invoke(_id, _replicatedId);
+            OnChanged?.Invoke(_id);
         }
     }
 }

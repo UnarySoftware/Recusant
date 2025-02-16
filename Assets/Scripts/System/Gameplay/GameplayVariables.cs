@@ -1,83 +1,108 @@
-using Netick;
-using Netick.Unity;
 using System.Collections.Generic;
 using System.Linq;
 
-public class GameplayVariables : NetworkBehaviour, ISystem
+public class GameplayVariablesShared : CoreSystemShared
 {
-    public static GameplayVariables Instance = null;
+    public List<AbstractVariable> SubscribedVariables = new();
+}
 
-    private List<AbstractVariable> _replicatedVariables = new();
-
-#pragma warning disable IDE0051
-    [OnChanged(nameof(ReplicatedVariables))]
-    private void OnReplicatedVariablesChanged(OnChangedData onChangedData)
+public class GameplayVariables : CoreSystemNetwork<GameplayVariables, GameplayVariablesShared>
+{
+    public void ResetToOriginal()
     {
-        if(_skippingChange)
+        foreach (var variable in SharedData.SubscribedVariables)
+        {
+            variable.ResetToOriginal();
+        }
+    }
+
+    private void OnVariableChanged(int id)
+    {
+        if (Networking.Instance == null || GameplayVariablesNetwork.Instance == null || Networking.Instance.IsClient)
         {
             return;
         }
 
-        _replicatedVariables[onChangedData.GetArrayChangedElementIndex()]
-            .FromNetwork(ReplicatedVariables[onChangedData.GetArrayChangedElementIndex()]);
-    }
-#pragma warning restore IDE0051
-    
-    [Networked(size: CodeGenerated.GameplayVariableMaxCount)]
-    public readonly NetworkArray<GameplayVariableNetwork> ReplicatedVariables = new(CodeGenerated.GameplayVariableMaxCount);
+        var targetVariable = SharedData.SubscribedVariables[id];
+        var targetNetworkedVariable = GameplayVariablesNetwork.Instance.ReplicatedVariables[id];
 
-    private bool _skippingChange = false;
-
-    private void OnVariableChanged(int id, int replicatedId)
-    {
-        if (Networking.Instance == null || Networking.Instance.IsClient)
+        if (targetVariable.IsOriginal())
         {
-            return;
-        }
-
-        var targetVariable = _replicatedVariables[replicatedId];
-        var networked = targetVariable.ToNetwork();
-        ReplicatedVariables[replicatedId] = networked;
-        _skippingChange = true;
-    }
-
-    [InitDependency(typeof(Networking))]
-    public void Initialize()
-    {
-        // Sort by name in order to get a determenistic ordering for the network indexes
-        var SortedKeys = Reflector.Instance.GameplayUnits.Keys.OrderBy(k => k);
-
-        int idCounter = 0;
-        int idReplicated = 0;
-
-        foreach (var key in SortedKeys)
-        {
-            var Unit = Reflector.Instance.GameplayUnits[key];
-
-            if(Unit.IsVariable)
+            // We want to reset the value to a default state so that newly connecting players wont need to replicate it
+            if (targetNetworkedVariable != default)
             {
-                Unit.Variable.Id = idCounter;
-                idCounter++;
+                GameplayVariablesNetwork.Instance.ReplicatedVariables[id] = default;
+            }
 
-                if (Unit.Variable.GetFlags().HasFlag(GameplayFlag.Replicated))
+            return;
+        }
+
+        var networked = targetVariable.ToNetwork();
+        networked.Changed = true;
+        GameplayVariablesNetwork.Instance.ReplicatedVariables[id] = networked;
+    }
+
+    [InitDependency(typeof(Networking), typeof(GameplayExecutor))]
+    public override void Initialize()
+    {
+        List<string> networkedVariables = new();
+        List<string> nonNetworkedVariables = new();
+
+        foreach (var unit in GameplayExecutor.Instance.GameplayUnits)
+        {
+            if (unit.Value.IsVariable)
+            {
+                if (unit.Value.Variable.GetFlags().HasFlag(GameplayFlag.Replicated))
                 {
-                    _replicatedVariables.Add(Unit.Variable);
-                    _replicatedVariables[idReplicated].ReplicatedId = idReplicated;
-                    _replicatedVariables[idReplicated].OnChanged += OnVariableChanged;
-                    idReplicated++;
+                    networkedVariables.Add(unit.Key);
+                }
+                else
+                {
+                    nonNetworkedVariables.Add(unit.Key);
                 }
             }
         }
 
+        int idCounter = 0;
+
+        var sortedNetworked = networkedVariables.OrderBy(k => k);
+        var sortedNonNetworked = nonNetworkedVariables.OrderBy(k => k);
+
+        foreach (var key in sortedNetworked)
+        {
+            var unit = GameplayExecutor.Instance.GameplayUnits[key];
+
+            unit.Variable.Id = idCounter;
+
+            SharedData.SubscribedVariables.Add(unit.Variable);
+            SharedData.SubscribedVariables[idCounter].Id = idCounter;
+            SharedData.SubscribedVariables[idCounter].OnChanged += OnVariableChanged;
+
+            idCounter++;
+        }
+
+        foreach (var key in sortedNonNetworked)
+        {
+            var unit = GameplayExecutor.Instance.GameplayUnits[key];
+
+            unit.Variable.Id = idCounter;
+
+            idCounter++;
+        }
     }
 
-    public void Deinitialize()
+    public override void PostInitialize()
     {
-        for (int i = 0; i < _replicatedVariables.Count; i++)
+
+    }
+
+    public override void Deinitialize()
+    {
+        for (int i = 0; i < SharedData.SubscribedVariables.Count; i++)
         {
-            if (_replicatedVariables[i].GetFlags().HasFlag(GameplayFlag.Replicated))
+            if (SharedData.SubscribedVariables[i].GetFlags().HasFlag(GameplayFlag.Replicated))
             {
-                _replicatedVariables[i].OnChanged -= OnVariableChanged;
+                SharedData.SubscribedVariables[i].OnChanged -= OnVariableChanged;
             }
         }
     }

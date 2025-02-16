@@ -1,9 +1,7 @@
 using UnityEngine;
 
-public class CameraManager : MonoBehaviour, ISystem
+public class CameraManager : CoreSystem<CameraManager>
 {
-    public static CameraManager Instance = null;
-
     [SerializeField]
     private Camera _currentCamera = null;
 
@@ -19,18 +17,29 @@ public class CameraManager : MonoBehaviour, ISystem
             {
                 _currentCamera.enabled = false;
             }
+
             _currentCamera = value;
-            _currentCamera.enabled = true;
+
+            if (_currentCamera != null)
+            {
+                _currentCamera.enabled = true;
+            }
         }
     }
 
     [InitDependency()]
-    public void Initialize()
+    public override void Initialize()
+    {
+        CurrentCamera = GetComponent<Camera>();
+        CurrentCamera = null;
+    }
+
+    public override void PostInitialize()
     {
 
     }
 
-    public void Deinitialize()
+    public override void Deinitialize()
     {
 
     }

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class MainMenu : UiState
+public class MainMenuState : UiState
 {
     private UIDocument Document;
     private Button HostButton;
@@ -16,11 +16,11 @@ public class MainMenu : UiState
     {
         await Task.Run(() => Thread.Sleep(100));
 
-        if (EditorLaunch.LaunchData.Type == EditorLaunchData.LaunchType.Host)
+        if (Launcher.LaunchData.Type == LaunchData.LaunchType.Host)
         {
             HostButton.Click();
         }
-        else if (EditorLaunch.LaunchData.Type == EditorLaunchData.LaunchType.Client)
+        else if (Launcher.LaunchData.Type == LaunchData.LaunchType.Client)
         {
             ClientButton.Click();
         }
@@ -38,14 +38,14 @@ public class MainMenu : UiState
         HostButton.RegisterCallback<MouseUpEvent>((evt) =>
         {
             Networking.Instance.StartHost();
-            Ui.Instance.GoForward(typeof(Loading));
+            Ui.Instance.GoForward(typeof(LoadingState));
         });
 
         ClientButton = Document.rootVisualElement.Q<Button>("Client");
         ClientButton.RegisterCallback<MouseUpEvent>((evt) =>
         {
             Networking.Instance.StartClient();
-            Ui.Instance.GoForward(typeof(Loading));
+            Ui.Instance.GoForward(typeof(LoadingState));
         });
 
         // TODO: Move this in some other place
