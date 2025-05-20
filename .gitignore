@@ -11,12 +11,15 @@
 /[Uu]ser[Ss]ettings/
 /[Uu][Ii][Ee]lements[Ss]chema/
 /[Ss]aves/
+/[Mm]emory[Cc]aptures/
 
 # Remove project files
 [Aa]ssets/[Bb]ootstrap.unity
 [Aa]ssets/[Bb]ootstrap.unity.meta
 /[Aa]ssets/[Ii]nput/
 [Aa]ssets/[Ii]nput.meta
+/[Aa]ssets/[Ee]ditor/
+[Aa]ssets/[Ee]ditor.meta
 /[Aa]ssets/[Nn]etick/
 [Aa]ssets/[Nn]etick.meta
 /[Aa]ssets/[Pp]lugins/
