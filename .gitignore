@@ -2,55 +2,150 @@
 #
 # Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
 #
-/[Ll]ibrary/
-/[Tt]emp/
-/[Oo]bj/
-/[Bb]uild/
-/[Bb]uilds/
-/[Ll]ogs/
-/[Uu]ser[Ss]ettings/
-/[Uu][Ii][Ee]lements[Ss]chema/
-/[Ss]aves/
-/[Mm]emory[Cc]aptures/
 
-# Remove project files
-[Aa]ssets/[Bb]ootstrap.unity
-[Aa]ssets/[Bb]ootstrap.unity.meta
-/[Aa]ssets/[Ii]nput/
-[Aa]ssets/[Ii]nput.meta
-/[Aa]ssets/[Ee]ditor/
-[Aa]ssets/[Ee]ditor.meta
-/[Aa]ssets/[Nn]etick/
-[Aa]ssets/[Nn]etick.meta
-/[Aa]ssets/[Pp]lugins/
-[Aa]ssets/[Pp]lugins.meta
-/[Aa]ssets/[Rr]ecusant/
-[Aa]ssets/[Rr]ecusant.meta
-/[Aa]ssets/[Tt]emp/
-[Aa]ssets/[Tt]emp.meta
-/[Aa]ssets/[Tt]hirdparty/
-[Aa]ssets/[Tt]hirdparty.meta
-/[Aa]ssets/[Uu][Ii] [Tt]oolkit/
-[Aa]ssets/[Uu][Ii] [Tt]oolkit.meta
-/[Pp]ackages/
-/[Pp]roject[Ss]ettings/
+# Root folders
 
-BUILD_ID
-[Vv]ersion.txt
+/Library/
+/Temp/
+/obj/
+/Mods/
+/ModsCache/
+/Player/
+/PlayerCache/
+/PlayerDebug/
+/PlayerDebugCache/
+/Logs/
+/UserSettings/
+/UiElementsSchema/
+/Saves/
+/MemoryCaptures/
+/Packages/
+/UserSettings/
+/ProjectSettings/
+
+# Asset files
+
+/Assets/EditorAssets/
+Assets/EditorAssets.meta
+Assets/Bootstrap.unity
+Assets/Bootstrap.unity.meta
+/Assets/Input/
+Assets/Input.meta
+/Assets/Netick/
+Assets/Netick.meta
+/Assets/Plugins/
+Assets/Plugins.meta
+/Assets/Temp/
+Assets/Temp.meta
+/Assets/Thirdparty/
+Assets/Thirdparty.meta
+/Assets/UI Toolkit/
+Assets/UI Toolkit.meta
+/Assets/URP/
+Assets/URP.meta
+
+# Mod Files
+
+/Assets/Recusant/Audio/
+Assets/Recusant/Audio.meta
+/Assets/Recusant/Bundles/
+Assets/Recusant/Bundles.meta
+Assets/Recusant/ContentManifest.asset
+Assets/Recusant/ContentManifest.asset.meta
+Assets/Recusant/ModManifest.json
+Assets/Recusant/ModManifest.json.meta
+/Assets/Recusant/Levels/
+Assets/Recusant/Levels.meta
+/Assets/Recusant/Materials/
+Assets/Recusant/Materials.meta
+/Assets/Recusant/Models/
+Assets/Recusant/Models.meta
+/Assets/Recusant/Other/
+Assets/Recusant/Other.meta
+/Assets/Recusant/Particles/
+Assets/Recusant/Particles.meta
+/Assets/Recusant/PrefabsLocal/
+Assets/Recusant/PrefabsLocal.meta
+/Assets/Recusant/PrefabsNetwork/
+Assets/Recusant/PrefabsNetwork.meta
+/Assets/Recusant/ScriptableObjects/
+Assets/Recusant/ScriptableObjects.meta
+/Assets/Recusant/Sound/
+Assets/Recusant/Sound.meta
+/Assets/Recusant/Textures/
+Assets/Recusant/Textures.meta
+/Assets/Recusant/Ui/
+Assets/Recusant/Ui.meta
+
+/Assets/TestMod1/Audio/
+Assets/TestMod1/Audio.meta
+/Assets/TestMod1/Bundles/
+Assets/TestMod1/Bundles.meta
+Assets/TestMod1/ContentManifest.asset
+Assets/TestMod1/ContentManifest.asset.meta
+Assets/TestMod1/ModManifest.json
+Assets/TestMod1/ModManifest.json.meta
+/Assets/TestMod1/Levels/
+Assets/TestMod1/Levels.meta
+/Assets/TestMod1/Materials/
+Assets/TestMod1/Materials.meta
+/Assets/TestMod1/Models/
+Assets/TestMod1/Models.meta
+/Assets/TestMod1/Other/
+Assets/TestMod1/Other.meta
+/Assets/TestMod1/Particles/
+Assets/TestMod1/Particles.meta
+/Assets/TestMod1/PrefabsLocal/
+Assets/TestMod1/PrefabsLocal.meta
+/Assets/TestMod1/PrefabsNetwork/
+Assets/TestMod1/PrefabsNetwork.meta
+/Assets/TestMod1/ScriptableObjects/
+Assets/TestMod1/ScriptableObjects.meta
+/Assets/TestMod1/Sound/
+Assets/TestMod1/Sound.meta
+/Assets/TestMod1/Textures/
+Assets/TestMod1/Textures.meta
+/Assets/TestMod1/Ui/
+Assets/TestMod1/Ui.meta
+
+/Assets/TestMod2/Audio/
+Assets/TestMod2/Audio.meta
+/Assets/TestMod2/Bundles/
+Assets/TestMod2/Bundles.meta
+Assets/TestMod2/ContentManifest.asset
+Assets/TestMod2/ContentManifest.asset.meta
+Assets/TestMod2/ModManifest.json
+Assets/TestMod2/ModManifest.json.meta
+/Assets/TestMod2/Levels/
+Assets/TestMod2/Levels.meta
+/Assets/TestMod2/Materials/
+Assets/TestMod2/Materials.meta
+/Assets/TestMod2/Models/
+Assets/TestMod2/Models.meta
+/Assets/TestMod2/Other/
+Assets/TestMod2/Other.meta
+/Assets/TestMod2/Particles/
+Assets/TestMod2/Particles.meta
+/Assets/TestMod2/PrefabsLocal/
+Assets/TestMod2/PrefabsLocal.meta
+/Assets/TestMod2/PrefabsNetwork/
+Assets/TestMod2/PrefabsNetwork.meta
+/Assets/TestMod2/ScriptableObjects/
+Assets/TestMod2/ScriptableObjects.meta
+/Assets/TestMod2/Sound/
+Assets/TestMod2/Sound.meta
+/Assets/TestMod2/Textures/
+Assets/TestMod2/Textures.meta
+/Assets/TestMod2/Ui/
+Assets/TestMod2/Ui.meta
+
+steam_appid.txt
+UnityVersion.txt
 app.config
 packages.config
 
 # Custom launch related file
-[Ee]ditor[Ll]aunch.json
-
-# Remove unity related meta files
-*.meta
-
-# Custom codegenned fules
-[Aa]ssets/[Ss]cripts/[Ee]ditor/[Ee]ditor.[Gg]en.cs
-[Aa]ssets/[Ss]cripts/[Ee]ditor/[Ee]ditor.[Gg]en.cs.meta
-[Aa]ssets/[Ss]cripts/[Gg]ame.[Gg]en.cs
-[Aa]ssets/[Ss]cripts/[Gg]ame.[Gg]en.cs.meta
+EditorLaunch.json
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
