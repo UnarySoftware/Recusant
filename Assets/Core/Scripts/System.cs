@@ -145,12 +145,18 @@ namespace Core
     {
         protected override void InitializeSystemInternal()
         {
-            Instance = (T)Convert.ChangeType(this, typeof(T));
+            Type type = typeof(T);
+            _instance = (T)Convert.ChangeType(this, type);
+
+            if (_instance == null)
+            {
+                Logger.Instance.Error("Failed to provide an instance to for a networked prefab type " + type.FullName);
+            }
         }
 
         public override void DeinitializeSystemInternal()
         {
-            Instance = null;
+            _instance = null;
         }
 
         private static T _instance = null;

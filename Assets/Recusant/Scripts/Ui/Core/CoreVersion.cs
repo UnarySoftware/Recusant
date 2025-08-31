@@ -2,6 +2,7 @@ using Core;
 using Steamworks;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UIElements;
 
 namespace Recusant
@@ -39,7 +40,24 @@ namespace Recusant
 
             ModManifestFile manifest = ContentLoader.Instance.GetModManifest("Recusant");
 
-            finalString += "Build: " + manifest.BuildNumber + " Date: " + manifest.BuildDate + '\n';
+            string device = "(?)";
+
+            GraphicsDeviceType currentGraphicsAPI = SystemInfo.graphicsDeviceType;
+
+            if (currentGraphicsAPI == GraphicsDeviceType.Vulkan)
+            {
+                device = "(Vulkan)";
+            }
+            else if (currentGraphicsAPI == GraphicsDeviceType.Direct3D11)
+            {
+                device = "(DX11)";
+            }
+            else if (currentGraphicsAPI == GraphicsDeviceType.Direct3D12)
+            {
+                device = "(DX12)";
+            }
+
+            finalString += "Build: " + manifest.BuildNumber + " Date: " + manifest.BuildDate + " " + device + '\n';
             finalString += Launcher.Instance.UnityVersion;
 
             VersionLabel.text = finalString;

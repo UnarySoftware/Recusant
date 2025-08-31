@@ -39,7 +39,7 @@ namespace Recusant
 
         public bool OnConnectedChanged(PlayerConnectedChangedEvent data)
         {
-            if (data.Value && data.Root != null && data.Root.IsInputSource)
+            if (data.Value && data.Root != null)
             {
                 _pawnController.MeshRoot.SetActive(true);
 

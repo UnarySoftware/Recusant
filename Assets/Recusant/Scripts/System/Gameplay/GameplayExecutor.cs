@@ -30,31 +30,23 @@ namespace Recusant
 
     public class GameplayExecutor : SystemNetworkRoot<GameplayExecutor, GameplayExecutorShared>
     {
-        private const int _collectedMessagesMaxCount = 4;
-
         public Dictionary<string, GameplayExecutorShared.GameplayUnit> GameplayUnits { get { return SharedData.GameplayUnits; } }
-
-        // TODO Remove this
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051")]
-        [GameplayCommand(GameplayGroup.Server, GameplayFlag.Replicated, "Spawns cube at coordinates")]
-        [GameplayCommandFloat(1.0f, -10.0f, 10.0f)]
-        public void SpawnCubeCmd(Vector3 coords)
-        {
-            GameObject target = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            target.transform.parent = gameObject.transform;
-            target.transform.position = coords;
-            Core.Logger.Instance.Log("Spawning cube at " + GameplayShared.StringifyVariable(coords, GameplayType.Vector3));
-        }
 
         public void Execute(string line)
         {
-            if (!line.Contains(" "))
-            {
-                Core.Logger.Instance.Error("Invalid variable/command format: " + line);
-                return;
-            }
+            string[] parts;
+            bool hasValue;
 
-            string[] parts = line.Split(new[] { ' ' }, 2);
+            if (line.Contains(' '))
+            {
+                parts = line.Split(new[] { ' ' }, 2);
+                hasValue = true;
+            }
+            else
+            {
+                parts = new string[1] { line };
+                hasValue = false;
+            }
 
             string key = parts[0];
 
@@ -102,30 +94,41 @@ namespace Recusant
                 }
             }
 
-            string value = parts[1];
+            string value;
+            object node = null;
 
-            if (!unit.IsVariable)
+            if (hasValue)
             {
-                value = "[ " + value + " ]";
-            }
+                value = parts[1];
 
-            object node;
+                if (!unit.IsVariable)
+                {
+                    value = "[ " + value + " ]";
+                }
 
-            try
-            {
-                node = JsonSerializer.Deserialize<object>(value);
-            }
-            catch (Exception e)
-            {
-                Core.Logger.Instance.Error("Failed to parse variable/command value: " + e.Message);
-                return;
+                try
+                {
+                    node = JsonSerializer.Deserialize<object>(value);
+                }
+                catch (Exception e)
+                {
+                    Core.Logger.Instance.Error("Failed to parse variable/command value: " + e.Message);
+                    return;
+                }
             }
 
             if (unit.IsVariable)
             {
-                object result = GameplayShared.GetValueFromNode(unit.Variable.GetTypeEnum(), unit.Variable.GetTypeSystem(), node);
-
-                unit.Variable.SetObject(result);
+                if (hasValue)
+                {
+                    object result = GameplayShared.GetValueFromNode(unit.Variable.GetTypeEnum(), unit.Variable.GetTypeSystem(), node);
+                    unit.Variable.SetObject(result);
+                }
+                else
+                {
+                    Core.Logger.Instance.Error("Failed to parse variable/command value: " + key);
+                    return;
+                }
             }
             else
             {
@@ -149,44 +152,49 @@ namespace Recusant
                     return;
                 }
 
-                if (node is not List<object>)
+                object[] callingParams = null;
+
+                if (hasValue)
                 {
-                    Core.Logger.Instance.Error("Failed parsing arguments for command \"" + key + "\"");
-                    return;
-                }
-
-                List<object> array = (List<object>)node;
-
-                if (array.Count != arguments.Count)
-                {
-                    Core.Logger.Instance.Error("Argument count mismatch for command \"" + key + "\"");
-                    return;
-                }
-
-                object[] callingParams = new object[arguments.Count];
-
-                for (int i = 0; i < arguments.Count; i++)
-                {
-                    GameplayCommandRange range = null;
-
-                    if (unit.Command.Ranges[i] is not GameplayCommandIgnore)
+                    if (node is not List<object>)
                     {
-                        range = unit.Command.Ranges[i];
+                        Core.Logger.Instance.Error("Failed parsing arguments for command \"" + key + "\"");
+                        return;
                     }
 
-                    object result;
+                    List<object> array = (List<object>)node;
 
-                    if (range == null)
+                    if (array.Count != arguments.Count)
                     {
-                        result = GameplayShared.GetValueFromNode(arguments[i].gameplayType, arguments[i].systemType, array[i]);
-                    }
-                    else
-                    {
-                        result = GameplayShared.GetValueFromNode(arguments[i].gameplayType, arguments[i].systemType, array[i], range.DefaultValue);
-                        result = GameplayShared.ClampWithRanges(result, arguments[i].gameplayType, range.Min, range.Max);
+                        Core.Logger.Instance.Error("Argument count mismatch for command \"" + key + "\"");
+                        return;
                     }
 
-                    callingParams[i] = result;
+                    callingParams = new object[arguments.Count];
+
+                    for (int i = 0; i < arguments.Count; i++)
+                    {
+                        GameplayCommandRange range = null;
+
+                        if (unit.Command.Ranges[i] is not GameplayCommandIgnore)
+                        {
+                            range = unit.Command.Ranges[i];
+                        }
+
+                        object result;
+
+                        if (range == null)
+                        {
+                            result = GameplayShared.GetValueFromNode(arguments[i].gameplayType, arguments[i].systemType, array[i]);
+                        }
+                        else
+                        {
+                            result = GameplayShared.GetValueFromNode(arguments[i].gameplayType, arguments[i].systemType, array[i], range.DefaultValue);
+                            result = GameplayShared.ClampWithRanges(result, arguments[i].gameplayType, range.Min, range.Max);
+                        }
+
+                        callingParams[i] = result;
+                    }
                 }
 
                 SystemBasic targetSystem = (SystemBasic)Systems.Instance.GetSystem(unit.Command.SystemType);
@@ -197,7 +205,14 @@ namespace Recusant
                     return;
                 }
 
-                unit.Command.Method.Invoke(targetSystem, callingParams);
+                if (hasValue)
+                {
+                    unit.Command.Method.Invoke(targetSystem, callingParams);
+                }
+                else
+                {
+                    unit.Command.Method.Invoke(targetSystem, null);
+                }
             }
         }
 
@@ -244,7 +259,17 @@ namespace Recusant
 
         public override void Initialize()
         {
-            Type[] types = typeof(Bootstrap).Assembly.GetTypes();
+            List<Type> types = new();
+
+            foreach (var assembly in ContentLoader.Instance.GetLoadedAssemblies())
+            {
+                Type[] assemblyTypes = assembly.GetTypes();
+
+                foreach (var assemblyType in assemblyTypes)
+                {
+                    types.Add(assemblyType);
+                }
+            }
 
             foreach (Type type in types)
             {
@@ -298,11 +323,6 @@ namespace Recusant
 
                 foreach (MethodInfo method in methods)
                 {
-                    if (!method.Name.EndsWith("Cmd"))
-                    {
-                        continue;
-                    }
-
                     if (method.ReturnType != typeof(void))
                     {
                         continue;
@@ -357,7 +377,7 @@ namespace Recusant
 
                     if (validRanges && info.Command != null && info.Method != null && info.SystemType != null)
                     {
-                        SharedData.GameplayUnits[info.Command.Group + "." + type.FullName + "." + method.Name[..^3]] = new GameplayExecutorShared.GameplayUnit()
+                        SharedData.GameplayUnits[info.Command.Group + "." + type.FullName + "." + method.Name] = new GameplayExecutorShared.GameplayUnit()
                         {
                             IsVariable = false,
                             Command = info

@@ -25,6 +25,7 @@ namespace Recusant
         {
             if (data.CurrentCount != 0 && data.TargetCount != 0)
             {
+                SteamAchievementManager.Instance.GiveAchievement("FinishedGame");
                 _transitionLabel.style.display = DisplayStyle.Flex;
                 _transitionLabel.text = $"Waiting for players( {data.CurrentCount} / {data.TargetCount} )";
             }

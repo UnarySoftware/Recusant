@@ -17,7 +17,6 @@ namespace Recusant
 
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051")]
         [Rpc(source: RpcPeers.Everyone, target: RpcPeers.Owner, isReliable: true, localInvoke: false)]
         public void SendCmd(NetworkString128 line, RpcContext ctx = default)
         {
@@ -51,13 +50,13 @@ namespace Recusant
                 counter++;
             }
 
-            RpcRelay relay = RpcDispatcher.Instance.GetRelay(connection);
+            RecieveCmdResult(connection, types, lines, stackTraces);
+        }
 
-            if (relay != null)
-            {
-                relay.RecieveCmdResult(types, lines, stackTraces);
-            }
-
+        [Rpc(source: RpcPeers.Owner, target: RpcPeers.Everyone, isReliable: true, localInvoke: false)]
+        public void RecieveCmdResult([RpcTarget] NetworkPlayerId target, NetworkArrayStruct4<Logger.LogType> types, NetworkArrayStruct4<NetworkString128> lines, NetworkArrayStruct4<NetworkString256> stackTraces)
+        {
+            GameplayExecutor.Instance.RecieveResult(types, lines, stackTraces);
         }
     }
 }

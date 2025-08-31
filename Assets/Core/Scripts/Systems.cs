@@ -219,6 +219,12 @@ namespace Core
 
                 if (entry.EntryType == EntryType.NetworkPrefab)
                 {
+                    // We are not in a networked context yet, cant request networked managers
+                    if(_sandbox == null)
+                    {
+                        return null;
+                    }
+
                     NetworkObject networkObject = _sandbox.NetworkInstantiate(entry.NetworkPrefab, Vector3.zero, Quaternion.identity);
                     entry.GameObject = networkObject.gameObject;
                     entry.NetworkPrefabBase = entry.GameObject.GetComponent<SystemPrefabBase>();

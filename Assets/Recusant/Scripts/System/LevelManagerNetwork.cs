@@ -1,14 +1,11 @@
 using Core;
 using Netick;
-using System.Diagnostics;
 using UnityEngine.SceneManagement;
 
 namespace Recusant
 {
     public class LevelManagerNetwork : SystemNetworkPrefab<LevelManagerNetwork, LevelManagerShared>
     {
-        private int _currentCount = 0;
-
         [Networked]
         public int CurrentCount { get; set; } = 0;
 
@@ -29,15 +26,6 @@ namespace Recusant
             UpdateCounts();
         }
 
-        public override void NetworkFixedUpdate()
-        {
-            if (CurrentCount != _currentCount)
-            {
-                Logger.Instance.Log("Changed to: " + CurrentCount);
-                _currentCount = CurrentCount;
-            }
-        }
-
 #pragma warning restore IDE0051
 
         public override void Initialize()
@@ -47,8 +35,8 @@ namespace Recusant
                 return;
             }
 
-            //NetworkPlayerJoinedEvent.Instance.Subscribe(OnPlayerJoined, this);
-            //NetworkPlayerLeftEvent.Instance.Subscribe(OnPlayerLeft, this);
+            NetworkPlayerJoinedEvent.Instance.Subscribe(OnPlayerJoined, this);
+            NetworkPlayerLeftEvent.Instance.Subscribe(OnPlayerLeft, this);
 
             TargetCount = Sandbox.Players.Count;
         }
@@ -62,20 +50,20 @@ namespace Recusant
                 return;
             }
 
-            //NetworkPlayerJoinedEvent.Instance.Unsubscribe(this);
-            //NetworkPlayerLeftEvent.Instance.Unsubscribe(this);
+            NetworkPlayerJoinedEvent.Instance.Unsubscribe(this);
+            NetworkPlayerLeftEvent.Instance.Unsubscribe(this);
         }
 
         private void UpdateCounts()
         {
-            //LevelTransitionEvent.Instance.Publish(CurrentCount, TargetCount);
+            LevelTransitionEvent.Instance.Publish(CurrentCount, TargetCount);
 
             if (NetworkManager.Instance.IsClient)
             {
                 return;
             }
 
-            if(LevelManager.Instance == null || LevelManager.Instance.LevelData == null)
+            if (LevelManager.Instance == null || LevelManager.Instance.LevelData == null)
             {
                 return;
             }
@@ -87,12 +75,10 @@ namespace Recusant
             if (CurrentCount == TargetCount && validLevel)
             {
                 // TODO Move this to a custom method
-                NetworkManager.Instance.Sandbox.LoadCustomSceneAsync(NetickSceneHandler.Instance.GetSceneIndex(levelName), 
+                NetworkManager.Instance.Sandbox.LoadCustomSceneAsync(NetickSceneHandler.Instance.GetSceneIndex(levelName),
                     new() { loadSceneMode = LoadSceneMode.Single, localPhysicsMode = LocalPhysicsMode.Physics3D });
             }
         }
-
-#pragma warning disable UNT0006
 
         private bool OnPlayerJoined(NetworkPlayerJoinedEvent data)
         {
@@ -107,8 +93,6 @@ namespace Recusant
             UpdateCounts();
             return true;
         }
-
-#pragma warning restore UNT0006
 
     }
 }
