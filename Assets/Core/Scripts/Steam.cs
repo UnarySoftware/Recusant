@@ -132,7 +132,7 @@ namespace Core
                 return string.Empty;
             }
 
-            // In order to unnecessarily strain Steamworks here we determine root path for all mods
+            // In order to not strain Steamworks unnecessarily here, we determine root path for all mods
             // by requesting a single workshop mod and using its parent folder for further parsing
 
             uint subscribed = SteamUGC.GetNumSubscribedItems();

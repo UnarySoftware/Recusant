@@ -63,12 +63,19 @@ namespace Recusant.Editor
             {
                 targetObject = (UnityEngine.Object)internalObject;
             }
-            else if(objectBase.Path != string.Empty && internalObject == null)
+            else if (objectBase.Path != string.Empty && internalObject == null)
             {
                 targetObject = AssetDatabase.LoadAssetAtPath(objectBase.Path, targetType);
+
+                if (targetObject == null)
+                {
+                    Debug.LogError("We have failed to resolve ScriptingObject at path \"" + objectBase.Path + "\"");
+                    return;
+                }
+
                 objectBase.SetValueInternal(targetObject);
             }
-            
+
             EditorGUI.BeginChangeCheck();
 
             UnityEngine.Object selection = EditorGUI.ObjectField(position, property.displayName, targetObject, targetType, false);
