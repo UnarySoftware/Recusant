@@ -60,7 +60,7 @@ namespace Recusant
             }
 
             target.NetworkId = networkId;
-            target.PrecacheInternal();
+            target.Precache();
 
             return networkId;
         }
