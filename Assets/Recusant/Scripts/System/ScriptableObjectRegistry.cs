@@ -1,27 +1,33 @@
 using Core;
-using System;
+using NUnit.Framework.Interfaces;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Recusant
 {
     public class ScriptableObjectRegistry : System<ScriptableObjectRegistry>
     {
-        private readonly Dictionary<Guid, BaseScriptableObject> _registryDictionary = new();
-
-        [AssetInject("Assets/Recusant/ScriptableObjects/ScriptableObjectRegistryData.asset")]
-        private readonly ScriptableObjectRegistryData _registryData = null;
+        private readonly Dictionary<string, int> _pathToNetwork = new();
+        private readonly Dictionary<int, string> _networkToPath = new();
 
         public override void Initialize()
         {
-            int IdCounter = 0;
+            List<string> paths = ContentLoader.Instance.GetAssetPaths("ScriptableObjects");
 
-            foreach (var entry in _registryData.Entries)
+            if(paths.Count == 0)
             {
-                entry.IndexId = IdCounter;
-                IdCounter++;
+                Logger.Instance.Warning("ContentLoader failed to return any ScriptableObjects");
+                return;
+            }
 
-                _registryDictionary[entry.UniqueId] = entry;
+            paths.Sort();
+
+            int networkId = 1; // 0 is reserved for the default value
+
+            foreach (var path in paths)
+            {
+                _pathToNetwork[path] = networkId;
+                _networkToPath[networkId] = path;
+                networkId++;
             }
         }
 
@@ -35,24 +41,60 @@ namespace Recusant
 
         }
 
-        public T GetObject<T>(int indexId) where T : BaseScriptableObject
+        public int GetNetworkId(string path)
         {
-            if (indexId < 0 && indexId >= _registryData.Entries.Length)
+            if( _pathToNetwork.TryGetValue(path, out int result))
             {
-                return null;
+                return result;
             }
 
-            return (T)_registryData.Entries[indexId];
+            return 0;
         }
 
-        public T GetObject<T>(Guid uniqueId) where T : BaseScriptableObject
+        private int AssignNetworkId(BaseScriptableObject target, string path)
         {
-            if (_registryDictionary.TryGetValue(uniqueId, out var entry))
+            if (!_pathToNetwork.TryGetValue(path, out var networkId))
             {
-                return (T)entry;
+                Logger.Instance.Error("ScriptableObject's path \"" + path + "\" is missing from the registry");
+                return 0;
             }
 
-            return null;
+            target.NetworkId = networkId;
+            target.PrecacheInternal();
+
+            return networkId;
+        }
+
+        public bool LoadObject<T>(string path, out T result) where T : BaseScriptableObject
+        {
+            if (!_pathToNetwork.TryGetValue(path, out var networkId))
+            {
+                result = null;
+                return false;
+            }
+
+            result = ContentLoader.Instance.LoadAsset<T>(path);
+            AssignNetworkId(result, path);
+            return true;
+        }
+
+        public bool LoadObject<T>(int networkId, out T result) where T : BaseScriptableObject
+        {
+            if (networkId < 1 || networkId >= _networkToPath.Count)
+            {
+                result = null;
+                return false;
+            }
+
+            if(!_networkToPath.TryGetValue(networkId, out var path))
+            {
+                result = null;
+                return false;
+            }
+
+            result = ContentLoader.Instance.LoadAsset<T>(path);
+            AssignNetworkId(result, path);
+            return true;
         }
     }
 }

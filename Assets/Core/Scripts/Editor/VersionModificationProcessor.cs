@@ -9,7 +9,7 @@ namespace Core.Editor
     {
         public static string[] OnWillSaveAssets(string[] paths)
         {
-            ModVersionUpdater.ProcessVersions(paths.ToList());
+            VersionUpdater.ProcessVersions(paths.ToList());
             return paths;
         }
     }

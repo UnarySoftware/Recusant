@@ -7,6 +7,7 @@ namespace Recusant
     [Networked]
     public struct PlayerNetworkSentInput : INetworkInput
     {
+        // Movement
         [Networked]
         public int AiTriangle { get; set; }
         [Networked]
@@ -18,7 +19,7 @@ namespace Recusant
         [Networked]
         public NetworkBool Teleporting { get; set; }
         [Networked]
-        public bool Grounded { get; set; }
+        public NetworkBool Grounded { get; set; }
     }
 
     public class PlayerNetworkInput : NetworkBehaviour

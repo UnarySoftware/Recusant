@@ -9,7 +9,7 @@ using Utf8Json;
 
 namespace Core.Editor
 {
-    public class ModVersionUpdater
+    public class VersionUpdater
     {
         public static void ProcessVersions(List<string> assets)
         {

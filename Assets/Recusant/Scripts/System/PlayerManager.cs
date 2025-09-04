@@ -66,14 +66,12 @@ namespace Recusant
             return true;
         }
 
-        public void SpawnPlayer(NetworkSandbox sandbox, NetworkPlayerId id, string name = "")
+        public void SpawnPlayer(NetworkSandbox sandbox, NetworkPlayerId id, string name = "???")
         {
             Vector3 position = _spawnPoints[_spawnCounter].transform.position;
             Quaternion rotation = _spawnPoints[_spawnCounter].GetValidRotation();
 
             var spawnedPlayer = sandbox.NetworkInstantiate(PlayerPrefab, position, rotation, id);
-
-            spawnedPlayer.GetComponent<PlayerCharacterController>().Teleport(position, rotation);
 
             _spawnCounter++;
 

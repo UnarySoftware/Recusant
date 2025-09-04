@@ -27,7 +27,7 @@ namespace Core.Editor
                 modifiedFiles.Add(movedFromAssetPaths[i].Replace("\\", "/"));
             }
 
-            ModVersionUpdater.ProcessVersions(modifiedFiles);
+            VersionUpdater.ProcessVersions(modifiedFiles);
         }
     }
 }

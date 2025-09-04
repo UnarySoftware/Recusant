@@ -1,6 +1,7 @@
 using UnityEngine;
 using KinematicCharacterController;
 using Netick.Unity;
+using Netick;
 
 namespace Recusant
 {
@@ -86,8 +87,11 @@ namespace Recusant
             // Assign to motor
             Motor.enabled = true;
             Motor.CharacterController = this;
+
             _spawnPosition = transform.position;
-            _spawnRotation = Head.transform.localRotation;
+            _spawnRotation = transform.rotation;
+
+            Teleport(_spawnPosition, _spawnRotation, false);
         }
 
         public void Teleport(Vector3 position, Quaternion rotation, bool PreserveVelocity = false)
