@@ -16,15 +16,13 @@ namespace Recusant
     {
         public int OnlineProviderPort { get; set; } = 0;
 
-        [AssetInject("Assets/Recusant/Other/LiteNet.asset")]
+        [AssetInject("other/litenet.asset")]
         public LiteNetLibTransportProvider OfflineTransportProvider;
 
-        [AssetInject("Assets/Recusant/Other/Steamworks.asset")]
+        [AssetInject("other/steamworks.asset")]
         public SteamworksTransportProvider OnlineTransportProvider;
 
         public bool IsRunning { get; private set; } = false;
-
-        private NetickConfig _config;
 
         public NetworkSandbox Sandbox { get; private set; } = null;
 
@@ -36,59 +34,76 @@ namespace Recusant
 
         public const int AreaOfInterestCellSize = 125;
 
-        private void InitConfig()
+        public GameObject ResolveGameObject(GameObject unresolvedObject)
         {
-            _config = Network.CloneDefaultConfig();
+            string path = ContentLoader.Instance.GetInstancePath(unresolvedObject);
+
+            if(_resolver.TryGetValue(path, out var resolved))
+            {
+                return resolved;
+            }
+
+            return null;
+        }
+
+        // TODO Implement general pooling solution
+        Dictionary<string, GameObject> _resolver = new();
+
+        private NetickConfig InitConfig()
+        {
+            NetickConfig config = Network.CloneDefaultConfig();
 
             // General
 
-            _config.TickRate = 20;
-            _config.ServerDivisor = 1;
-            _config.MaxPlayers = 4;
-            _config.MaxObjects = 2048;
-            _config.MaxAdditiveScenes = 1;
-            _config.PhysicsPrediction = false;
-            _config.PhysicsType = PhysicsType.Physics3D;
-            _config.InputReuseAtLowFPS = true;
-            _config.InvokeUpdate = true;
-            _config.InvokeRenderInHeadless = false;
-            _config.RenderInvokeOrder = NetworkRenderInvokeOrder.LateUpdate;
-            _config.EnableLogging = true;
-            _config.EnableProfiling = false;
+            config.TickRate = 20;
+            config.ServerDivisor = 1;
+            config.MaxPlayers = 4;
+            config.MaxObjects = 2048;
+            config.MaxAdditiveScenes = 1;
+            config.PhysicsPrediction = false;
+            config.PhysicsType = PhysicsType.Physics3D;
+            config.InputReuseAtLowFPS = true;
+            config.InvokeUpdate = true;
+            config.InvokeRenderInHeadless = false;
+            config.RenderInvokeOrder = NetworkRenderInvokeOrder.LateUpdate;
+            config.EnableLogging = true;
+            config.EnableProfiling = false;
 
             // Interest Management
 
-            _config.EnableInterestManagement = true;
-            _config.EnableNarrowphaseFiltering = false;
-            _config.CustomGroupCount = 0;
-            _config.WorldSize = new(5000.0f, 1.0f, 5000.0f);
-            _config.AoILayerCount = 1;
-            _config.AoILayer0CellSize = AreaOfInterestCellSize;
-            _config.RenderWorldGrid = false;
+            config.EnableInterestManagement = true;
+            config.EnableNarrowphaseFiltering = false;
+            config.CustomGroupCount = 0;
+            config.WorldSize = new(5000.0f, 1.0f, 5000.0f);
+            config.AoILayerCount = 1;
+            config.AoILayer0CellSize = AreaOfInterestCellSize;
+            config.RenderWorldGrid = false;
 
             // Lag Compensation
 
-            _config.EnableLagCompensation = false;
+            config.EnableLagCompensation = false;
 
             // Advanced
 
-            _config.MaxSendableDataSize = 50000;
-            _config.StateAllocatorBlockSize = 131072 * 4;
-            _config.MetaAllocatorBlockSize = 1048576 * 4;
-            _config.FastSerialization = true;
-            _config.EnableMultithreading = false;
-            _config.AggressivePreAllocation = false;
-            _config.MaxAllowedTimestep = 0.1f;
-            _config.MaxPredictedTicks = 16;
-            _config.IncludeInactiveObjects = false;
+            config.MaxSendableDataSize = 50000;
+            config.StateAllocatorBlockSize = 131072 * 4;
+            config.MetaAllocatorBlockSize = 1048576 * 4;
+            config.FastSerialization = true;
+            config.EnableMultithreading = false;
+            config.AggressivePreAllocation = false;
+            config.MaxAllowedTimestep = 0.1f;
+            config.MaxPredictedTicks = 16;
+            config.IncludeInactiveObjects = false;
 
-            // TODO Load additional mods
-            List<GameObject> prefabs = ContentLoader.Instance.LoadAssets<GameObject>("PrefabsNetwork");
+            _resolver.Clear();
 
+            List<string> paths = ContentLoader.Instance.GetAssetPaths("PrefabsNetwork");
             List<NetworkObject> objects = new();
 
-            foreach (var prefab in prefabs)
+            foreach (var path in paths)
             {
+                GameObject prefab = ContentLoader.Instance.LoadAsset<GameObject>(path);
+                _resolver[path] = prefab;
                 objects.Add(prefab.GetComponent<NetworkObject>());
             }
 
@@ -102,7 +117,9 @@ namespace Recusant
                 }
             }
 
-            _config.Prefabs = objects;
+            config.Prefabs = objects;
+
+            return config;
         }
 
         public override void Initialize()
@@ -112,7 +129,7 @@ namespace Recusant
 
         public override void PostInitialize()
         {
-            InitConfig();
+
         }
 
         public override void Deinitialize()
@@ -171,11 +188,11 @@ namespace Recusant
             if (startOnline)
             {
                 OnlineProviderPort = UnityEngine.Random.Range(53000, 55000);
-                Sandbox = Network.StartAsHost(OnlineTransportProvider, OnlineProviderPort, _sandboxPrefab, _config);
+                Sandbox = Network.StartAsHost(OnlineTransportProvider, OnlineProviderPort, _sandboxPrefab, InitConfig());
             }
             else
             {
-                Sandbox = Network.StartAsHost(OfflineTransportProvider, 53495, _sandboxPrefab, _config);
+                Sandbox = Network.StartAsHost(OfflineTransportProvider, 53495, _sandboxPrefab, InitConfig());
             }
 
             Subscribe();
@@ -200,11 +217,11 @@ namespace Recusant
 
             if (startOnline)
             {
-                Sandbox = Network.StartAsClient(OnlineTransportProvider, UnityEngine.Random.Range(53000, 55000), _sandboxPrefab, _config);
+                Sandbox = Network.StartAsClient(OnlineTransportProvider, UnityEngine.Random.Range(53000, 55000), _sandboxPrefab, InitConfig());
             }
             else
             {
-                Sandbox = Network.StartAsClient(OfflineTransportProvider, 53555, _sandboxPrefab, _config);
+                Sandbox = Network.StartAsClient(OfflineTransportProvider, 53555, _sandboxPrefab, InitConfig());
             }
 
             Subscribe();

@@ -17,9 +17,9 @@ namespace Core.Editor
 
             foreach (var file in assets)
             {
-                string targetFile = file.Replace('\\', '/');
+                string targetFile = file.Replace('\\', '/').ToLower();
 
-                if(targetFile.EndsWith("/ModManifest.json"))
+                if(targetFile.EndsWith("/modmanifest.json"))
                 {
                     continue;
                 }
@@ -36,7 +36,7 @@ namespace Core.Editor
                     continue;
                 }
 
-                if (fileParts[0] != "Assets")
+                if (fileParts[0].ToLower() != "assets")
                 {
                     continue;
                 }
@@ -51,7 +51,7 @@ namespace Core.Editor
 
             foreach (var mod in modFolders)
             {
-                string filePath = "Assets/" + mod + "/ModManifest.json";
+                string filePath = "assets/" + mod + "/modmanifest.json";
 
                 if (!File.Exists(filePath))
                 {

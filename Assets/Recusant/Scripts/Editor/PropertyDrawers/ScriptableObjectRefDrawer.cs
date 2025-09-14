@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor;
 using System;
 using System.Reflection;
+using Core;
 
 namespace Recusant.Editor
 {
@@ -32,6 +33,14 @@ namespace Recusant.Editor
             TypeInfo typeInfo = type.GetTypeInfo();
 
             return typeInfo.GenericTypeArguments[0];
+        }
+
+        private void MarkDirty(SerializedProperty property)
+        {
+            foreach(var targetObject in property.serializedObject.targetObjects)
+            {
+                EditorUtility.SetDirty(targetObject);
+            }
         }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -63,13 +72,16 @@ namespace Recusant.Editor
             {
                 targetObject = (UnityEngine.Object)internalObject;
             }
-            else if (objectBase.Path != string.Empty && internalObject == null)
+            else if (internalObject == null && !objectBase.UniqueId.IsDefault())
             {
-                targetObject = AssetDatabase.LoadAssetAtPath(objectBase.Path, targetType);
+                targetObject = AssetDatabase.LoadAssetByGUID(objectBase.UniqueId.Value.ToUnity(), targetType);
 
                 if (targetObject == null)
                 {
-                    Debug.LogError("We have failed to resolve ScriptingObject at path \"" + objectBase.Path + "\"");
+                    Debug.LogError("We have failed to resolve ScriptingObject with GUID \"" + objectBase.UniqueId.Value + "\"");
+                    objectBase.UniqueId.Value = Guid.Empty;
+                    property.boxedValue = objectBase;
+                    MarkDirty(property);
                     return;
                 }
 
@@ -83,9 +95,10 @@ namespace Recusant.Editor
             if (EditorGUI.EndChangeCheck())
             {
                 string assetPath = AssetDatabase.GetAssetPath(selection).Replace("\\", "/");
-                objectBase.Path = assetPath;
+                objectBase.UniqueId.Value = AssetDatabase.GUIDFromAssetPath(assetPath).ToSystem();
                 objectBase.SetValueInternal(selection);
                 property.boxedValue = objectBase;
+                MarkDirty(property);
             }
         }
     }

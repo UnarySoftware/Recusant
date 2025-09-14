@@ -11,7 +11,7 @@ namespace Recusant
 
         public override void NetworkAwake()
         {
-            DrillDataTestNetworked = new(First.Get());
+            DrillDataTestNetworked = new(First.Value);
         }
 
         [Networked]
@@ -46,12 +46,12 @@ namespace Recusant
                 if (isFirst)
                 {
                     isFirst = false;
-                    DrillDataTestNetworked = new(Second.Get());
+                    DrillDataTestNetworked = new(Second.Value);
                 }
                 else
                 {
                     isFirst = true;
-                    DrillDataTestNetworked = new(First.Get());
+                    DrillDataTestNetworked = new(First.Value);
                 }
             }
         }

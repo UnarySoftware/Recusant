@@ -150,7 +150,9 @@ namespace Core
                         {
                             UnityEngine.Object loadedAsset = ContentLoader.Instance.LoadAsset<UnityEngine.Object>(asset.Path);
 
-                            if(loadedAsset != null)
+                            ContentLoader.Instance.RegisterInstancePath(loadedAsset, asset.Path);
+
+                            if (loadedAsset != null)
                             {
                                 field.SetValue(target, loadedAsset);
                             }
@@ -353,7 +355,9 @@ namespace Core
 
                         if (entry.PrefabInitialization != null)
                         {
-                            gameObject = GameObject.Instantiate(ContentLoader.Instance.LoadAsset<GameObject>(entry.PrefabInitialization), modRoot.transform);
+                            GameObject target = ContentLoader.Instance.LoadAsset<GameObject>(entry.PrefabInitialization);
+                            ContentLoader.Instance.RegisterInstancePath(target, entry.PrefabInitialization);
+                            gameObject = GameObject.Instantiate(target, modRoot.transform);
                             gameObject.name = splitFullName[^1];
                             entry.Basic = (SystemBasic)gameObject.GetComponent(entry.SystemType);
                         }

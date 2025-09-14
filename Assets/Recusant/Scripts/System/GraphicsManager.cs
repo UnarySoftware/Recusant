@@ -51,7 +51,9 @@ namespace Recusant
         private void ApplySettings()
         {
             Application.runInBackground = true;
-            Application.targetFrameRate = Settings.TargetFps;
+            // !!!
+            //Application.targetFrameRate = Settings.TargetFps;
+            Application.targetFrameRate = 99999;
         }
     }
 }

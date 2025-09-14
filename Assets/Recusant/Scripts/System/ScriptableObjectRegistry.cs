@@ -1,5 +1,5 @@
 using Core;
-using NUnit.Framework.Interfaces;
+using System;
 using System.Collections.Generic;
 
 namespace Recusant
@@ -63,6 +63,11 @@ namespace Recusant
             target.Precache();
 
             return networkId;
+        }
+
+        public bool LoadObject<T>(Guid guid, out T result) where T : BaseScriptableObject
+        {
+            return LoadObject(ContentLoader.Instance.GetPathFromGuid(guid), out result);
         }
 
         public bool LoadObject<T>(string path, out T result) where T : BaseScriptableObject

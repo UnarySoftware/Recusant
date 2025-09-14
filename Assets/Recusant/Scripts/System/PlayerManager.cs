@@ -15,7 +15,7 @@ namespace Recusant
 
     public class PlayerManager : SystemNetworkRoot<PlayerManager, PlayerManagerShared>
     {
-        [AssetInject("Assets/Recusant/PrefabsNetwork/Player.prefab")]
+        [AssetInject("prefabsnetwork/player.prefab")]
         public GameObject PlayerPrefab = null;
 
         [HideInInspector]
@@ -71,7 +71,7 @@ namespace Recusant
             Vector3 position = _spawnPoints[_spawnCounter].transform.position;
             Quaternion rotation = _spawnPoints[_spawnCounter].GetValidRotation();
 
-            var spawnedPlayer = sandbox.NetworkInstantiate(PlayerPrefab, position, rotation, id);
+            var spawnedPlayer = sandbox.NetworkInstantiate(NetworkManager.Instance.ResolveGameObject(PlayerPrefab), position, rotation, id);
 
             _spawnCounter++;
 

@@ -1,3 +1,4 @@
+using Core;
 using System;
 
 namespace Recusant
@@ -29,39 +30,25 @@ namespace Recusant
         [NonSerialized]
         private T _value = null;
 
-        public ScriptableObjectRef(string value) : base(value)
+        public ScriptableObjectRef(Guid value) : base(value)
         {
         }
 
-        public T Get()
+        public T Value
         {
-            if (_value != null)
+            get
             {
-                return _value;
-            }
-
-            if (Path != string.Empty)
-            {
-                if(!ScriptableObjectRegistry.Instance.LoadObject<T>(Path, out _value))
+                if (_value != null)
                 {
-                    Core.Logger.Instance.Error("Failed to resolve ScriptableObject reference with path \"" + Path + "\"");
+                    return _value;
                 }
-            }
-            else
-            {
-                Core.Logger.Instance.Error("Failed to resolve ScriptableObject reference");
-            }
 
-            return _value;
-        }
+                if (!ScriptableObjectRegistry.Instance.LoadObject(UniqueId, out _value))
+                {
+                    Logger.Instance.Error("Failed to resolve ScriptableObject reference with GUID \"" + UniqueId.Value.ToString() + "\"");
+                }
 
-        public void Set(T value, string path)
-        {
-            _value = value;
-
-            if (path != string.Empty)
-            {
-                Path = path;
+                return _value;
             }
         }
     }

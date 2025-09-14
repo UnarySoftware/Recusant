@@ -1,13 +1,12 @@
-using Netick;
+using Core;
 using System;
 
 namespace Recusant
 {
     [Serializable]
-    [Networked]
     public abstract class ScriptableObjectBase
     {
-        public string Path = string.Empty;
+        public SerializableGuid UniqueId;
 
 #if UNITY_EDITOR
 
@@ -18,14 +17,9 @@ namespace Recusant
 
         protected abstract void ResetValue();
 
-        public ScriptableObjectBase(string value)
+        public ScriptableObjectBase(Guid value)
         {
-            Path = value;
-
-            if (ScriptableObjectRegistry.Instance == null)
-            {
-                return;
-            }
+            UniqueId = value;
         }
     }
 }

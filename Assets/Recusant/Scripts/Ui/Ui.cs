@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 
 namespace Recusant
 {
-    [PrefabInject("Assets/Recusant/PrefabsLocal/Ui.prefab")]
+    [PrefabInject("prefabslocal/ui.prefab")]
     public sealed class Ui : System<Ui>
     {
         private readonly List<UiState> _uiStatesList = new();

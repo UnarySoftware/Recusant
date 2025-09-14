@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.Build.Reporting;
 using UnityEngine;
 using Utf8Json;
 
@@ -12,11 +13,19 @@ namespace Core.Editor
 {
     public class ScriptingAssembliesData
     {
+#pragma warning disable IDE1006
         public List<string> names { get; set; }
         public List<int> types { get; set; }
+#pragma warning restore IDE1006
     }
 
-    // TODO Fix folder paths in this class, its a mess rn
+    public struct ContentManifest
+    {
+        public string Name;
+        public List<string> AssetPaths;
+        public List<string> CapitalizedPaths;
+    }
+
     public class EditorBuilding
     {
         // Why isnt this a part of the language yet?
@@ -49,56 +58,101 @@ namespace Core.Editor
             }
         }
 
-        private static Tuple<List<ContentManifest>, List<ModManifestFile>> BuildMods(string modsDir, List<string> selectedMods)
+        private static List<ContentManifest> BuildManifests()
         {
-            var manifests = ContentLoader.BuildManifests();
+            string[] directories = Directory.GetDirectories("Assets");
 
-            List<AssetBundleBuild> definitions = new();
+            List<ContentManifest> manifests = new();
 
-            foreach (var contentManifest in manifests.Item1)
+            foreach (var directory in directories)
             {
-                Dictionary<string, HashSet<string>> typeQueue = new();
+                string directoryPath = directory.Replace("\\", "/");
 
-                foreach (var entry in contentManifest.Entries)
+                if (!File.Exists(directoryPath + "/ModManifest.json"))
                 {
-                    if (!typeQueue.TryGetValue(entry.Type, out var entries))
-                    {
-                        entries = new();
-                        typeQueue[entry.Type] = entries;
-                    }
-
-                    entries.Add(entry.Path);
+                    continue;
                 }
 
-                foreach (var typeEntry in typeQueue)
+                var manifest = ContentLoader.FindAssetFiles(directoryPath);
+
+                manifests.Add(new()
                 {
-                    string bundleName = contentManifest.Name;
+                    Name = Path.GetFileName(directoryPath),
+                    AssetPaths = manifest.Item1,
+                    CapitalizedPaths = manifest.Item2,
+                });
+            }
 
-                    if (typeEntry.Key != string.Empty)
-                    {
-                        bundleName += "_" + typeEntry.Key;
-                    }
+            return manifests;
+        }
 
-                    string[] finalEntries = typeEntry.Value.ToArray();
+        private static bool BuildMods(List<ContentManifest> manifests, string outputDir, List<string> selectedMods)
+        {
+            string cacheDir = "ModsCache";
 
-                    definitions.Add(new()
-                    {
-                        assetBundleName = bundleName,
-                        assetNames = finalEntries,
-                        addressableNames = finalEntries
-                    });
+            if (!Directory.Exists(cacheDir))
+            {
+                Directory.CreateDirectory(cacheDir);
+            }
+
+            manifests = BuildManifests();
+
+            HashSet<string> existingFiles = new();
+
+            string[] modsFiles = Directory.GetFiles(cacheDir, "*.*", SearchOption.AllDirectories);
+
+            foreach (var modFile in modsFiles)
+            {
+                string fileName = Path.GetFileName(modFile);
+
+                if (fileName.StartsWith("ModsCache"))
+                {
+                    continue;
+                }
+
+                existingFiles.Add("ModsCache/" + fileName);
+            }
+
+            HashSet<string> requiredFiles = new();
+
+            foreach (var manifest in manifests)
+            {
+                foreach (var path in manifest.AssetPaths)
+                {
+                    string bundlePath = AssetDatabase.GUIDFromAssetPath(path).ToString();
+                    requiredFiles.Add("ModsCache/" + bundlePath);
+                    requiredFiles.Add("ModsCache/" + bundlePath + ".manifest");
                 }
             }
 
-            if (!Directory.Exists("ModsCache"))
+            foreach (var existingFile in existingFiles)
             {
-                Directory.CreateDirectory("ModsCache");
+                if (!requiredFiles.Contains(existingFile))
+                {
+                    File.Delete(existingFile);
+                }
+            }
+
+            List<AssetBundleBuild> definitions = new();
+
+            foreach (var manifest in manifests)
+            {
+                foreach (var path in manifest.AssetPaths)
+                {
+                    definitions.Add(new()
+                    {
+                        assetBundleName = AssetDatabase.GUIDFromAssetPath(path).ToString(),
+                        assetNames = new string[1] { path }
+                    });
+                }
             }
 
             BuildAssetBundlesParameters buildInput = new()
             {
                 outputPath = "ModsCache",
-                options = BuildAssetBundleOptions.UncompressedAssetBundle,
+                options = BuildAssetBundleOptions.DisableLoadAssetByFileName |
+                BuildAssetBundleOptions.DisableLoadAssetByFileNameWithExtension |
+                BuildAssetBundleOptions.AssetBundleStripUnityVersion,
                 bundleDefinitions = definitions.ToArray()
             };
 
@@ -107,51 +161,74 @@ namespace Core.Editor
             if (bundleManifest == null)
             {
                 Debug.LogError("We failed to build asset bundles");
-                return manifests;
+                return false;
             }
 
-            if (Directory.Exists(modsDir))
+            if (!Directory.Exists(outputDir))
             {
-                Directory.Delete(modsDir, true);
+                Directory.CreateDirectory(outputDir);
             }
 
-            Directory.CreateDirectory(modsDir);
+            Dictionary<string, List<PackageBundleEntry>> bundleEntries = new();
 
-            foreach (var contentManifest in manifests.Item1)
+            foreach (var manifest in manifests)
             {
-                if (selectedMods != null && !selectedMods.Contains(contentManifest.Name))
+                bundleEntries[manifest.Name] = new();
+
+                for (int i = 0; i < manifest.AssetPaths.Count; i++)
+                {
+                    string path = manifest.AssetPaths[i];
+                    string capitalizedPath = manifest.CapitalizedPaths[i];
+
+                    GUID unityGuid = AssetDatabase.GUIDFromAssetPath(path);
+                    Guid systemGuid = unityGuid.ToSystem();
+                    string bundleName = unityGuid.ToString();
+                    string bundlePath = "ModsCache/" + bundleName;
+                    BuildPipeline.GetCRCForAssetBundle(bundlePath, out uint crc);
+                    string[] deps = bundleManifest.GetAllDependencies(bundleName);
+
+                    List<Guid> depsGuids = new();
+
+                    foreach (var dep in deps)
+                    {
+                        depsGuids.Add(new(dep));
+                    }
+
+                    bundleEntries[manifest.Name].Add(new()
+                    {
+                        Guid = systemGuid,
+                        AssetPath = path,
+                        CapitalizedPath = capitalizedPath,
+                        BundlePath = bundlePath,
+                        Crc = crc,
+                        Dependencies = depsGuids
+                    });
+                }
+            }
+
+            foreach (var manifest in manifests)
+            {
+                if (selectedMods != null && !selectedMods.Contains(manifest.Name))
                 {
                     continue;
                 }
 
-                string outputModDir = modsDir + "/" + contentManifest.Name;
+                string outputModDir = outputDir + "/" + manifest.Name;
 
-                Directory.CreateDirectory(outputModDir);
-
-                File.Copy("Assets/" + contentManifest.Name + "/ModManifest.json", outputModDir + "/ModManifest.json", true);
-
-                string[] files = Directory.GetFiles("ModsCache", "*.*", SearchOption.TopDirectoryOnly);
-
-                foreach (var file in files)
+                if (!Directory.Exists(outputModDir))
                 {
-                    if (file.EndsWith(".manifest"))
-                    {
-                        continue;
-                    }
-
-                    string fileName = Path.GetFileName(file);
-
-                    if (fileName.StartsWith(contentManifest.Name.ToLower() + "_"))
-                    {
-                        File.Copy(file, outputModDir + "/" + Path.GetFileName(fileName), true);
-                    }
+                    Directory.CreateDirectory(outputModDir);
                 }
+
+                File.Copy("Assets/" + manifest.Name + "/ModManifest.json", outputModDir + "/ModManifest.json", true);
+
+                PackageManager.Build(bundleEntries[manifest.Name], outputModDir);
             }
 
-            return manifests;
+            return true;
         }
 
-        private static void BuildPlayerCache(bool debug)
+        private static bool BuildPlayerCache(bool debug)
         {
             string resultPath;
 
@@ -186,10 +263,17 @@ namespace Core.Editor
                 options = BuildOptions.Development | BuildOptions.AllowDebugging;
             }
 
-            BuildPipeline.BuildPlayer(scenes, resultPath + "/Recusant.exe", BuildTarget.StandaloneWindows, options);
+            BuildReport report = BuildPipeline.BuildPlayer(scenes, resultPath + "/Recusant.exe", BuildTarget.StandaloneWindows, options);
+
+            if (report == null)
+            {
+                return false;
+            }
+
+            return true;
         }
 
-        private static void ProcessDLLs(Tuple<List<ContentManifest>, List<ModManifestFile>> manifests, List<string> selectedMods, string outputDir, bool buildingMods, bool debug)
+        private static bool ProcessDLLs(List<ContentManifest> manifests, List<string> selectedMods, string outputDir, bool buildingMods, bool debug)
         {
             string cacheDir;
             string targetDir;
@@ -205,7 +289,7 @@ namespace Core.Editor
                 targetDir = "Player";
             }
 
-            foreach (var manifest in manifests.Item1)
+            foreach (var manifest in manifests)
             {
                 if (selectedMods != null && !selectedMods.Contains(manifest.Name))
                 {
@@ -241,9 +325,11 @@ namespace Core.Editor
                     }
                 }
             }
+
+            return true;
         }
 
-        private static void ProcessScriptingAssemblies(Tuple<List<ContentManifest>, List<ModManifestFile>> manifests, string modsFolder, string outputDir)
+        private static bool ProcessScriptingAssemblies(List<ContentManifest> manifests, string outputDir)
         {
             ScriptingAssembliesData playerData;
 
@@ -254,14 +340,14 @@ namespace Core.Editor
             catch (Exception e)
             {
                 Debug.LogError(e);
-                return;
+                return false;
             }
 
             for (int i = 0; i < playerData.names.Count; i++)
             {
                 string dllName = playerData.names[i].Replace(".dll", "");
 
-                foreach (var manifest in manifests.Item1)
+                foreach (var manifest in manifests)
                 {
                     if (dllName == manifest.Name)
                     {
@@ -272,9 +358,11 @@ namespace Core.Editor
             }
 
             File.WriteAllBytes(outputDir + "/Recusant_Data/ScriptingAssemblies.json", JsonSerializer.PrettyPrintByteArray(JsonSerializer.Serialize(playerData)));
+
+            return true;
         }
 
-        private static void BuildPlayer(Tuple<List<ContentManifest>, List<ModManifestFile>> manifests, string modsFolder, bool debug)
+        private static bool BuildPlayer(bool debug)
         {
             string cacheDir;
             string outputDir;
@@ -317,11 +405,15 @@ namespace Core.Editor
                     Directory.Delete(tryDelete, true);
                 }
             }
+
+            return true;
         }
 
         [MenuItem("Core/Build Game (Release)")]
         public static void BuildGameRelease()
         {
+            DateTime startTime = DateTime.Now;
+
             if (Directory.Exists("Player"))
             {
                 Directory.Delete("Player", true);
@@ -330,17 +422,33 @@ namespace Core.Editor
             Directory.CreateDirectory("Player");
             Directory.CreateDirectory("Player/Mods");
 
-            var manifests = BuildMods("Player/Mods", null);
-            BuildPlayerCache(false);
-            BuildPlayer(manifests, "Player/Mods", false);
-            ProcessDLLs(manifests, null, "Player/Mods", false, false);
-            ProcessScriptingAssemblies(manifests, "Player/Mods", "Player");
-            Debug.Log("Finished building game");
+            List<ContentManifest> manifests = new();
+
+            if (BuildMods(manifests, "Player/Mods", null) &&
+                BuildPlayerCache(false) &&
+                BuildPlayer(false) &&
+                ProcessDLLs(manifests, null, "Player/Mods", false, false) &&
+                ProcessScriptingAssemblies(manifests, "Player"))
+            {
+                DateTime endTime = DateTime.Now;
+                TimeSpan elapsed = endTime - startTime;
+
+                Debug.Log("Finished building game (release) in " + string.Format("{0:00}:{1:00}:{2:00}", elapsed.Hours, elapsed.Minutes, elapsed.Seconds));
+            }
+            else
+            {
+                DateTime endTime = DateTime.Now;
+                TimeSpan elapsed = endTime - startTime;
+
+                Debug.LogError("Failed building game (release) in " + string.Format("{0:00}:{1:00}:{2:00}", elapsed.Hours, elapsed.Minutes, elapsed.Seconds));
+            }
         }
 
         [MenuItem("Core/Build Game (Debug)")]
         public static void BuildGameDebug()
         {
+            DateTime startTime = DateTime.Now;
+
             if (Directory.Exists("PlayerDebug"))
             {
                 Directory.Delete("PlayerDebug", true);
@@ -349,17 +457,33 @@ namespace Core.Editor
             Directory.CreateDirectory("PlayerDebug");
             Directory.CreateDirectory("PlayerDebug/Mods");
 
-            var manifests = BuildMods("PlayerDebug/Mods", null);
-            BuildPlayerCache(true);
-            BuildPlayer(manifests, "PlayerDebug/Mods", true);
-            ProcessDLLs(manifests, null, "PlayerDebug/Mods", false, true);
-            ProcessScriptingAssemblies(manifests, "PlayerDebug/Mods", "PlayerDebug");
-            Debug.Log("Finished building game");
+            List<ContentManifest> manifests = new();
+
+            if (BuildMods(manifests, "PlayerDebug/Mods", null) &&
+                BuildPlayerCache(true) &&
+                BuildPlayer(true) &&
+                ProcessDLLs(manifests, null, "PlayerDebug/Mods", false, true) &&
+                ProcessScriptingAssemblies(manifests, "PlayerDebug"))
+            {
+                DateTime endTime = DateTime.Now;
+                TimeSpan elapsed = endTime - startTime;
+
+                Debug.Log("Finished building game (debug) in " + string.Format("{0:00}:{1:00}:{2:00}", elapsed.Hours, elapsed.Minutes, elapsed.Seconds));
+            }
+            else
+            {
+                DateTime endTime = DateTime.Now;
+                TimeSpan elapsed = endTime - startTime;
+
+                Debug.LogError("Failed building game (debug) in " + string.Format("{0:00}:{1:00}:{2:00}", elapsed.Hours, elapsed.Minutes, elapsed.Seconds));
+            }
         }
 
         [MenuItem("Assets/Core/Build Mod")]
         public static void BuildMod()
         {
+            DateTime startTime = DateTime.Now;
+
             List<string> selectedMods = new();
 
             foreach (var targetObject in Selection.objects)
@@ -389,25 +513,31 @@ namespace Core.Editor
                 return;
             }
 
-            if (Directory.Exists("Mods"))
-            {
-                Directory.Delete("Mods", true);
-            }
+            List<ContentManifest> manifests = new();
 
-            Directory.CreateDirectory("Mods");
-
-            var manifests = BuildMods("Mods", selectedMods);
-            BuildPlayerCache(false);
-            ProcessDLLs(manifests, selectedMods, "Mods", true, false);
-
-            string resultReport = "Finished building mods: ";
+            string modsList = string.Empty;
 
             foreach (var mod in selectedMods)
             {
-                resultReport += "\"" + mod + "\" ";
+                modsList += "\"" + mod + "\" ";
             }
 
-            Debug.Log(resultReport);
+            if (BuildMods(manifests, "Mods", selectedMods) &&
+            BuildPlayerCache(false) &&
+            ProcessDLLs(manifests, selectedMods, "Mods", true, false))
+            {
+                DateTime endTime = DateTime.Now;
+                TimeSpan elapsed = endTime - startTime;
+
+                Debug.Log("Finished building mods: " + modsList + "in " + string.Format("{0:00}:{1:00}:{2:00}", elapsed.Hours, elapsed.Minutes, elapsed.Seconds));
+            }
+            else
+            {
+                DateTime endTime = DateTime.Now;
+                TimeSpan elapsed = endTime - startTime;
+
+                Debug.LogError("Failed building mods: " + modsList + "in " + string.Format("{0:00}:{1:00}:{2:00}", elapsed.Hours, elapsed.Minutes, elapsed.Seconds));
+            }
         }
     }
 }

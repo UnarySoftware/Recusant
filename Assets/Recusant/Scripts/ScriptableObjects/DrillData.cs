@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Recusant
 {
-    [CreateAssetMenu(fileName = "Drill", menuName = "Recusant/Data/Drill")]
+    [CreateAssetMenu(fileName = "DrillData", menuName = "Recusant/Data/DrillData")]
     public class DrillData : BaseScriptableObject
     {
         public string Name = "Basic";

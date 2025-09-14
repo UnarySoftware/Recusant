@@ -1,3 +1,4 @@
+using System;
 using Utf8Json;
 
 namespace Recusant
@@ -12,8 +13,8 @@ namespace Recusant
                 return;
             }
 
-            var formatter = formatterResolver.GetFormatterWithVerify<string>();
-            formatter.Serialize(ref writer, value.Path, formatterResolver);
+            var formatter = formatterResolver.GetFormatterWithVerify<Guid>();
+            formatter.Serialize(ref writer, value.UniqueId.Value, formatterResolver);
         }
 
         public ScriptableObjectRef<T> Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
@@ -23,7 +24,7 @@ namespace Recusant
                 return null;
             }
 
-            string value = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref reader, formatterResolver);
+            Guid value = formatterResolver.GetFormatterWithVerify<Guid>().Deserialize(ref reader, formatterResolver);
             return new ScriptableObjectRef<T>(value);
         }
     }
