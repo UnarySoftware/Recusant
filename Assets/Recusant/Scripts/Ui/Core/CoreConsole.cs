@@ -272,7 +272,6 @@ namespace Recusant
             NewFoldout.Q(className: Foldout.toggleUssClassName).pickingMode = PickingMode.Ignore;
             NewFoldout.Q(className: Foldout.textUssClassName).pickingMode = PickingMode.Ignore;
 
-
             NewFoldout.text = Message;
             NewFoldout.style.color = color;
             NewFoldout.style.unityTextOutlineColor = outline;
@@ -385,16 +384,54 @@ namespace Recusant
 
                 _builder.Clear();
 
+                GameplayGroup group = GameplayGroup.Server;
+                bool replicated = false;
+
+                if (unit.IsVariable)
+                {
+                    group = unit.Variable.GetGroup();
+                    replicated = unit.Variable.GetFlags().HasFlag(GameplayFlag.Replicated);
+                }
+                else
+                {
+                    group = unit.Command.Command.Group;
+                    replicated = unit.Command.Command.Flags.HasFlag(GameplayFlag.Replicated);
+                }
+
+                if (replicated)
+                {
+                    _builder.Append("<color=#bb6dc6>[R] ");
+                }
+                else if (group == GameplayGroup.Server)
+                {
+                    _builder.Append("<color=#ff9a00>[S] ");
+                }
+                else
+                {
+                    _builder.Append("<color=#00a2ff>[C] ");
+                }
+
                 _builder.Append(matchedName);
+                _builder.Append("</color>");
                 _builder.Append(" ");
 
                 if (unit.IsVariable)
                 {
                     if (unit.Variable.IsRanged())
                     {
+                        _builder.Append("<color=#8ebf45>");
                         _builder.Append(GameplayShared.StringifyRanges(unit.Variable.GetMinRange(), unit.Variable.GetMaxRange(), GameplayShared.GetRangeForType(unit.Variable.GetTypeSystem())));
+                        _builder.Append("</color>");
                     }
                     _builder.Append(GameplayShared.StringifyVariable(unit.Variable.GetObject(), unit.Variable.GetTypeEnum()));
+
+                    if (!unit.Variable.IsOriginal())
+                    {
+                        _builder.Append("<color=#fe1a76> [ ");
+                        _builder.Append(GameplayShared.StringifyVariable(unit.Variable.GetOriginalObject(), unit.Variable.GetTypeEnum()));
+                        _builder.Append(" ]</color>");
+                    }
+
                     _builder.Append("\n");
                     _builder.Append(unit.Variable.Description);
 
@@ -406,6 +443,11 @@ namespace Recusant
                     var parameters = unit.Command.Method.GetParameters();
 
                     int parameterCounter = 0;
+
+                    if (parameters.Length > 0)
+                    {
+                        _builder.Append("<color=#8ebf45>");
+                    }
 
                     foreach (var parameter in parameters)
                     {
@@ -424,6 +466,11 @@ namespace Recusant
                         }
 
                         parameterCounter++;
+                    }
+
+                    if (parameters.Length > 0)
+                    {
+                        _builder.Append("</color>");
                     }
 
                     _builder.Append('\n');

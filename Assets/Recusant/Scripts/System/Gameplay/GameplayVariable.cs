@@ -35,6 +35,7 @@ namespace Recusant
 
         public abstract void SetObject(object value);
         public abstract object GetObject();
+        public abstract object GetOriginalObject();
         public abstract GameplayGroup GetGroup();
         public abstract GameplayFlag GetFlags();
         public abstract GameplayType GetTypeEnum();
@@ -141,6 +142,11 @@ namespace Recusant
         public override object GetObject()
         {
             return _currentValue;
+        }
+
+        public override object GetOriginalObject()
+        {
+            return _originalValue;
         }
 
         public override bool IsRanged()

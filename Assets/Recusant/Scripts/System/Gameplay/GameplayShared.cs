@@ -185,9 +185,9 @@ namespace Recusant
                     }
                 case GameplayType.Bool:
                     {
-                        if (node is bool)
+                        if (node is double v)
                         {
-                            return node;
+                            return (v != 0.0);
                         }
                         else
                         {
@@ -477,8 +477,7 @@ namespace Recusant
                     }
                 case GameplayType.Bool:
                     {
-                        bool result = (bool)value;
-                        return result.ToString().ToLower();
+                        return (bool)value ? "1" : "0";
                     }
                 case GameplayType.Short:
                     {

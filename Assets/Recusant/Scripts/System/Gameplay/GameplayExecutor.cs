@@ -32,6 +32,16 @@ namespace Recusant
     {
         public Dictionary<string, GameplayExecutorShared.GameplayUnit> GameplayUnits { get { return SharedData.GameplayUnits; } }
 
+        [GameplayCommand(GameplayGroup.Client, GameplayFlag.None, "Quits the game")]
+        public void Quit()
+        {
+            Application.Quit(0);
+
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#endif
+        }
+
         public void Execute(string line)
         {
             string[] parts;
@@ -304,7 +314,13 @@ namespace Recusant
                     // between play sessions in the editor we need to reset them all here
                     variableValue.ResetToOriginal();
 
-                    string gameplayName = variableValue.GetGroup() + "." + type.FullName + "." + Field.Name;
+                    string gameplayName = Field.Name.ToSnakeCase('_');
+
+                    if (SharedData.GameplayUnits.ContainsKey(gameplayName))
+                    {
+                        gameplayName = type.FullName + "." + Field.Name;
+                    }
+
                     variableValue.Name = gameplayName;
 
                     SharedData.GameplayUnits[gameplayName] = new GameplayExecutorShared.GameplayUnit()
@@ -377,7 +393,14 @@ namespace Recusant
 
                     if (validRanges && info.Command != null && info.Method != null && info.SystemType != null)
                     {
-                        SharedData.GameplayUnits[info.Command.Group + "." + type.FullName + "." + method.Name] = new GameplayExecutorShared.GameplayUnit()
+                        string gameplayName = method.Name.ToSnakeCase('_');
+
+                        if (SharedData.GameplayUnits.ContainsKey(gameplayName))
+                        {
+                            gameplayName = type.FullName + "." + method.Name;
+                        }
+
+                        SharedData.GameplayUnits[gameplayName] = new GameplayExecutorShared.GameplayUnit()
                         {
                             IsVariable = false,
                             Command = info

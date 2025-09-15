@@ -1,4 +1,6 @@
 
+using System.Collections.Generic;
+
 namespace Core
 {
     public static class StringExtensions
@@ -20,6 +22,24 @@ namespace Core
                 return value;
             }
             return value.Length <= maxLength ? value : value[..maxLength];
+        }
+
+        public static string ToSnakeCase(this string source, char sep)
+        {
+            var result = new List<char>();
+            var chars = source.Replace(" ", "").ToCharArray();
+
+            for (var i = 0; i < chars.Length; i++)
+            {
+                if (i != 0 && char.IsUpper(chars[i]))
+                {
+                    result.Add(sep);
+                }
+
+                result.Add(chars[i]);
+            }
+
+            return string.Concat(result).ToLowerInvariant();
         }
     }
 }
