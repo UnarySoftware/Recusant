@@ -15,7 +15,7 @@ namespace Recusant
 
     public class PlayerManager : SystemNetworkRoot<PlayerManager, PlayerManagerShared>
     {
-        [AssetInject("prefabsnetwork/player.prefab")]
+        [SystemAssetInject("prefabsnetwork/player.prefab")]
         public GameObject PlayerPrefab = null;
 
         [HideInInspector]

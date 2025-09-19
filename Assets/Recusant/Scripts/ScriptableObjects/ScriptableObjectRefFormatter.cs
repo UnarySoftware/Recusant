@@ -3,9 +3,9 @@ using Utf8Json;
 
 namespace Recusant
 {
-    public class ScriptableObjectRefFormatter<T> : IJsonFormatter<ScriptableObjectRef<T>> where T : BaseScriptableObject
+    public class ScriptableObjectRefFormatter<T> : IJsonFormatter<AssetRef<T>> where T : BaseScriptableObject
     {
-        public void Serialize(ref JsonWriter writer, ScriptableObjectRef<T> value, IJsonFormatterResolver formatterResolver)
+        public void Serialize(ref JsonWriter writer, AssetRef<T> value, IJsonFormatterResolver formatterResolver)
         {
             if (value == null)
             {
@@ -14,10 +14,10 @@ namespace Recusant
             }
 
             var formatter = formatterResolver.GetFormatterWithVerify<Guid>();
-            formatter.Serialize(ref writer, value.UniqueId.Value, formatterResolver);
+            formatter.Serialize(ref writer, value.AssetId.Value, formatterResolver);
         }
 
-        public ScriptableObjectRef<T> Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
+        public AssetRef<T> Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
         {
             if (reader.ReadIsNull())
             {
@@ -25,7 +25,7 @@ namespace Recusant
             }
 
             Guid value = formatterResolver.GetFormatterWithVerify<Guid>().Deserialize(ref reader, formatterResolver);
-            return new ScriptableObjectRef<T>(value);
+            return new AssetRef<T>(value);
         }
     }
 }

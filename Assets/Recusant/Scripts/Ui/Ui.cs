@@ -1,52 +1,61 @@
 ﻿using Core;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Recusant
 {
-    [PrefabInject("prefabslocal/ui.prefab")]
+    [SystemPrefabInject("prefabslocal/ui/ui.prefab")]
     public sealed class Ui : System<Ui>
     {
+        [SerializeField]
+        private List<PrefabRef<UiState>> _states;
+
         private readonly List<UiState> _uiStatesList = new();
         private readonly Dictionary<Type, UiState> _uiStatesDict = new();
         private UiState _currentState = null;
 
+        private UiState _mainMenu = null;
+
         public override void Initialize()
         {
-            UiState[] targetStates = GetComponentsInChildren<UiState>();
+            //UiState[] targetStates = GetComponentsInChildren<UiState>();
 
-            UiState mainMenu = null;
-
-            foreach (UiState state in targetStates)
+            foreach (var state in _states)
             {
-                Type type = state.GetType();
-                _uiStatesDict[type] = state;
-                _uiStatesList.Add(state);
-                if (state is MainMenuState)
-                {
-                    mainMenu = state;
-                }
-                else
-                {
-                    state.Initialize();
-                }
-
-                if (state is CoreState)
-                {
-                    state.Open();
-                }
-                else
-                {
-                    state.GetComponent<UIDocument>().rootVisualElement.style.visibility = Visibility.Hidden;
-                }
+                RegisterState(Instantiate(state.Value, transform).GetComponent<UiState>());
             }
 
-            if (mainMenu != null)
+            if (_mainMenu != null)
             {
-                _currentState = mainMenu;
-                mainMenu.GetComponent<UIDocument>().rootVisualElement.style.visibility = Visibility.Visible;
-                mainMenu.Initialize();
+                _currentState = _mainMenu;
+                _mainMenu.GetComponent<UIDocument>().rootVisualElement.style.visibility = Visibility.Visible;
+                _mainMenu.Initialize();
+            }
+        }
+
+        public void RegisterState(UiState state)
+        {
+            Type type = state.GetType();
+            _uiStatesDict[type] = state;
+            _uiStatesList.Add(state);
+            if (state is MainMenuState)
+            {
+                _mainMenu = state;
+            }
+            else
+            {
+                state.Initialize();
+            }
+
+            if (state is CoreState)
+            {
+                state.Open();
+            }
+            else
+            {
+                state.GetComponent<UIDocument>().rootVisualElement.style.visibility = Visibility.Hidden;
             }
         }
 
@@ -71,7 +80,7 @@ namespace Recusant
 
             if (targetState == null)
             {
-                Logger.Instance.Error("Tried opening non-existing UI state " + state.Name);
+                Core.Logger.Instance.Error("Tried opening non-existing UI state " + state.Name);
                 return;
             }
 

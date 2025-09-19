@@ -146,7 +146,7 @@ namespace Core
 
                     foreach (var attribute in attributes)
                     {
-                        if (attribute is AssetInjectAttribute asset)
+                        if (attribute is SystemAssetInjectAttribute asset)
                         {
                             UnityEngine.Object loadedAsset = ContentLoader.Instance.LoadAsset<UnityEngine.Object>(asset.Path);
 
@@ -272,7 +272,7 @@ namespace Core
 
                 foreach (var attribute in attributes)
                 {
-                    if (attribute is PrefabInjectAttribute prefab)
+                    if (attribute is SystemPrefabInjectAttribute prefab)
                     {
                         prefabInitialization = prefab.Path;
                     }

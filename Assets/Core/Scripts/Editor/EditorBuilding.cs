@@ -86,7 +86,7 @@ namespace Core.Editor
             return manifests;
         }
 
-        private static bool BuildMods(List<ContentManifest> manifests, string outputDir, List<string> selectedMods)
+        private static bool BuildMods(out List<ContentManifest> manifests, string outputDir, List<string> selectedMods)
         {
             string cacheDir = "ModsCache";
 
@@ -422,9 +422,7 @@ namespace Core.Editor
             Directory.CreateDirectory("Player");
             Directory.CreateDirectory("Player/Mods");
 
-            List<ContentManifest> manifests = new();
-
-            if (BuildMods(manifests, "Player/Mods", null) &&
+            if (BuildMods(out List<ContentManifest> manifests, "Player/Mods", null) &&
                 BuildPlayerCache(false) &&
                 BuildPlayer(false) &&
                 ProcessDLLs(manifests, null, "Player/Mods", false, false) &&
@@ -457,9 +455,7 @@ namespace Core.Editor
             Directory.CreateDirectory("PlayerDebug");
             Directory.CreateDirectory("PlayerDebug/Mods");
 
-            List<ContentManifest> manifests = new();
-
-            if (BuildMods(manifests, "PlayerDebug/Mods", null) &&
+            if (BuildMods(out List<ContentManifest> manifests, "PlayerDebug/Mods", null) &&
                 BuildPlayerCache(true) &&
                 BuildPlayer(true) &&
                 ProcessDLLs(manifests, null, "PlayerDebug/Mods", false, true) &&
@@ -513,8 +509,6 @@ namespace Core.Editor
                 return;
             }
 
-            List<ContentManifest> manifests = new();
-
             string modsList = string.Empty;
 
             foreach (var mod in selectedMods)
@@ -522,7 +516,7 @@ namespace Core.Editor
                 modsList += "\"" + mod + "\" ";
             }
 
-            if (BuildMods(manifests, "Mods", selectedMods) &&
+            if (BuildMods(out List<ContentManifest> manifests, "Mods", selectedMods) &&
             BuildPlayerCache(false) &&
             ProcessDLLs(manifests, selectedMods, "Mods", true, false))
             {

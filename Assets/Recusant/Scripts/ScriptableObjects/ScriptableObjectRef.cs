@@ -4,52 +4,22 @@ using System;
 namespace Recusant
 {
     [Serializable]
-    public class ScriptableObjectRef<T> : ScriptableObjectBase
+    public class ScriptableObjectRef<T> : AssetRef<T>
         where T : BaseScriptableObject
     {
-
-#if UNITY_EDITOR
-
-        public override object GetValueInternal()
-        {
-            return _value;
-        }
-
-        public override void SetValueInternal(object value)
-        {
-            _value = (T)value;
-        }
-
-#endif
-
-        protected override void ResetValue()
-        {
-            _value = null;
-        }
-
-        [NonSerialized]
-        private T _value = null;
-
         public ScriptableObjectRef(Guid value) : base(value)
         {
+
         }
 
-        public T Value
+        protected override T LoadValue()
         {
-            get
+            if (ScriptableObjectRegistry.Instance.LoadObject(AssetId.Value, out T result))
             {
-                if (_value != null)
-                {
-                    return _value;
-                }
-
-                if (!ScriptableObjectRegistry.Instance.LoadObject(UniqueId, out _value))
-                {
-                    Logger.Instance.Error("Failed to resolve ScriptableObject reference with GUID \"" + UniqueId.Value.ToString() + "\"");
-                }
-
-                return _value;
+                return result;
             }
+            Logger.Instance.Error("Failed to resolve ScriptableObject reference with GUID \"" + AssetId.Value.ToString() + "\"");
+            return null;
         }
     }
 }

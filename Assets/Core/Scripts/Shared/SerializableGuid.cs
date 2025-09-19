@@ -35,7 +35,7 @@ namespace Core
         {
             get
             {
-                if (_id == Guid.Empty)
+                if (_id == Guid.Empty && _bytes.Length == 16)
                 {
                     _id = new Guid(_bytes);
                 }
@@ -51,7 +51,7 @@ namespace Core
 
         public void OnAfterDeserialize()
         {
-            if (_id == Guid.Empty)
+            if (_id == Guid.Empty && _bytes.Length == 16)
             {
                 _id = new Guid(_bytes);
             }

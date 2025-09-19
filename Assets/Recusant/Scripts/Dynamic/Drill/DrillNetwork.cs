@@ -1,6 +1,5 @@
 using Netick;
 using Netick.Unity;
-using UnityEngine;
 
 namespace Recusant
 {
@@ -8,6 +7,12 @@ namespace Recusant
     {
         public ScriptableObjectRef<DrillData> First;
         public ScriptableObjectRef<DrillData> Second;
+
+        private void Awake()
+        {
+            First.Precache();
+            Second.Precache();
+        }
 
         public override void NetworkAwake()
         {
@@ -21,13 +26,13 @@ namespace Recusant
         public void OnDataChanged(OnChangedData data)
         {
             string previousName = "Empty";
-            if(data.GetPreviousValue<ScriptableObjectNetworkRef<DrillData>>().TryGetObject(out var previous))
+            if (data.GetPreviousValue<ScriptableObjectNetworkRef<DrillData>>().TryGetObject(out var previous))
             {
                 previousName = previous.Name;
             }
 
             string currentName = "Empty";
-            if(DrillDataTestNetworked.TryGetObject(out var current))
+            if (DrillDataTestNetworked.TryGetObject(out var current))
             {
                 currentName = current.Name;
             }
@@ -56,12 +61,8 @@ namespace Recusant
             }
         }
 
-
-
-
-        float max = 5.0f;
+        float max = 1.0f;
         float counter = 0.0f;
         bool isFirst = true;
-
     }
 }

@@ -16,10 +16,10 @@ namespace Recusant
     {
         public int OnlineProviderPort { get; set; } = 0;
 
-        [AssetInject("other/litenet.asset")]
+        [SystemAssetInject("other/litenet.asset")]
         public LiteNetLibTransportProvider OfflineTransportProvider;
 
-        [AssetInject("other/steamworks.asset")]
+        [SystemAssetInject("other/steamworks.asset")]
         public SteamworksTransportProvider OnlineTransportProvider;
 
         public bool IsRunning { get; private set; } = false;

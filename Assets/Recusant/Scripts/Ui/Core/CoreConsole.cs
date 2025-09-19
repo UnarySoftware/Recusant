@@ -25,118 +25,49 @@ namespace Recusant
         private int _historyIndex = -1;
 
         private int _currentConsoleLines = 0;
-        public int MaxConsoleLines = 128;
+        private bool _userScrolledUp = false;
 
+        public int MaxConsoleLines = 128;
         public const int MaxAutocompleteLines = 5;
 
         private readonly StringBuilder _builder = new();
 
-        private static List<string> GetAutocompleteMatches(string input, bool strict = false, int maxMatches = int.MaxValue)
+        public override void Initialize()
         {
-            if (input.Contains(" "))
+            var Document = GetComponent<UIDocument>();
+
+            _root = Document.rootVisualElement.Q("Console");
+            _entryList = Document.rootVisualElement.Q<ScrollView>("ConsoleList");
+            _entryList.verticalScroller.valueChanged += OnScrollChanged;
+
+            _input = Document.rootVisualElement.Q<TextField>("ConsoleInput");
+
+            _input.RegisterValueChangedCallback(evt =>
             {
-                string[] spaceParts = input.ToUpper().Split(' ');
-                input = spaceParts[0];
+                UpdateAutocomplete();
+            });
+
+            _input.RegisterCallback<KeyDownEvent>(OnKeyDownEvent, TrickleDown.TrickleDown);
+            _input.RegisterCallback<InputEvent>(OnInputEvent, TrickleDown.TrickleDown);
+
+            _root.style.display = DisplayStyle.None;
+
+            for (int i = 1; i <= MaxAutocompleteLines; i++)
+            {
+                _autocompleteLabels[i - 1] = Document.rootVisualElement.Q<Label>("ConsoleAutocomplete" + i);
+                _autocompleteLabels[i - 1].style.opacity = 0.0f;
             }
 
-            string[] inputParts = input.ToUpper().Split('.');
-
-            List<string> results = new();
-
-            int counter = 0;
-
-            foreach (var target in GameplayExecutor.Instance.GameplayUnits.Keys)
-            {
-                if (counter >= maxMatches)
-                {
-                    break;
-                }
-
-                if (strict)
-                {
-                    if (input.ToUpper() == target.ToUpper())
-                    {
-                        results.Add(target);
-                        counter++;
-                    }
-                }
-                else
-                {
-                    string[] targetParts = target.ToUpper().Split('.');
-
-                    if (targetParts.Length < inputParts.Length)
-                    {
-                        continue;
-                    }
-
-                    bool match = true;
-
-                    for (int i = 0; i < inputParts.Length; i++)
-                    {
-                        if (targetParts[i] != inputParts[i] && !targetParts[i].StartsWith(inputParts[i]))
-                        {
-                            match = false;
-                        }
-                    }
-
-                    if (match)
-                    {
-                        results.Add(target);
-                        counter++;
-                    }
-                }
-            }
-
-            return results;
-        }
-
-        public static string GetCommonStartingSubString(List<string> strings)
-        {
-            if (strings.Count == 0)
-            {
-                return "";
-            }
-
-            if (strings.Count == 1)
-            {
-                return strings[0];
-            }
-
-            int charIndex = 0;
-
-            while (IsCommonChar(strings, charIndex))
-            {
-                ++charIndex;
-            }
-
-            return strings[0][..charIndex];
-        }
-
-        private static bool IsCommonChar(List<string> strings, int charIndex)
-        {
-            if (strings[0].Length <= charIndex)
-            {
-                return false;
-            }
-
-            for (int i = 1; i < strings.Count; ++i)
-            {
-                if (strings[i].Length <= charIndex || strings[i][charIndex] != strings[0][charIndex])
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            LogEvent.Instance.Subscribe(OnLog, this);
         }
 
         public void OnKeyDownEvent(KeyDownEvent evt)
         {
             if (evt.keyCode == KeyCode.Tab)
             {
-                var matches = GetAutocompleteMatches(_input.value);
+                var matches = GameplayAutocomplete.Instance.GetAutocompleteMatches(_input.value);
 
-                string commonString = GetCommonStartingSubString(matches);
+                string commonString = GameplayAutocomplete.GetCommonStartingSubString(matches);
 
                 if (!string.IsNullOrWhiteSpace(commonString) && !_input.value.Contains(" "))
                 {
@@ -215,39 +146,18 @@ namespace Recusant
             }
         }
 
+        private void OnScrollChanged(float value)
+        {
+            float maxScroll = _entryList.verticalScroller.highValue - _entryList.verticalScroller.lowValue;
+            _userScrolledUp = (_entryList.scrollOffset.y < maxScroll - 10f);
+        }
+
         private void OnInputEvent(InputEvent evt)
         {
             if (Input.GetKeyDown(KeyCode.Tilde) || Input.GetKeyDown(KeyCode.BackQuote))
             {
                 _input.SetValueWithoutNotify(evt.previousData);
             }
-        }
-
-        public override void Initialize()
-        {
-            var Document = GetComponent<UIDocument>();
-
-            _root = Document.rootVisualElement.Q("Console");
-            _entryList = Document.rootVisualElement.Q<ScrollView>("ConsoleList");
-            _input = Document.rootVisualElement.Q<TextField>("ConsoleInput");
-
-            _input.RegisterValueChangedCallback(evt =>
-            {
-                UpdateAutocomplete();
-            });
-
-            _input.RegisterCallback<KeyDownEvent>(OnKeyDownEvent, TrickleDown.TrickleDown);
-            _input.RegisterCallback<InputEvent>(OnInputEvent, TrickleDown.TrickleDown);
-
-            _root.style.display = DisplayStyle.None;
-
-            for (int i = 1; i <= MaxAutocompleteLines; i++)
-            {
-                _autocompleteLabels[i - 1] = Document.rootVisualElement.Q<Label>("ConsoleAutocomplete" + i);
-                _autocompleteLabels[i - 1].style.opacity = 0.0f;
-            }
-
-            LogEvent.Instance.Subscribe(OnLog, this);
         }
 
         public override void Deinitialize()
@@ -260,6 +170,10 @@ namespace Recusant
             if (_currentConsoleLines >= MaxConsoleLines)
             {
                 _entryList.RemoveAt(0);
+            }
+            else
+            {
+                _currentConsoleLines++;
             }
 
             var NewEntry = ConsoleEntry.Instantiate();
@@ -300,9 +214,9 @@ namespace Recusant
                 NewLabel.style.unityTextOutlineWidth = 0.25f;
             }
 
-            if (_currentConsoleLines < MaxConsoleLines)
+            if (!_userScrolledUp)
             {
-                _currentConsoleLines++;
+                StartCoroutine(ScrollToBottom());
             }
         }
 
@@ -374,7 +288,7 @@ namespace Recusant
                 targetInput = _input.value;
             }
 
-            var matches = GetAutocompleteMatches(targetInput, strict, MaxAutocompleteLines);
+            var matches = GameplayAutocomplete.Instance.GetAutocompleteMatches(targetInput, strict, MaxAutocompleteLines);
 
             int labelCounter = 0;
 
@@ -503,7 +417,6 @@ namespace Recusant
                     _input.Focus();
                     _input.SelectRange(99999, 99999);
                     UnityEngine.Cursor.lockState = CursorLockMode.None;
-                    StartCoroutine(DelayScroll());
                 }
                 else
                 {
@@ -551,19 +464,17 @@ namespace Recusant
             }
         }
 
-        IEnumerator DelayScroll()
+        private IEnumerator ScrollToBottom()
         {
             yield return new WaitForEndOfFrame();
 
-            if (_entryList.childCount > 0)
-            {
-                _entryList.ScrollTo(_entryList.ElementAt(_entryList.childCount - 1));
-            }
+            _entryList.verticalScroller.value = _entryList.verticalScroller.highValue > 0 ? _entryList.verticalScroller.highValue : 0;
         }
 
-        IEnumerator DelayFocus()
+        private IEnumerator DelayFocus()
         {
             yield return new WaitForEndOfFrame();
+
             _input.Focus();
         }
     }

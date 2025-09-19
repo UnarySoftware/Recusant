@@ -4,9 +4,9 @@ using System;
 namespace Recusant
 {
     [Serializable]
-    public abstract class ScriptableObjectBase
+    public abstract class AssetRefBase
     {
-        public SerializableGuid UniqueId;
+        public SerializableGuid AssetId;
 
 #if UNITY_EDITOR
 
@@ -16,10 +16,5 @@ namespace Recusant
 #endif
 
         protected abstract void ResetValue();
-
-        public ScriptableObjectBase(Guid value)
-        {
-            UniqueId = value;
-        }
     }
 }

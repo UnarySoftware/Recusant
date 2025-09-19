@@ -36,7 +36,7 @@ namespace Recusant
             {
                 var genericType = ti.GetGenericTypeDefinition();
 
-                if (genericType == typeof(ScriptableObjectRef<>))
+                if (genericType == typeof(AssetRef<>))
                 {
                     return CreateInstance(typeof(ScriptableObjectRefFormatter<>), ti.GenericTypeArguments);
                 }

@@ -2,12 +2,12 @@ using System;
 
 namespace Core
 {
-    [AttributeUsage(AttributeTargets.Field)]
-    public class AssetInjectAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Class)]
+    public class SystemPrefabInjectAttribute : Attribute
     {
         private readonly string _path;
 
-        public AssetInjectAttribute(string path)
+        public SystemPrefabInjectAttribute(string path)
         {
             _path = path;
         }

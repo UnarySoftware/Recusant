@@ -19,7 +19,11 @@ namespace Recusant
 
         public override void Initialize()
         {
-            Instance = this;
+            // This is a temp intentional comment out of tooltip-related code
+            if (Instance == null)
+            {
+                return;
+            }
 
             var Document = GetComponent<UIDocument>();
 

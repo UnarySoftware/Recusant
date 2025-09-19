@@ -166,7 +166,7 @@ namespace Recusant
                 _triangleCount = 0;
                 _triangleDistance = 1.1f;
 
-                if (NavMesh.SamplePosition(_pawnController.transform.position, out _hit, 4.0f, -1))
+                if (NavMesh.SamplePosition(_pawnController.transform.position, out _hit, 1.5f, -1))
                 {
                     _position = _hit.position;
 
