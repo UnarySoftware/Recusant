@@ -88,7 +88,7 @@ namespace Recusant.Editor
 
         private void Ping()
         {
-            if(_pingIndex == -1)
+            if (_pingIndex == -1)
             {
                 return;
             }
@@ -98,7 +98,7 @@ namespace Recusant.Editor
 
         private void Selected()
         {
-            if(_selectIndex != -1)
+            if (_selectIndex != -1)
             {
                 SelectedObject = _objects[_selectIndex];
             }
@@ -110,11 +110,13 @@ namespace Recusant.Editor
         {
             _searchIndexes.Clear();
 
+            string searchString = _search.ToLower();
+
             for (int i = 0; i < _paths.Count; i++)
             {
-                string path = _paths[i];
+                string path = _paths[i].ToLower();
 
-                if (path.Contains(_search))
+                if (path.Contains(searchString))
                 {
                     _searchIndexes.Add(i);
                 }
@@ -178,7 +180,7 @@ namespace Recusant.Editor
                 };
             }
 
-            if(_wantToClose)
+            if (_wantToClose)
             {
                 Close();
                 return;
@@ -221,9 +223,18 @@ namespace Recusant.Editor
 
             bool list = false;
 
-            if(_scale == _scaleMin)
+            if (_scale == _scaleMin)
             {
                 list = true;
+            }
+
+            int maxRows = (int)(position.width / (_scale + 4));
+
+            int counter = 0;
+
+            if (!list)
+            {
+                EditorGUILayout.BeginHorizontal();
             }
 
             if (_searchIndexes.Count > 0)
@@ -231,6 +242,15 @@ namespace Recusant.Editor
                 foreach (var index in _searchIndexes)
                 {
                     DisplayEntry(index, list);
+                    counter++;
+
+                    if(!list && counter == maxRows)
+                    {
+                        counter = 0;
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.EndHorizontal();
+                        EditorGUILayout.BeginHorizontal();
+                    }
                 }
             }
             else
@@ -238,12 +258,27 @@ namespace Recusant.Editor
                 for (int i = 0; i < _textures.Count; i++)
                 {
                     DisplayEntry(i, list);
+                    counter++;
+
+                    if (!list && counter == maxRows)
+                    {
+                        counter = 0;
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.EndHorizontal();
+                        EditorGUILayout.BeginHorizontal();
+                    }
                 }
+            }
+
+            if (!list)
+            {
+                GUILayout.FlexibleSpace();
+                EditorGUILayout.EndHorizontal();
             }
 
             EditorGUILayout.EndScrollView();
 
-            if(_pingIndex == -1)
+            if (_pingIndex == -1)
             {
                 return;
             }
