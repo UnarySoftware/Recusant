@@ -18,23 +18,7 @@ namespace Recusant
 
         private UiState _mainMenu = null;
 
-        public override void Initialize()
-        {
-            //UiState[] targetStates = GetComponentsInChildren<UiState>();
-
-            foreach (var state in _states)
-            {
-                RegisterState(Instantiate(state.Value, transform).GetComponent<UiState>());
-            }
-
-            if (_mainMenu != null)
-            {
-                _currentState = _mainMenu;
-                _mainMenu.GetComponent<UIDocument>().rootVisualElement.style.visibility = Visibility.Visible;
-                _mainMenu.Initialize();
-            }
-        }
-
+        // Call this method in System.Initialize() to inject your own additional states
         public void RegisterState(UiState state)
         {
             Type type = state.GetType();
@@ -56,6 +40,21 @@ namespace Recusant
             else
             {
                 state.GetComponent<UIDocument>().rootVisualElement.style.visibility = Visibility.Hidden;
+            }
+        }
+
+        public override void Initialize()
+        {
+            foreach (var state in _states)
+            {
+                RegisterState(Instantiate(state.Value, transform).GetComponent<UiState>());
+            }
+
+            if (_mainMenu != null)
+            {
+                _currentState = _mainMenu;
+                _mainMenu.GetComponent<UIDocument>().rootVisualElement.style.visibility = Visibility.Visible;
+                _mainMenu.Initialize();
             }
         }
 
