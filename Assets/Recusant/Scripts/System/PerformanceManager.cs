@@ -6,29 +6,8 @@ namespace Recusant
 {
     public class PerformanceManager : System<PerformanceManager>
     {
-        public static GameplayVariable<int> ClientFpsMediumThreshold = new(
-        GameplayGroup.Client, GameplayFlag.None, 55, "Performance problem detection threshold");
-
-        public static GameplayVariable<int> ClientFpsHighThreshold = new(
-        GameplayGroup.Client, GameplayFlag.None, 30, "Performance problem detection threshold");
-
-        public static GameplayVariable<float> BandwithMediumThreshold = new(
-        GameplayGroup.Client, GameplayFlag.None, 25.0f, "Performance problem detection threshold");
-
-        public static GameplayVariable<float> BandwithHighThreshold = new(
-        GameplayGroup.Client, GameplayFlag.None, 60.0f, "Performance problem detection threshold");
-
-        public static GameplayVariable<float> LatencyMediumThreshold = new(
-        GameplayGroup.Client, GameplayFlag.None, 100.0f, "Performance problem detection threshold");
-
-        public static GameplayVariable<float> LatencyHighThreshold = new(
-        GameplayGroup.Client, GameplayFlag.None, 175.0f, "Performance problem detection threshold");
-
-        public static GameplayVariable<float> PacketLossMediumThreshold = new(
-        GameplayGroup.Client, GameplayFlag.None, 1.0f, "Performance problem detection threshold");
-
-        public static GameplayVariable<float> PacketLossHighThreshold = new(
-        GameplayGroup.Client, GameplayFlag.None, 10.0f, "Performance problem detection threshold");
+        [SystemAssetInject("scriptableobjects/system/performancemanagerdata.asset")]
+        private readonly PerformanceManagerData _data;
 
         public enum ProblemScale
         {
@@ -159,11 +138,11 @@ namespace Recusant
             FpsValue = Mathf.RoundToInt(1.0f / Time.unscaledDeltaTime);
             FpsProblems = ProblemScale.None;
 
-            if (FpsValue < ClientFpsHighThreshold.Get())
+            if (FpsValue < _data.ClientFpsHighThreshold)
             {
                 FpsProblems = ProblemScale.High;
             }
-            else if (FpsValue < ClientFpsMediumThreshold.Get())
+            else if (FpsValue < _data.ClientFpsMediumThreshold)
             {
                 FpsProblems = ProblemScale.Medium;
             }
@@ -190,11 +169,11 @@ namespace Recusant
             BandwithMax = Mathf.Max(sandbox.InKBps, sandbox.OutKBps); // Kb/s
             BandwithProblems = ProblemScale.None;
 
-            if (BandwithMax > BandwithHighThreshold.Get())
+            if (BandwithMax > _data.BandwithHighThreshold)
             {
                 BandwithProblems = ProblemScale.High;
             }
-            else if (BandwithMax > BandwithMediumThreshold.Get())
+            else if (BandwithMax > _data.BandwithMediumThreshold)
             {
                 BandwithProblems = ProblemScale.Medium;
             }
@@ -205,11 +184,11 @@ namespace Recusant
             Rtt = (float)sandbox.RTT * 1000.0f; // multiplying by 1000 to convert from seconds to milliseconds.
             RttProblems = ProblemScale.None;
 
-            if (Rtt > LatencyHighThreshold.Get())
+            if (Rtt > _data.LatencyHighThreshold)
             {
                 RttProblems = ProblemScale.High;
             }
-            else if (Rtt > LatencyMediumThreshold.Get())
+            else if (Rtt > _data.LatencyMediumThreshold)
             {
                 RttProblems = ProblemScale.Medium;
             }
@@ -222,11 +201,11 @@ namespace Recusant
             PacketLossMax = Mathf.Max(inLoss, outLoss);
             PacketLossProblems = ProblemScale.None;
 
-            if (PacketLossMax > PacketLossHighThreshold.Get())
+            if (PacketLossMax > _data.PacketLossHighThreshold)
             {
                 PacketLossProblems = ProblemScale.High;
             }
-            else if (PacketLossMax > PacketLossMediumThreshold.Get())
+            else if (PacketLossMax > _data.PacketLossMediumThreshold)
             {
                 PacketLossProblems = ProblemScale.Medium;
             }

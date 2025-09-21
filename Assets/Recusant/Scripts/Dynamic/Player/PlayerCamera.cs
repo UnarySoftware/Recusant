@@ -7,17 +7,19 @@ namespace Recusant
     {
         public GameObject Head;
 
-        public static GameplayVariableRanged<float, float> MinVerticalAngle = new(
-            GameplayGroup.Client, GameplayFlag.None, -89.0f, -89.9f, 89.9f, "Minimal angle that local player camera can lower down to");
+        public ScriptableObjectRef<PlayerCameraData> Data;
 
-        public static GameplayVariableRanged<float, float> MaxVerticalAngle = new(
-            GameplayGroup.Client, GameplayFlag.None, 89.0f, -89.9f, 89.9f, "Maximum angle that local player camera can go up to");
-
+        // TODO Move this to game settings
         public static GameplayVariableRanged<float, float> Sensitivity = new(
             GameplayGroup.Client, GameplayFlag.None, 1.0f, 0.0001f, 9999.9f, "Local player camera sensitivity");
 
         private Vector3 _rotation = Vector3.forward;
         private float _vertical = 0.0f;
+
+        private void Awake()
+        {
+            Data.Precache();
+        }
 
         public override void NetworkStart()
         {
@@ -39,7 +41,7 @@ namespace Recusant
         {
             var angles = rotation * Vector3.forward;
             _rotation = angles;
-            _vertical = Mathf.Clamp(angles.y, MinVerticalAngle.Get(), MaxVerticalAngle.Get());
+            _vertical = Mathf.Clamp(angles.y, Data.Value.MinVerticalAngle, Data.Value.MaxVerticalAngle);
             Head.transform.rotation = rotation;
         }
 
@@ -51,7 +53,7 @@ namespace Recusant
             Quaternion planarRot = Quaternion.LookRotation(_rotation, transform.up);
 
             _vertical -= (rotationInput.y * Sensitivity.Get());
-            _vertical = Mathf.Clamp(_vertical, MinVerticalAngle.Get(), MaxVerticalAngle.Get());
+            _vertical = Mathf.Clamp(_vertical, Data.Value.MinVerticalAngle, Data.Value.MaxVerticalAngle);
             Quaternion verticalRot = Quaternion.Euler(_vertical, 0, 0);
 
             Head.transform.rotation = planarRot * verticalRot;

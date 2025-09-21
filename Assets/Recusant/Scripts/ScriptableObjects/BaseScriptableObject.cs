@@ -8,6 +8,9 @@ namespace Recusant
         [NonSerialized]
         public int NetworkId = 0;
 
-        public abstract void Precache();
+        public virtual void Precache()
+        {
+
+        }
     }
 }

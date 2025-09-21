@@ -5,6 +5,7 @@ namespace Recusant
 {
     public class PlayerFlashlight : NetworkBehaviour
     {
+        // TODO Move this to game settings
         public static GameplayVariable<bool> EnableShadows = new(
             GameplayGroup.Server, GameplayFlag.Replicated, false, "Should our flashlight have detailed shadows");
 

@@ -6,8 +6,8 @@ namespace Recusant
 {
     public class PlayerInput : NetworkBehaviour
     {
-        public static GameplayVariable<bool> RotateWithPhysicsMover = new(
-            GameplayGroup.Server, GameplayFlag.Replicated, true, "Should our camera view move while standing on physics objects");
+        [SerializeField]
+        private ScriptableObjectRef<PlayerInputData> _data;
 
         public PlayerCamera OrbitCamera;
         public Transform CameraFollowPoint;
@@ -20,6 +20,11 @@ namespace Recusant
         private const string JumpInput = "Jump";
 
         public bool AllowInputs { get; set; } = true;
+
+        private void Awake()
+        {
+            _data.Precache();
+        }
 
         public override void NetworkStart()
         {
@@ -50,7 +55,7 @@ namespace Recusant
 
         private void LateUpdate()
         {
-            if (RotateWithPhysicsMover.Get())
+            if (_data.Value.RotateWithPhysicsMover)
             {
                 if (Character.Motor.AttachedRigidbody != null)
                 {

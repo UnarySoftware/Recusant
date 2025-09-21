@@ -7,16 +7,20 @@ namespace Recusant
 {
     public class PlayerNetworkVisual : NetworkBehaviour
     {
-        private PlayerNetworkData _data = null;
+        [SerializeField]
+        private ScriptableObjectRef<PlayerNetworkVisualData> _data;
+
+        private PlayerNetworkData _networkData = null;
         private PlayerCharacterController _pawnController = null;
 
-        public static GameplayVariableRanged<float, float> SmoothingTeleportRange = new(
-        GameplayGroup.Server, GameplayFlag.Replicated, 30.0f, 0.0001f, 99999.0f,
-        "Range at which proxy player would teleport instead of interpolation");
+        private void Awake()
+        {
+            _data.Precache();
+        }
 
         public override void NetworkStart()
         {
-            _data = GetComponent<PlayerNetworkData>();
+            _networkData = GetComponent<PlayerNetworkData>();
             _pawnController = GetComponent<PlayerCharacterController>();
 
             PlayerConnectedChangedEvent.Instance.Subscribe(OnConnectedChanged, this);
@@ -63,22 +67,22 @@ namespace Recusant
                 return;
             }
 
-            if (_data.Connected)
+            if (_networkData.Connected)
             {
-                Vector3 Euler = _data.Rotation.eulerAngles;
+                Vector3 Euler = _networkData.Rotation.eulerAngles;
                 _pawnController.Head.transform.localEulerAngles = new Vector3(Euler.x, 0, 0);
                 _pawnController.MeshRoot.transform.rotation = Quaternion.Euler(new Vector3(0, Euler.y, 0));
 
-                Vector3 Target = _data.Position;
+                Vector3 Target = _networkData.Position;
 
-                NetworkObject TargetMover = _data.Mover.GetObject(Sandbox);
+                NetworkObject TargetMover = _networkData.Mover.GetObject(Sandbox);
 
                 if (TargetMover != null)
                 {
-                    Target = TargetMover.transform.position + _data.Position;
+                    Target = TargetMover.transform.position + _networkData.Position;
                 }
 
-                if (_data.Teleporting || Vector3.Distance(_pawnController.transform.position, Target) >= SmoothingTeleportRange.Get())
+                if (_networkData.Teleporting || Vector3.Distance(_pawnController.transform.position, Target) >= _data.Value.SmoothingTeleportRange)
                 {
                     _pawnController.transform.position = Target;
                 }

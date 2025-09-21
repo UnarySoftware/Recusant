@@ -7,46 +7,8 @@ namespace Recusant
 {
     public class PlayerNetworkPhysics : NetworkBehaviour
     {
-
-        public static GameplayVariableRanged<float, float> OwnedPhysicsMassServer = new(
-            GameplayGroup.Server, GameplayFlag.None, 0.3f, 0.0001f, 99999.0f, "Local owned player mass for pushing of physics objects");
-
-        public static GameplayVariableRanged<float, float> OwnedPhysicsMassClient = new(
-            GameplayGroup.Server, GameplayFlag.None, 0.075f, 0.0001f, 99999.0f, "Proxy client player mass for pushing of physics objects");
-
-        // Physics ping related variables
-
-        public static GameplayVariableRanged<float, float> PhysicsPingDeltaInputMin = new(
-            GameplayGroup.Server, GameplayFlag.None, 35.0f, 0.0001f, 99999.0f, "Remapped ping input min for physics pushing");
-
-        public static GameplayVariableRanged<float, float> PhysicsPingDeltaInputMax = new(
-            GameplayGroup.Server, GameplayFlag.None, 250.0f, 0.0001f, 99999.0f, "Remapped ping input max for physics pushing");
-
-        public static GameplayVariableRanged<float, float> PhysicsPingDeltaOutputMin = new(
-            GameplayGroup.Server, GameplayFlag.None, 2.0f, 0.0001f, 99999.0f, "Remapped ping output min for physics pushing");
-
-        public static GameplayVariableRanged<float, float> PhysicsPingDeltaOutputMax = new(
-            GameplayGroup.Server, GameplayFlag.None, 2.5f, 0.0001f, 99999.0f, "Remapped ping output max for physics pushing");
-
-        public static GameplayVariableRanged<float, float> PhysicsPingDeltaClampMin = new(
-            GameplayGroup.Server, GameplayFlag.None, 1.9f, 0.0001f, 99999.0f, "Remapped ping clamped min for physics pushing");
-
-        public static GameplayVariableRanged<float, float> PhysicsPingDeltaClampMax = new(
-            GameplayGroup.Server, GameplayFlag.None, 2.6f, 0.0001f, 99999.0f, "Remapped ping clamped max for physics pushing");
-
-        // Physics magnitude related variables
-
-        public static GameplayVariableRanged<float, float> PhysicsMagnitudeDeltaMultiplier = new(
-            GameplayGroup.Server, GameplayFlag.None, -1.5f, -99999.0f, 99999.0f, "Magnitude delta multiplier for physics pushing");
-
-        public static GameplayVariableRanged<float, float> PhysicsMagnitudeDeltaAddition = new(
-            GameplayGroup.Server, GameplayFlag.None, 0.33f, 0.0001f, 99999.0f, "Magnitude delta addition for physics pushing");
-
-        public static GameplayVariableRanged<float, float> PhysicsMagnitudeClampMin = new(
-            GameplayGroup.Server, GameplayFlag.None, 0.02f, 0.0001f, 99999.0f, "Magnitude delta clamp min for physics pushing");
-
-        public static GameplayVariableRanged<float, float> PhysicsMagnitudeClampMax = new(
-            GameplayGroup.Server, GameplayFlag.None, 1.0f, 0.0001f, 99999.0f, "Magnitude delta clamp max for physics pushing");
+        [SerializeField]
+        private ScriptableObjectRef<PlayerNetworkPhysicsData> _data;
 
         private GameObject _rigidObject = null;
         private Rigidbody _rigid = null;
@@ -62,12 +24,17 @@ namespace Recusant
         private SingleLayer _proxyPhysicsMoverLayer = GameObjectLayerMask.ProxyPhysicsMover;
 
         private PlayerCharacterController _pawnController = null;
-        private PlayerNetworkData _data = null;
+        private PlayerNetworkData _networkData = null;
+
+        private void Awake()
+        {
+            _data.Precache();
+        }
 
         public override void NetworkStart()
         {
             _pawnController = GetComponent<PlayerCharacterController>();
-            _data = GetComponent<PlayerNetworkData>();
+            _networkData = GetComponent<PlayerNetworkData>();
 
             if (IsInputSource)
             {
@@ -75,11 +42,11 @@ namespace Recusant
 
                 if (IsServer)
                 {
-                    _pawnController.Motor.SimulatedCharacterMass = OwnedPhysicsMassServer.Get();
+                    _pawnController.Motor.SimulatedCharacterMass = _data.Value.OwnedPhysicsMassServer;
                 }
                 else
                 {
-                    _pawnController.Motor.SimulatedCharacterMass = OwnedPhysicsMassClient.Get();
+                    _pawnController.Motor.SimulatedCharacterMass = _data.Value.OwnedPhysicsMassClient;
                 }
             }
             else
@@ -140,7 +107,7 @@ namespace Recusant
             }
 
             // Get movement delta extrapolation between current position and previous
-            var extrapolation = _data.Position - _previousPosition;
+            var extrapolation = _networkData.Position - _previousPosition;
 
             // Cache extrapolation magnitude
             float magnitude = extrapolation.magnitude;
@@ -149,25 +116,25 @@ namespace Recusant
             extrapolation.y = 0.0f;
 
             // Remap ping into a delta adjustment for rigidbody extrapolation
-            float pingDelta = _data.Ping.Remap(
-                PhysicsPingDeltaInputMin.Get(),
-                PhysicsPingDeltaInputMax.Get(),
-                PhysicsPingDeltaOutputMin.Get(),
-                PhysicsPingDeltaOutputMax.Get());
+            float pingDelta = _networkData.Ping.Remap(
+                _data.Value.PhysicsPingDeltaInputMin,
+                _data.Value.PhysicsPingDeltaInputMax,
+                _data.Value.PhysicsPingDeltaOutputMin,
+                _data.Value.PhysicsPingDeltaOutputMax);
             // Clamp results
             pingDelta = Mathf.Clamp(pingDelta,
-                PhysicsPingDeltaClampMin.Get(),
-                PhysicsPingDeltaClampMax.Get());
+                _data.Value.PhysicsPingDeltaClampMin,
+                _data.Value.PhysicsPingDeltaClampMax);
 
             // Remap additional delta, which is scaled proportionally with the magnitude
             // Smaller movements by the rigidbody - bigger delta
             // Bigger movements by the rigidbody - smaller delta
-            float magnitudeDelta = (PhysicsMagnitudeDeltaMultiplier.Get() * magnitude) + PhysicsMagnitudeDeltaAddition.Get();
+            float magnitudeDelta = (_data.Value.PhysicsMagnitudeDeltaMultiplier * magnitude) + _data.Value.PhysicsMagnitudeDeltaAddition;
 
             // Clamp results
             magnitudeDelta = Mathf.Clamp(magnitudeDelta,
-                PhysicsMagnitudeClampMin.Get(),
-                PhysicsMagnitudeClampMax.Get());
+                _data.Value.PhysicsMagnitudeClampMin,
+                _data.Value.PhysicsMagnitudeClampMax);
 
             // Calculate final extrapolation delta before adding to current position
             extrapolation *= (pingDelta + magnitudeDelta);
@@ -177,10 +144,10 @@ namespace Recusant
             // 2. Adjust extrapolated disance with this ping (pingDelta)
             // 3. Adjust for small movements that might be caused by player rubbing against physics objects (magnitudeDelta)
             // 4. Take current position and apply final calculated extrapolation
-            _rigid.MovePosition(_data.Position + extrapolation);
+            _rigid.MovePosition(_networkData.Position + extrapolation);
 
             // Save previous position
-            _previousPosition = _data.Position;
+            _previousPosition = _networkData.Position;
         }
 
         public override void OnInputSourceLeft()
