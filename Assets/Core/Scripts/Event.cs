@@ -5,8 +5,10 @@ namespace Core
 {
     public abstract class BaseEvent<T> where T : BaseEvent<T>, new()
     {
-        private readonly List<Type> _subscriberTypes = new();
-        private readonly List<Func<T, bool>> _subscriberFuncs = new();
+        private static readonly List<Type> _subscriberTypes = new();
+        private static readonly List<Func<T, bool>> _subscriberFuncs = new();
+        private static List<T> _initQueue = new();
+        private static bool _initialized = false;
 
         private static T _instance = null;
         public static T Instance
@@ -19,26 +21,65 @@ namespace Core
             private set { }
         }
 
-        private readonly T _casted = null;
-
         protected BaseEvent()
         {
-            _casted = (T)this;
             Bootstrap.Instance.OnCleanupStaticState += OnCleanupStaticState;
+
+            if (Bootstrap.Instance.FinishedInitialization)
+            {
+                _initialized = true;
+            }
+            else
+            {
+                _initialized = false;
+                Bootstrap.Instance.OnFinishInitialization += OnFinishInitialization;
+            }
         }
 
         private void OnCleanupStaticState()
         {
             _instance = null;
+            _initialized = false;
             _subscriberTypes.Clear();
             _subscriberFuncs.Clear();
+            _initQueue.Clear();
+        }
+
+        private void OnFinishInitialization()
+        {
+            if(_initialized)
+            {
+                return;
+            }
+
+            foreach(var entry in _initQueue)
+            {
+                foreach (Func<T, bool> handler in _subscriberFuncs)
+                {
+                    if (!handler(entry))
+                    {
+                        break;
+                    }
+                }
+            }
+
+            _initQueue.Clear();
+
+            _initialized = true;
         }
 
         protected void Publish()
         {
+            if(!_initialized)
+            {
+                _initQueue.Add(_instance);
+                _instance = new();
+                return;
+            }
+
             foreach (Func<T, bool> handler in _subscriberFuncs)
             {
-                if (!handler(_casted))
+                if (!handler(_instance))
                 {
                     break;
                 }

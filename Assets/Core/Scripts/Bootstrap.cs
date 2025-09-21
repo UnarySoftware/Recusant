@@ -14,6 +14,8 @@ namespace Core
         private bool _initSuccess = true;
 
         public Action OnCleanupStaticState;
+        public Action OnFinishInitialization;
+        public bool FinishedInitialization { get; private set; }
 
         private static void Dummy()
         {
@@ -31,7 +33,7 @@ namespace Core
 
             _initSuccess = newSystem.Initialize();
 
-            if(!_initSuccess)
+            if (!_initSuccess)
             {
                 Logger.Instance.Error($"{typeof(T).Name} failed to initialize");
             }
@@ -44,11 +46,13 @@ namespace Core
         private void Awake()
         {
             OnCleanupStaticState = Dummy;
+            OnFinishInitialization = Dummy;
 
             DontDestroyOnLoad(this);
 
             Instance = this;
             IsRuntime = true;
+            FinishedInitialization = false;
 
             Init<Logger>();
             Init<Launcher>();
@@ -56,6 +60,9 @@ namespace Core
             Init<ModLoader>();
             Init<ContentLoader>();
             Init<Systems>();
+
+            FinishedInitialization = true;
+            OnFinishInitialization();
 
             if (!_initSuccess)
             {
