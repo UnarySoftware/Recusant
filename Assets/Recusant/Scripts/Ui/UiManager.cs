@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 namespace Recusant
 {
     [SystemPrefabInject("prefabslocal/ui/ui.prefab")]
-    public sealed class Ui : System<Ui>
+    public sealed class UiManager : System<UiManager>
     {
         [SerializeField]
         private List<PrefabRef<UiState>> _states;

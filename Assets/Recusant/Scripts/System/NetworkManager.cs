@@ -266,7 +266,7 @@ namespace Recusant
 
         private void OnSceneOperationBegan(NetworkSandbox sandbox, NetworkSceneOperation sceneOperation)
         {
-            Ui.Instance.GoForward(typeof(LoadingState));
+            UiManager.Instance.GoForward(typeof(LoadingState));
 
             NetworkSceneOperationEvent.Instance.Publish(NetworkSceneOperationType.Began, sandbox, sceneOperation);
         }

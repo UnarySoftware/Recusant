@@ -57,7 +57,7 @@ namespace Recusant
         {
             ContentLoader.Instance.UnloadDependencies(_dependencies.Result);
             _dependencies = null;
-            Ui.Instance.GoForward(typeof(MainMenuState));
+            UiManager.Instance.GoForward(typeof(MainMenuState));
         }
 
 #if UNITY_EDITOR
@@ -74,14 +74,14 @@ namespace Recusant
 
         private void OnLoadSceneAsyncEditor(AsyncOperation obj)
         {
-            Ui.Instance.GoForward(typeof(MainMenuState));
+            UiManager.Instance.GoForward(typeof(MainMenuState));
         }
 
 #endif
 
         public void LoadLevel(string path, LoadSceneParameters parameters)
         {
-            Ui.Instance.GoForward(typeof(LoadingState));
+            UiManager.Instance.GoForward(typeof(LoadingState));
 
 #if UNITY_EDITOR
             if (ContentLoader.Instance.IsEditorPath(path))

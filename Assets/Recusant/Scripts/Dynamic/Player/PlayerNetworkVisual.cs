@@ -49,7 +49,7 @@ namespace Recusant
 
                 if (IsInputSource)
                 {
-                    Ui.Instance.GoForward(typeof(GameplayState));
+                    UiManager.Instance.GoForward(typeof(GameplayState));
                 }
                 else
                 {

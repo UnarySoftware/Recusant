@@ -91,7 +91,10 @@ namespace Recusant.Editor
 
             foreach (var monoBehaviour in _monoBehaviours)
             {
-                types.Add(monoBehaviour.GetType());
+                if(monoBehaviour != null)
+                {
+                    types.Add(monoBehaviour.GetType());
+                }
             }
 
             foreach (var type in types)

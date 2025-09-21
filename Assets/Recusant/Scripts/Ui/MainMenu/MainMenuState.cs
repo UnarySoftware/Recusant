@@ -41,7 +41,7 @@ namespace Recusant
             HostButton.RegisterCallback<MouseUpEvent>((evt) =>
             {
                 NetworkManager.Instance.StartHost();
-                Ui.Instance.GoForward(typeof(LoadingState));
+                UiManager.Instance.GoForward(typeof(LoadingState));
             });
 
             ClientButton = Document.rootVisualElement.Q<Button>("Client");
@@ -58,12 +58,12 @@ namespace Recusant
 
                 if (startOnline)
                 {
-                    Ui.Instance.GoForward(typeof(StartClientState));
+                    UiManager.Instance.GoForward(typeof(StartClientState));
                 }
                 else
                 {
                     NetworkManager.Instance.StartClient();
-                    Ui.Instance.GoForward(typeof(LoadingState));
+                    UiManager.Instance.GoForward(typeof(LoadingState));
                 }
             });
 

@@ -6,7 +6,7 @@ namespace Recusant
 {
     public abstract class UiState : MonoBehaviour
     {
-        public static Ui Instance = null;
+        public static UiManager Instance = null;
 
         private readonly List<UiUnit> _uiUnits = new();
 

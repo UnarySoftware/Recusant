@@ -139,7 +139,7 @@ namespace Recusant
 
         private bool OnLobbyJoin(SteamLobbyJoinedEvent data)
         {
-            Ui.Instance.GoForward(typeof(LoadingState));
+            UiManager.Instance.GoForward(typeof(LoadingState));
 
             return true;
         }
