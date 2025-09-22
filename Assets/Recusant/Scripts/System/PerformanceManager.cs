@@ -7,7 +7,7 @@ namespace Recusant
     public class PerformanceManager : System<PerformanceManager>
     {
         [SystemAssetInject("scriptableobjects/system/performancemanagerdata.asset")]
-        private readonly PerformanceManagerData _data;
+        private readonly PerformanceManagerData _data = null;
 
         public enum ProblemScale
         {

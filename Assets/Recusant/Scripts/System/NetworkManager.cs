@@ -16,11 +16,14 @@ namespace Recusant
     {
         public int OnlineProviderPort { get; set; } = 0;
 
+        [SystemAssetInject("other/netickscenehandler.prefab")]
+        private readonly GameObject _sandboxPrefab = null;
+
         [SystemAssetInject("other/litenet.asset")]
-        public LiteNetLibTransportProvider OfflineTransportProvider;
+        private readonly LiteNetLibTransportProvider _offlineTransportProvider = null;
 
         [SystemAssetInject("other/steamworks.asset")]
-        public SteamworksTransportProvider OnlineTransportProvider;
+        private readonly SteamworksTransportProvider _onlineTransportProvider = null;
 
         public bool IsRunning { get; private set; } = false;
 
@@ -97,7 +100,7 @@ namespace Recusant
 
             _resolver.Clear();
 
-            List<string> paths = ContentLoader.Instance.GetAssetPaths("PrefabsNetwork");
+            List<string> paths = ContentLoader.Instance.GetAssetPaths("prefabsnetwork");
             List<NetworkObject> objects = new();
 
             foreach (var path in paths)
@@ -182,21 +185,18 @@ namespace Recusant
             }
 #endif
 
-            GameObject _sandboxPrefab = new();
-            _sandboxPrefab.AddComponent<NetickSceneHandler>();
-
             if (startOnline)
             {
                 OnlineProviderPort = UnityEngine.Random.Range(53000, 55000);
-                Sandbox = Network.StartAsHost(OnlineTransportProvider, OnlineProviderPort, _sandboxPrefab, InitConfig());
+                Sandbox = Network.StartAsHost(_onlineTransportProvider, OnlineProviderPort, _sandboxPrefab, InitConfig());
             }
             else
             {
-                Sandbox = Network.StartAsHost(OfflineTransportProvider, 53495, _sandboxPrefab, InitConfig());
+                Sandbox = Network.StartAsHost(_offlineTransportProvider, 53495, _sandboxPrefab, InitConfig());
             }
 
             Subscribe();
-            Sandbox.LoadCustomSceneAsync(NetickSceneHandler.Instance.GetSceneIndex("Quarry"), new() { loadSceneMode = LoadSceneMode.Single, localPhysicsMode = LocalPhysicsMode.Physics3D });
+            Sandbox.LoadCustomSceneAsync(LevelManager.Instance.GetSceneIndex("Quarry"), new() { loadSceneMode = LoadSceneMode.Single, localPhysicsMode = LocalPhysicsMode.Physics3D });
             IsRunning = true;
             IsServer = true;
         }
@@ -212,16 +212,13 @@ namespace Recusant
             }
 #endif
 
-            GameObject _sandboxPrefab = new();
-            _sandboxPrefab.AddComponent<NetickSceneHandler>();
-
             if (startOnline)
             {
-                Sandbox = Network.StartAsClient(OnlineTransportProvider, UnityEngine.Random.Range(53000, 55000), _sandboxPrefab, InitConfig());
+                Sandbox = Network.StartAsClient(_onlineTransportProvider, UnityEngine.Random.Range(53000, 55000), _sandboxPrefab, InitConfig());
             }
             else
             {
-                Sandbox = Network.StartAsClient(OfflineTransportProvider, 53555, _sandboxPrefab, InitConfig());
+                Sandbox = Network.StartAsClient(_offlineTransportProvider, 53555, _sandboxPrefab, InitConfig());
             }
 
             Subscribe();

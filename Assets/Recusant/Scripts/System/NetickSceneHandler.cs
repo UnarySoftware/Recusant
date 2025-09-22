@@ -85,7 +85,7 @@ namespace Recusant
         {
             get
             {
-                if(_operation == null)
+                if (_operation == null)
                 {
                     return false;
                 }
@@ -100,7 +100,7 @@ namespace Recusant
         {
             get
             {
-                if(_operation == null)
+                if (_operation == null)
                 {
                     return 1.0f;
                 }
@@ -114,51 +114,20 @@ namespace Recusant
 
     public class NetickSceneHandler : NetworkSceneHandler
     {
-        private List<string> _scenePaths;
-        private Dictionary<string, int> _nameToId = new();
-        private Dictionary<int, string> _IdToName = new();
-
-        public override int CustomScenesCount => _scenePaths != null ? _scenePaths.Count : 0;
+        public override int CustomScenesCount => LevelManager.Instance.SceneCount;
 
         public static NetickSceneHandler Instance { get; private set; }
 
         private void Awake()
         {
             Instance = this;
-
-            _scenePaths = ContentLoader.Instance.GetAssetPaths("levels");
-
-            for (int i = 0; i < _scenePaths.Count; i++)
-            {
-                string path = _scenePaths[i];
-
-                if(!path.EndsWith(".unity"))
-                {
-                    continue;
-                }
-
-                string name = Path.GetFileNameWithoutExtension(path);
-                _nameToId[name] = i;
-                _IdToName[i] = name;
-            }
-        }
-
-        private void OnDestroy()
-        {
-
-        }
-
-        public int GetSceneIndex(string scene)
-        {
-            scene = scene.ToLower();
-            return _nameToId[scene];
         }
 
         protected override ISceneOperation LoadCustomSceneAsync(int index, LoadSceneParameters loadSceneParameters, out string sceneName)
         {
-            sceneName = _IdToName[index];
+            sceneName = LevelManager.Instance.GetScenePath(index);
 
-            string selectedScene = _scenePaths[index];
+            string selectedScene = LevelManager.Instance.GetScenePath(index);
 
 #if UNITY_EDITOR
 

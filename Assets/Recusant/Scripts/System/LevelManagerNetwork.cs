@@ -75,7 +75,7 @@ namespace Recusant
             if (CurrentCount == TargetCount && validLevel)
             {
                 // TODO Move this to a custom method
-                NetworkManager.Instance.Sandbox.LoadCustomSceneAsync(NetickSceneHandler.Instance.GetSceneIndex(levelName),
+                NetworkManager.Instance.Sandbox.LoadCustomSceneAsync(LevelManager.Instance.GetSceneIndex(levelName),
                     new() { loadSceneMode = LoadSceneMode.Single, localPhysicsMode = LocalPhysicsMode.Physics3D });
             }
         }

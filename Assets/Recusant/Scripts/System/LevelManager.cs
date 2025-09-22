@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Threading.Tasks;
+using System.IO;
+
 
 
 #if UNITY_EDITOR
@@ -21,12 +23,62 @@ namespace Recusant
 
     public class LevelManager : SystemNetworkRoot<LevelManager, LevelManagerShared>
     {
+        private List<string> _scenePaths;
+        private Dictionary<string, int> _nameToId = new();
+        private Dictionary<int, string> _IdToName = new();
+
+        public int GetSceneIndex(string scene)
+        {
+            scene = scene.ToLower();
+
+            if(_nameToId.TryGetValue(scene, out int id))
+            {
+                return id;
+            }
+
+            return -1;
+        }
+
+        public string GetScenePath(int index)
+        {
+            if(index < 0 || index >= _scenePaths.Count)
+            {
+                return null;
+            }
+
+            return _scenePaths[index];
+        }
+
+        public int SceneCount
+        {
+            get
+            {
+                return _scenePaths.Count;
+            }
+        }
+
         private readonly Dictionary<Vector3Int, AiBoundData> _spatialBounds = new();
 
         public CompiledLevelData LevelData { get; private set; } = null;
 
         public override void Initialize()
         {
+            _scenePaths = ContentLoader.Instance.GetAssetPaths("levels");
+
+            for (int i = 0; i < _scenePaths.Count; i++)
+            {
+                string path = _scenePaths[i];
+
+                if (!path.EndsWith(".unity"))
+                {
+                    continue;
+                }
+
+                string name = Path.GetFileNameWithoutExtension(path);
+                _nameToId[name] = i;
+                _IdToName[i] = name;
+            }
+
             LoadSceneParameters parameters = new()
             {
                 loadSceneMode = LoadSceneMode.Single,
