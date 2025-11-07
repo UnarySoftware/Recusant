@@ -1,8 +1,9 @@
 {
 	"Enabled":
-	[
-		"Recusant",
-		"TestMod1",
-		"TestMod2"
-	]
+	{
+		"Unary.Core": "0.0.1",
+		"Unary.Recusant": "0.0.1",
+		"Unary.TestMod1": "0.0.1",
+		"Unary.TestMod2": "0.0.1"
+	}
 }

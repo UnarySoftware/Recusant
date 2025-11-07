@@ -1,0 +1,19 @@
+{
+    "name": "Unary.Core.Editor",
+    "rootNamespace": "Unary.Core.Editor",
+    "references": [
+        "Unary.Core",
+        "Unity.RenderPipelines.Core.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

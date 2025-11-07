@@ -1,0 +1,25 @@
+{
+    "name": "Unary.Recusant",
+    "rootNamespace": "Unary.Recusant",
+    "references": [
+        "Unary.Core",
+        "KinematicCharacterController",
+        "Highlight",
+        "com.rlabrecque.steamworks.net",
+        "Unity.TextMeshPro",
+        "Steamworks Transport",
+        "Unity.Collections",
+        "LiteNetLib",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Core.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

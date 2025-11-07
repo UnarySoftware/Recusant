@@ -1,0 +1,23 @@
+{
+    "name": "Unary.Recusant.Editor",
+    "rootNamespace": "Unary.Recusant.Editor",
+    "references": [
+        "Unary.Core",
+        "Unary.Core.Editor",
+        "Unary.Recusant",
+        "ToolbarExtender.Editor",
+        "Unity.AI.Navigation",
+        "com.rlabrecque.steamworks.net"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
