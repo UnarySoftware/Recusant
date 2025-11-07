@@ -1,7 +1,5 @@
 using Unary.Core;
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 using UnityEngine.UIElements;
 using Steamworks;
 
@@ -10,8 +8,11 @@ namespace Unary.Recusant
     public class MainMenuState : UiState
     {
         private UIDocument Document;
+
         private Button HostButton;
         private Button ClientButton;
+        private Button QuitButton;
+
         private Label CurrentPlayers;
 
         private CallResult<NumberOfCurrentPlayers_t> OnNumberOfCurrentPlayersCallback;
@@ -55,6 +56,12 @@ namespace Unary.Recusant
                 {
                     NetworkManager.Instance.StartClient();
                 }
+            });
+
+            QuitButton = Document.rootVisualElement.Q<Button>("Quit");
+            QuitButton.RegisterCallback<MouseUpEvent>((evt) =>
+            {
+                Bootstrap.Instance.Quit();
             });
 
         }

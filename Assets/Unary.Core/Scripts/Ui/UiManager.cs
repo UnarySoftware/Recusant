@@ -128,5 +128,13 @@ namespace Unary.Core
                 GoForward(_currentState.GetBackState());
             }
         }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                GoBack();
+            }
+        }
     }
 }

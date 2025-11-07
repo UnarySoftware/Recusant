@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Unary.Recusant
 {
-    public class GameplayState : Core.UiState
+    public class GameplayPauseState : Core.UiState
     {
         public override void Initialize()
         {
@@ -20,28 +20,17 @@ namespace Unary.Recusant
         {
             base.Open();
 
-            Cursor.lockState = CursorLockMode.Locked;
-
-            StartCoroutine(DelayProfiling());
-        }
-
-        IEnumerator DelayProfiling()
-        {
-            yield return new WaitForSeconds(4.0f);
-            // TODO Delay profiling here
-            //PerformanceManager.Instance.Profiling = true;
+            Cursor.lockState = CursorLockMode.None;
         }
 
         public override void Close()
         {
             base.Close();
-
-            //PerformanceManager.Instance.Profiling = false;
         }
 
         public override Type GetBackState()
         {
-            return typeof(GameplayPauseState);
+            return typeof(GameplayState);
         }
     }
 }
