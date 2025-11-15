@@ -8,8 +8,6 @@ namespace Unary.Recusant
 {
     public class StartClientLobbies : UiUnit
     {
-        public static CoreVersion Instance = null;
-
         public AssetRef<VisualTreeAsset> LobbyEntry;
 
         private Button _refreshButton = null;
@@ -18,7 +16,7 @@ namespace Unary.Recusant
 
         private readonly Dictionary<string, CSteamID> _ownerToLobby = new();
 
-        private string _selecterOwner = null;
+        private string _selectedOwner = null;
         private VisualElement _selectedLobby = null;
 
         private void OnLobbySelected(MouseUpEvent evt)
@@ -39,7 +37,7 @@ namespace Unary.Recusant
                     _selectedLobby.style.backgroundColor = UnityEngine.Color.gray4;
                 }
 
-                _selecterOwner = ownerLabel.text;
+                _selectedOwner = ownerLabel.text;
 
                 _selectedLobby = newSelectedLobby;
                 _selectedLobby.style.backgroundColor = UnityEngine.Color.darkGreen;
@@ -48,7 +46,7 @@ namespace Unary.Recusant
 
         private void OnRefreshPressed(MouseUpEvent _)
         {
-            _selecterOwner = string.Empty;
+            _selectedOwner = string.Empty;
             _selectedLobby = null;
 
             _ownerToLobby.Clear();
@@ -83,8 +81,8 @@ namespace Unary.Recusant
             {
                 CSteamID lobby = SteamMatchmaking.GetLobbyByIndex(i);
 
-                var NewEntry = LobbyEntry.Value.Instantiate();
-                NewEntry.style.backgroundColor = UnityEngine.Color.gray4;
+                var newEntry = LobbyEntry.Value.Instantiate();
+                newEntry.style.backgroundColor = UnityEngine.Color.gray4;
 
                 string lobbyOwnerName = SteamMatchmaking.GetLobbyData(lobby, "OwnerName");
                 ulong lobbyOwnerSteamId = 0;
@@ -99,7 +97,7 @@ namespace Unary.Recusant
                     lobbyOwnerName = SteamFriends.GetFriendPersonaName(resolvedOwner);
                 }
 
-                NewEntry.Q<Label>("HostName").text = lobbyOwnerName;
+                newEntry.Q<Label>("HostName").text = lobbyOwnerName;
 
                 string mapText = SteamMatchmaking.GetLobbyData(lobby, "Map");
 
@@ -108,11 +106,11 @@ namespace Unary.Recusant
                     mapText += " <color=red>(DEBUG)</color>";
                 }
 
-                NewEntry.Q<Label>("Map").text = mapText;
+                newEntry.Q<Label>("Map").text = mapText;
 
-                NewEntry.Q<Label>("PlayerCount").text = SteamMatchmaking.GetNumLobbyMembers(lobby) + "/" + SteamMatchmaking.GetLobbyMemberLimit(lobby);
-                _lobbies.Add(NewEntry);
-                NewEntry.RegisterCallback<MouseUpEvent>(OnLobbySelected);
+                newEntry.Q<Label>("PlayerCount").text = SteamMatchmaking.GetNumLobbyMembers(lobby) + "/" + SteamMatchmaking.GetLobbyMemberLimit(lobby);
+                _lobbies.Add(newEntry);
+                newEntry.RegisterCallback<MouseUpEvent>(OnLobbySelected);
 
                 _ownerToLobby[lobbyOwnerName] = lobby;
             }
@@ -127,12 +125,12 @@ namespace Unary.Recusant
                 return;
             }
 
-            if (_selecterOwner == string.Empty)
+            if (_selectedOwner == string.Empty)
             {
                 return;
             }
 
-            CSteamID targetLobby = _ownerToLobby[_selecterOwner];
+            CSteamID targetLobby = _ownerToLobby[_selectedOwner];
 
             SteamLobbyManager.Instance.EnterLobby(targetLobby);
         }
