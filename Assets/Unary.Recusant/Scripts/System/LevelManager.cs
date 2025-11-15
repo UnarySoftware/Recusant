@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Threading.Tasks;
 using System.IO;
+using System;
+
 
 #if UNITY_EDITOR
 
@@ -101,6 +103,7 @@ namespace Unary.Recusant
 
         private Task<Dictionary<PackageIndexEntry, AssetBundle>> _dependencies;
         private AsyncOperation _operation;
+        private AsyncOperation _resourcesOperation;
         private Task _loadTask;
         private Task _sceneLoaded;
         private Task _unloadDependencies;
@@ -161,7 +164,25 @@ namespace Unary.Recusant
 
             _dependencies = null;
 
-            Loading = false;
+            _resourcesOperation = Resources.UnloadUnusedAssets();
+            _resourcesOperation.completed += (op) =>
+            {
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                Loading = false;
+            };
+
+            LoadingManager.Instance.AddJob("Unloading unused resources", () =>
+            {
+                if (_resourcesOperation == null)
+                {
+                    return 1.0f;
+                }
+
+                return _resourcesOperation.progress;
+            });
+
+            await _resourcesOperation;
         }
 
 #if UNITY_EDITOR
@@ -185,7 +206,25 @@ namespace Unary.Recusant
 
                 await _operation;
 
-                Loading = false;
+                _resourcesOperation = Resources.UnloadUnusedAssets();
+                _resourcesOperation.completed += (op) =>
+                {
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    Loading = false;
+                };
+
+                LoadingManager.Instance.AddJob("Unloading unused resources", () =>
+                {
+                    if (_resourcesOperation == null)
+                    {
+                        return 1.0f;
+                    }
+
+                    return _resourcesOperation.progress;
+                });
+
+                await _resourcesOperation;
             }
         }
 

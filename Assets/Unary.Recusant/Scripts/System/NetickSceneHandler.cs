@@ -22,6 +22,7 @@ namespace Unary.Recusant
         private Task _sceneLoaded;
         private Task _unloadDependencies;
         private AsyncOperation _operation;
+        private AsyncOperation _resourcesOperation;
         private ContentLoader.Progress _progress = new();
 
         public AssetBundleSceneOperation(string assetPath)
@@ -105,8 +106,24 @@ namespace Unary.Recusant
 
             _loadedDependencies = null;
 
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
+            _resourcesOperation = Resources.UnloadUnusedAssets();
+            _resourcesOperation.completed += (op) =>
+            {
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+            };
+
+            LoadingManager.Instance.AddJob("Unloading unused resources", () =>
+            {
+                if (_resourcesOperation == null)
+                {
+                    return 1.0f;
+                }
+
+                return _resourcesOperation.progress;
+            });
+
+            await _resourcesOperation;
         }
 
         public bool IsDone
