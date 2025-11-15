@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceafd6e03b5743c4980a5c2bf277b8b2, type: 3}
+  m_Name: Unary.TestMod2
+  m_EditorClassIdentifier: Unary.Recusant::Unary.Recusant.ContentManifest
+  ModId: Unary.TestMod2
+  FullName: Test Mod 2
+  FullDescription: Test Mod 2 Description
+  Preview:
+    AssetId:
+      _bytes: e51b6a108adc2487aa9bbb6cb0b4a921
+  Items: 0
+  Players: 0
+  Npcs: 0
+  Gamemodes: 0
+  Hub: 0
+  Weapons: 0
+  Skins: 0
+  Scripts: 0
+  Campaigns: 1

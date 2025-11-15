@@ -1,14 +1,14 @@
 {
   "ModId": "Unary.TestMod2",
   "Version": "0.0.1",
-  "BuildNumber": 91,
-  "BuildDate": "01.11.2025 00:20:36",
+  "BuildNumber": 92,
+  "BuildDate": "14.11.2025 13:25:01",
   "Dependency": {
     "Unary.Core": "0.0.1",
     "Unary.Recusant": "0.0.1",
     "Unary.TestMod1": "0.0.1"
   },
   "PublishedFileId": {
-    "m_PublishedFileId": 3597014254
+    "m_PublishedFileId": 3604383543
   }
 }

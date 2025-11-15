@@ -53,7 +53,7 @@ namespace Unary.Recusant
 
         public void Start()
         {
-            LevelManager.Instance.LevelData.AiMarkups[Index] = this;
+            LevelManager.Instance.CompiledLevelData.AiMarkups[Index] = this;
         }
 
 #if UNITY_EDITOR

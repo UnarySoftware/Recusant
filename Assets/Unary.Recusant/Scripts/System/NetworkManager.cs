@@ -181,7 +181,7 @@ namespace Unary.Recusant
             }
 
             Subscribe();
-            LevelManager.Instance.LoadLevelNetworked("Train");
+            LevelManager.Instance.LoadLevelNetworked("train");
             IsRunning = true;
             IsServer = true;
         }

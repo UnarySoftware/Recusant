@@ -1,5 +1,5 @@
-using Unary.Core;
 using Netick.Unity;
+using Unary.Core;
 using UnityEngine;
 
 namespace Unary.Recusant
@@ -7,7 +7,7 @@ namespace Unary.Recusant
     [RequireComponent(typeof(NetworkObject))]
     public class LevelRoot : NetworkBehaviourExtended
     {
-        public CompiledLevelData Data;
+        public CompiledLevelData CompiledLevelData;
 
 #if UNITY_EDITOR
         public void Destroy(GameObject target)
@@ -25,7 +25,7 @@ namespace Unary.Recusant
         {
             LevelManager.Instance.OnStart.Publish(new()
             {
-                LevelData = Data,
+                LevelDefinition = LevelManager.Instance.LevelDefinition,
                 LevelRoot = this
             });
         }
@@ -39,7 +39,7 @@ namespace Unary.Recusant
 
             LevelManager.Instance.OnAwakeNetwork.Publish(new()
             {
-                LevelData = Data,
+                LevelDefinition = LevelManager.Instance.LevelDefinition,
                 LevelRoot = this
             });
         }
@@ -48,7 +48,7 @@ namespace Unary.Recusant
         {
             LevelManager.Instance.OnStartNetwork.Publish(new()
             {
-                LevelData = Data,
+                LevelDefinition = LevelManager.Instance.LevelDefinition,
                 LevelRoot = this
             });
         }
@@ -59,7 +59,7 @@ namespace Unary.Recusant
             {
                 LevelManager.Instance.OnDestroy.Publish(new()
                 {
-                    LevelData = Data,
+                    LevelDefinition = LevelManager.Instance.LevelDefinition,
                     LevelRoot = this
                 });
             }
@@ -69,7 +69,7 @@ namespace Unary.Recusant
         {
             LevelManager.Instance.OnDestroyNetwork.Publish(new()
             {
-                LevelData = Data,
+                LevelDefinition = LevelManager.Instance.LevelDefinition,
                 LevelRoot = this
             });
         }

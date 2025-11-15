@@ -66,7 +66,7 @@ namespace Unary.Core
             }
         }
 
-        private void Awake()
+        private void Initialize()
         {
             IsDebug = false;
 
@@ -98,6 +98,11 @@ namespace Unary.Core
             Init<ModLoader>();
             Init<ContentLoader>();
             Init<Reflector>();
+            Init<LoadingScreen>();
+        }
+
+        private void InitializeUpdate()
+        {
             Init<ShaderManager>();
             Init<ScriptableObjectRegistry>();
             Init<Systems>();
@@ -121,6 +126,30 @@ namespace Unary.Core
             else
             {
                 Logger.Instance.Log("Finished Unary.Core initialization successfully");
+            }
+        }
+
+        private bool OnInitialized = false;
+
+        public void Awake()
+        {
+            if (!OnInitialized)
+            {
+                OnInitialized = true;
+                Initialize();
+                return;
+            }
+        }
+
+        private bool OnInitializedUpdate = false;
+
+        public void Update()
+        {
+            if (!OnInitializedUpdate)
+            {
+                OnInitializedUpdate = true;
+                InitializeUpdate();
+                return;
             }
         }
 

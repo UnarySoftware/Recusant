@@ -18,12 +18,12 @@ namespace Unary.Recusant
         {
             if (NetworkManager.Instance.IsClient ||
                 LevelManager.Instance == null ||
-                LevelManager.Instance.LevelData == null)
+                LevelManager.Instance.CompiledLevelData == null)
             {
                 return;
             }
 
-            AiTriangleData[] flowTriangles = LevelManager.Instance.LevelData.AiTriangles;
+            AiTriangleData[] flowTriangles = LevelManager.Instance.CompiledLevelData.AiTriangles;
 
             float flow = float.PositiveInfinity;
 

@@ -218,18 +218,23 @@ namespace Unary.Core
                     continue;
                 }
 
+                if (lowercase.EndsWith("/.gitkeep"))
+                {
+                    continue;
+                }
+
                 if (IsEditorOnlyAsset(lowercase))
                 {
                     continue;
                 }
 
-                if (lowercase.Count(c => c == '/') >= 4)
+                if (lowercase.Count(c => c == '/') > 3)
                 {
                     string[] parts = lowercase.Split('/');
 
                     if (parts[0] == "assets" && parts[2] == "levels" && !lowercase.EndsWith(".unity"))
                     {
-                        if (parts[4] != "data.asset")
+                        if (parts[4] != "compiledleveldata.asset")
                         {
                             continue;
                         }
@@ -239,7 +244,7 @@ namespace Unary.Core
                 Type assetType = AssetDatabase.GetMainAssetTypeAtPath(lowercase);
 
                 // Dont add original collections directly on their own
-                if(assetType == typeof(ShaderVariantCollection))
+                if (assetType == typeof(ShaderVariantCollection))
                 {
                     continue;
                 }

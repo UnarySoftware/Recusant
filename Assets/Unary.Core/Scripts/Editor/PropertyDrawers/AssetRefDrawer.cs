@@ -8,7 +8,7 @@ using System.Reflection;
 namespace Unary.Core.Editor
 {
     [CustomPropertyDrawer(typeof(AssetRef<>))]
-    //[CustomPropertyDrawer(typeof(ScriptableObjectRef<>))]
+    [CustomPropertyDrawer(typeof(ScriptableObjectRef<>))]
     [CustomPropertyDrawer(typeof(PrefabRef<>))]
     public class AssetRefDrawer : PropertyDrawer
     {

@@ -31,14 +31,14 @@ namespace Unary.Recusant
                 return;
             }
 
-            CompiledLevelData levelData = LevelManager.Instance.LevelData;
+            LevelDefinition levelDefinition = LevelManager.Instance.LevelDefinition;
 
-            if (levelData == null)
+            if (levelDefinition == null)
             {
                 return;
             }
 
-            SteamScreenshots.SetLocation(data.m_hLocal, levelData.LevelName);
+            SteamScreenshots.SetLocation(data.m_hLocal, levelDefinition.FullName);
 
             List<CSteamID> taggedUsers = new();
 

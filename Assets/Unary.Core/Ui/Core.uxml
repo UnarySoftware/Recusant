@@ -1,0 +1,15 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:VisualElement name="Console" enabled="true" style="flex-grow: 1; width: 48%; height: 96%; max-width: 48%; max-height: 97%; min-height: 25%; min-width: 25%; -unity-background-image-tint-color: rgb(118, 118, 118); background-color: rgba(80, 80, 80, 0); align-items: stretch; justify-content: space-between; align-content: flex-start; align-self: stretch; margin-top: 0; margin-left: 0; margin-right: 0; right: 0%; position: relative; top: 1%; left: 1%; bottom: initial; display: flex;">
+        <engine:VisualElement name="ConsoleHeader" style="flex-grow: 0; background-color: rgba(61, 61, 61, 0.94); flex-direction: row;">
+            <engine:Label text="Console" name="ConsoleHeaderText" style="color: rgb(255, 255, 255); -unity-text-align: middle-center; flex-direction: row; flex-grow: 1;" />
+        </engine:VisualElement>
+        <engine:ScrollView name="ConsoleList" enabled="true" vertical-scroller-visibility="Auto" horizontal-scroller-visibility="Hidden" style="justify-content: space-evenly; align-content: stretch; align-items: stretch; align-self: flex-start; flex-grow: 1; background-color: rgba(80, 80, 80, 0.94); width: 100%; height: 100%;" />
+    </engine:VisualElement>
+    <engine:VisualElement name="Performance" style="top: 0; left: auto; flex-direction: column; position: absolute; right: 2px;">
+        <engine:VisualElement name="NumberRoot" style="flex-grow: 1; flex-direction: row-reverse;" />
+        <engine:VisualElement name="TextRoot" style="flex-grow: 1; align-items: flex-end; justify-content: space-between; align-self: auto; flex-direction: column; align-content: auto;" />
+    </engine:VisualElement>
+    <engine:VisualElement name="Version" style="flex-grow: 1; position: absolute; left: auto; bottom: 0; right: 0;">
+        <engine:Label text="%Version%" name="VersionLabel" style="color: rgb(255, 255, 255); font-size: 20px; -unity-font-style: normal; text-shadow: 0 0 5px rgb(0, 0, 0); -unity-font-definition: url(&quot;project://database/Assets/Unary.Core/Ui/DefaultTheme.tss?fileID=2230732570650464555&amp;guid=544148cb8ed5fbe45b4542b12702314f&amp;type=3#NotInter-Regular&quot;);" />
+    </engine:VisualElement>
+</engine:UXML>

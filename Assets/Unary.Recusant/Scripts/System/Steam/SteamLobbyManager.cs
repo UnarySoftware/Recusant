@@ -59,11 +59,11 @@ namespace Unary.Recusant
             {
                 if (!GotLobby)
                 {
-                    CreateLobby(data.LevelData.LevelName);
+                    CreateLobby(data.LevelDefinition.FullName);
                 }
                 else
                 {
-                    LobbyMapName = data.LevelData.LevelName;
+                    LobbyMapName = data.LevelDefinition.FullName;
                 }
             }
 

@@ -5,172 +5,99 @@
 
 # Root folders
 
-/Library/
-/Temp/
-/obj/
-/Mods/
-/Player/
-/Cache/
-/PlayerDebug/
-/Logs/
-/UserSettings/
-/UiElementsSchema/
-/Saves/
-/MemoryCaptures/
-/Packages/
-/UserSettings/
-/ProjectSettings/
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Mm]ods/
+/[Pp]layer/
+/[Cc]ache/
+/[Pp]layer[Dd]ebug/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Uu]i[Ee]lements[Ss]chema/
+/[Ss]aves/
+/[Mm]emory[Cc]aptures/
+/[Rr]ecordings/
+/[Pp]roject[Ss]ettings/
 
-# Asset files
+# Root asset folders
 
-/Assets/EditorAssets/
-Assets/EditorAssets.meta
-Assets/Bootstrap.unity
-Assets/Bootstrap.unity.meta
-Assets/Empty.unity
-Assets/Empty.unity.meta
-/Assets/Input/
-Assets/Input.meta
-/Assets/Netick/
-Assets/Netick.meta
-/Assets/Plugins/
-Assets/Plugins.meta
-/Assets/Temp/
-Assets/Temp.meta
-/Assets/Thirdparty/
-Assets/Thirdparty.meta
-/Assets/UI Toolkit/
-Assets/UI Toolkit.meta
-/Assets/URP/
-Assets/URP.meta
-/Assets/Polybrush Data/
-Assets/Polybrush Data.meta
+Assets/EditorAssets/**
+!Assets/EditorAssets/**/.gitkeep
+Assets/Netick/**
+!Assets/Netick/**/.gitkeep
+Assets/Plugins/**
+!Assets/Plugins/**/.gitkeep
+Assets/Polybrush Data/**
+!Assets/Polybrush Data/**/.gitkeep
+Assets/ProBuilder Data/**
+!Assets/ProBuilder Data/**/.gitkeep
+Assets/Temp/**
+!Assets/Temp/**/.gitkeep
+Assets/Thirdparty/**
+!Assets/Thirdparty/**/.gitkeep
+Assets/URP/ReaderCollection.asset
+Assets/URP/EditorCollection.asset
 
 # Mod Files
 
-/Assets/Unary.Core/Audio/
-Assets/Unary.Core/Audio.meta
-/Assets/Unary.Core/Bundles/
-Assets/Unary.Core/Bundles.meta
-Assets/Unary.Core/ContentManifest.asset
-Assets/Unary.Core/ContentManifest.asset.meta
-/Assets/Unary.Core/Levels/
-Assets/Unary.Core/Levels.meta
-/Assets/Unary.Core/Materials/
-Assets/Unary.Core/Materials.meta
-/Assets/Unary.Core/Models/
-Assets/Unary.Core/Models.meta
-/Assets/Unary.Core/Other/
-Assets/Unary.Core/Other.meta
-/Assets/Unary.Core/Particles/
-Assets/Unary.Core/Particles.meta
-/Assets/Unary.Core/PrefabsLocal/
-Assets/Unary.Core/PrefabsLocal.meta
-/Assets/Unary.Core/PrefabsNetwork/
-Assets/Unary.Core/PrefabsNetwork.meta
-/Assets/Unary.Core/ScriptableObjects/
-Assets/Unary.Core/ScriptableObjects.meta
-/Assets/Unary.Core/Sound/
-Assets/Unary.Core/Sound.meta
-/Assets/Unary.Core/Textures/
-Assets/Unary.Core/Textures.meta
-/Assets/Unary.Core/Ui/
-Assets/Unary.Core/Ui.meta
-/Assets/Unary.Core/Shaders/
-Assets/Unary.Core/Shaders.meta
+# Core
 
-/Assets/Unary.Recusant/Audio/
-Assets/Unary.Recusant/Audio.meta
-/Assets/Unary.Recusant/Bundles/
-Assets/Unary.Recusant/Bundles.meta
-Assets/Unary.Recusant/ContentManifest.asset
-Assets/Unary.Recusant/ContentManifest.asset.meta
-/Assets/Unary.Recusant/Levels/
-Assets/Unary.Recusant/Levels.meta
-/Assets/Unary.Recusant/Materials/
-Assets/Unary.Recusant/Materials.meta
-/Assets/Unary.Recusant/Models/
-Assets/Unary.Recusant/Models.meta
-/Assets/Unary.Recusant/Other/
-Assets/Unary.Recusant/Other.meta
-/Assets/Unary.Recusant/Particles/
-Assets/Unary.Recusant/Particles.meta
-/Assets/Unary.Recusant/PrefabsLocal/
-Assets/Unary.Recusant/PrefabsLocal.meta
-/Assets/Unary.Recusant/PrefabsNetwork/
-Assets/Unary.Recusant/PrefabsNetwork.meta
-/Assets/Unary.Recusant/ScriptableObjects/
-Assets/Unary.Recusant/ScriptableObjects.meta
-/Assets/Unary.Recusant/Sound/
-Assets/Unary.Recusant/Sound.meta
-/Assets/Unary.Recusant/Textures/
-Assets/Unary.Recusant/Textures.meta
-/Assets/Unary.Recusant/Ui/
-Assets/Unary.Recusant/Ui.meta
-/Assets/Unary.Recusant/Shaders/
-Assets/Unary.Recusant/Shaders.meta
+Assets/Unary.Core/Shaders/**
+!Assets/Unary.Core/Shaders/.gitkeep
+Assets/Unary.Core/Textures/**
+!Assets/Unary.Core/Textures/.gitkeep
 
-/Assets/Unary.TestMod1/Audio/
-Assets/Unary.TestMod1/Audio.meta
-/Assets/Unary.TestMod1/Bundles/
-Assets/Unary.TestMod1/Bundles.meta
-Assets/Unary.TestMod1/ContentManifest.asset
-Assets/Unary.TestMod1/ContentManifest.asset.meta
-/Assets/Unary.TestMod1/Levels/
-Assets/Unary.TestMod1/Levels.meta
-/Assets/Unary.TestMod1/Materials/
-Assets/Unary.TestMod1/Materials.meta
-/Assets/Unary.TestMod1/Models/
-Assets/Unary.TestMod1/Models.meta
-/Assets/Unary.TestMod1/Other/
-Assets/Unary.TestMod1/Other.meta
-/Assets/Unary.TestMod1/Particles/
-Assets/Unary.TestMod1/Particles.meta
-/Assets/Unary.TestMod1/PrefabsLocal/
-Assets/Unary.TestMod1/PrefabsLocal.meta
-/Assets/Unary.TestMod1/PrefabsNetwork/
-Assets/Unary.TestMod1/PrefabsNetwork.meta
-/Assets/Unary.TestMod1/ScriptableObjects/
-Assets/Unary.TestMod1/ScriptableObjects.meta
-/Assets/Unary.TestMod1/Sound/
-Assets/Unary.TestMod1/Sound.meta
-/Assets/Unary.TestMod1/Textures/
-Assets/Unary.TestMod1/Textures.meta
-/Assets/Unary.TestMod1/Ui/
-Assets/Unary.TestMod1/Ui.meta
-/Assets/Unary.TestMod1/Shaders/
-Assets/Unary.TestMod1/Shaders.meta
+# Recusant
 
-/Assets/Unary.TestMod2/Audio/
-Assets/Unary.TestMod2/Audio.meta
-/Assets/Unary.TestMod2/Bundles/
-Assets/Unary.TestMod2/Bundles.meta
-Assets/Unary.TestMod2/ContentManifest.asset
-Assets/Unary.TestMod2/ContentManifest.asset.meta
-/Assets/Unary.TestMod2/Levels/
-Assets/Unary.TestMod2/Levels.meta
-/Assets/Unary.TestMod2/Materials/
-Assets/Unary.TestMod2/Materials.meta
-/Assets/Unary.TestMod2/Models/
-Assets/Unary.TestMod2/Models.meta
-/Assets/Unary.TestMod2/Other/
-Assets/Unary.TestMod2/Other.meta
-/Assets/Unary.TestMod2/Particles/
-Assets/Unary.TestMod2/Particles.meta
-/Assets/Unary.TestMod2/PrefabsLocal/
-Assets/Unary.TestMod2/PrefabsLocal.meta
-/Assets/Unary.TestMod2/PrefabsNetwork/
-Assets/Unary.TestMod2/PrefabsNetwork.meta
-/Assets/Unary.TestMod2/ScriptableObjects/
-Assets/Unary.TestMod2/ScriptableObjects.meta
-/Assets/Unary.TestMod2/Sound/
-Assets/Unary.TestMod2/Sound.meta
-/Assets/Unary.TestMod2/Textures/
-Assets/Unary.TestMod2/Textures.meta
-/Assets/Unary.TestMod2/Ui/
-Assets/Unary.TestMod2/Ui.meta
-/Assets/Unary.TestMod2/Shaders/
-Assets/Unary.TestMod2/Shaders.meta
+Assets/Unary.Recusant/Audio/**
+!Assets/Unary.Recusant/Audio/.gitkeep
+
+Assets/Unary.Recusant/Levels/Background1/**
+!Assets/Unary.Recusant/Levels/Background1/**/.gitkeep
+Assets/Unary.Recusant/Levels/Background2/**
+!Assets/Unary.Recusant/Levels/Background2/**/.gitkeep
+Assets/Unary.Recusant/Levels/Hub/**
+!Assets/Unary.Recusant/Levels/Hub/**/.gitkeep
+Assets/Unary.Recusant/Levels/Main_1/**
+!Assets/Unary.Recusant/Levels/Main_1/**/.gitkeep
+Assets/Unary.Recusant/Levels/Pasiri/**
+!Assets/Unary.Recusant/Levels/Pasiri/**/.gitkeep
+Assets/Unary.Recusant/Levels/Perf/**
+!Assets/Unary.Recusant/Levels/Perf/**/.gitkeep
+Assets/Unary.Recusant/Levels/Quarry/**
+!Assets/Unary.Recusant/Levels/Quarry/**/.gitkeep
+Assets/Unary.Recusant/Levels/Salvation1/**
+!Assets/Unary.Recusant/Levels/Salvation1/**/.gitkeep
+Assets/Unary.Recusant/Levels/Salvation2/**
+!Assets/Unary.Recusant/Levels/Salvation2/**/.gitkeep
+Assets/Unary.Recusant/Levels/Salvation3/**
+!Assets/Unary.Recusant/Levels/Salvation3/**/.gitkeep
+Assets/Unary.Recusant/Levels/Salvation4/**
+!Assets/Unary.Recusant/Levels/Salvation4/**/.gitkeep
+Assets/Unary.Recusant/Levels/Train/**
+!Assets/Unary.Recusant/Levels/Train/**/.gitkeep
+
+Assets/Unary.Recusant/Materials/**
+!Assets/Unary.Recusant/Materials/**/.gitkeep
+Assets/Unary.Recusant/Models/**
+!Assets/Unary.Recusant/Models/**/.gitkeep
+Assets/Unary.Recusant/Particles/**
+!Assets/Unary.Recusant/Particles/**/.gitkeep
+Assets/Unary.Recusant/Sound/**
+!Assets/Unary.Recusant/Sound/**/.gitkeep
+Assets/Unary.Recusant/Textures/**
+!Assets/Unary.Recusant/Textures/**/.gitkeep
+Assets/Unary.Recusant/Shaders/**
+!Assets/Unary.Recusant/Shaders/**/.gitkeep
+
+Assets/Unary.TestMod1/Materials/**
+!Assets/Unary.TestMod1/Materials/**/.gitkeep
+Assets/Unary.TestMod1/Textures/**
+!Assets/Unary.TestMod1/Textures/**/.gitkeep
+
+Assets/Unary.TestMod2/Textures/**
+!Assets/Unary.TestMod2/Textures/**/.gitkeep
 
 steam_appid.txt
 UnityVersion.txt
@@ -180,24 +107,11 @@ packages.config
 # Custom launch related file
 EditorLaunch.json
 
-# MemoryCaptures can get excessive in size.
-# They also could contain extremely sensitive data
-/[Mm]emoryCaptures/
-
-# Recordings can get excessive in size
-/[Rr]ecordings/
-
-# Uncomment this line if you wish to ignore the asset store tools plugin
-# /[Aa]ssets/AssetStoreTools*
-
 # Autogenerated Jetbrains Rider plugin
 /[Aa]ssets/Plugins/Editor/JetBrains*
 
 # Visual Studio cache directory
 .vs/
-
-# Gradle cache directory
-.gradle/
 
 # Autogenerated VS/MD/Consulo solution and project files
 ExportedObj/
@@ -205,6 +119,7 @@ ExportedObj/
 *.csproj
 *.unityproj
 *.sln
+*.slnx
 *.suo
 *.tmp
 *.user
@@ -217,27 +132,43 @@ ExportedObj/
 *.opendb
 *.VC.db
 
-# Unity3D generated meta files
-*.pidb.meta
-*.pdb.meta
-*.mdb.meta
-
 # Unity3D generated file on crash reports
 sysinfo.txt
-
-# Builds
-*.apk
-*.aab
-*.unitypackage
-*.unitypackage.meta
-*.app
 
 # Crashlytics generated file
 crashlytics-build.properties
 
-# Packed Addressables
-/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+# Generic asset types
+*.psd
+*.jpg
+*.png
+*.gif
+*.bmp
+*.tga
+*.tiff
+*.tif
+*.iff
+*.pict
+*.dds
+*.xcf
 
-# Temporary auto-generated Android Assets
-/[Aa]ssets/[Ss]treamingAssets/aa.meta
-/[Aa]ssets/[Ss]treamingAssets/aa/*
+*.mp3
+*.ogg
+*.wav
+*.aiff
+*.aif
+
+*.mov
+*.avi
+*.asf
+*.mpg
+*.mpeg
+*.mp4
+
+*.fbx
+*.obj
+*.max
+*.blend
+*.dae
+*.mb
+*.3ds

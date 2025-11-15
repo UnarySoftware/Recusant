@@ -34,7 +34,7 @@ namespace Unary.Recusant.Editor
             }
         }
 
-        private static Dictionary<EResult, string> _createItemErrorLocales = new()
+        private static readonly Dictionary<EResult, string> _createItemErrorLocales = new()
         {
             { EResult.k_EResultInsufficientPrivilege, "You are currently restricted from uploading content due to a hub ban, account lock, or community ban." },
             { EResult.k_EResultBanned, "You doesn't have permission to upload content to this hub because they have an active VAC or Game ban." },
@@ -51,7 +51,7 @@ namespace Unary.Recusant.Editor
                 "Usually this restriction will expire in 5 days, but can last up to 30 days if the account has been inactive recently." }
         };
 
-        private static Dictionary<EResult, string> _submitItemErrorLocales = new()
+        private static readonly Dictionary<EResult, string> _submitItemErrorLocales = new()
         {
             { EResult.k_EResultInvalidParam, "Either the provided app ID is invalid or doesn't match the consumer app ID of the item." },
             { EResult.k_EResultAccessDenied, "You dont own a license for the game." },
@@ -65,7 +65,7 @@ namespace Unary.Recusant.Editor
 
         private static bool StartSteam()
         {
-            if (!Steam.InitializeSteamWorks(false))
+            if (!Steam.InitializeSteamWorks())
             {
                 return false;
             }
@@ -490,7 +490,7 @@ namespace Unary.Recusant.Editor
         private static PublishedFileId_t _uploadingFile;
         private static bool _submitted = false;
         private static string _submittedMod = null;
-        private static List<PublishedFileId_t> _uploaded = new();
+        private static HashSet<PublishedFileId_t> _uploaded = new();
         private static DateTime _startTime;
         private static int _progressId = -1;
 

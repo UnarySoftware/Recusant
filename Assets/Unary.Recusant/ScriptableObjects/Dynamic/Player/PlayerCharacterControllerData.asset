@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a619fa7f28ebf6c4fa38870d72b75add, type: 3}
+  m_Name: PlayerCharacterControllerData
+  m_EditorClassIdentifier: Recusant::Recusant.PlayerCharacterControllerData
+  MotorMoverLayer: 6
+  Gravity: 22
+  Friction: 4.5
+  MoveSpeed: 6.7
+  RunAcceleration: 6
+  RunDeacceleration: 2
+  AirAcceleration: 0.5
+  AirDecceleration: 2
+  AirControl: 0.5
+  SideStrafeAcceleration: 20
+  SideStrafeSpeed: 1
+  JumpSpeed: 6.2
+  HoldJumpToBhop: 1
+  ProxyPlayerLayer: 7
+  ProxyProxyPhysicsMover: 8

@@ -24,12 +24,12 @@ namespace Unary.Recusant
         private AsyncOperation _operation;
         private ContentLoader.Progress _progress = new();
 
-        public AssetBundleSceneOperation(string assetPath, LoadSceneParameters parameters)
+        public AssetBundleSceneOperation(string assetPath)
         {
-            StartLoadingAsync(assetPath, parameters);
+            StartLoadingAsync(assetPath);
         }
 
-        private async void StartLoadingAsync(string assetPath, LoadSceneParameters parameters)
+        private async void StartLoadingAsync(string assetPath)
         {
             try
             {
@@ -52,7 +52,7 @@ namespace Unary.Recusant
 
                 await _loadedDependencies;
 
-                _operation = SceneManager.LoadSceneAsync(ContentLoader.Instance.GetBundlePath(assetPath), parameters);
+                _operation = SceneManager.LoadSceneAsync(ContentLoader.Instance.GetBundlePath(assetPath));
                 if (_operation != null)
                 {
                     _operation.completed += (op) => { _sceneLoaded = OnSceneLoaded(op); };
@@ -165,10 +165,10 @@ namespace Unary.Recusant
             }
             else
             {
-                return new AssetBundleSceneOperation(selectedScene, loadSceneParameters);
+                return new AssetBundleSceneOperation(selectedScene);
             }
 #else
-            return new AssetBundleSceneOperation(selectedScene, loadSceneParameters);
+            return new AssetBundleSceneOperation(selectedScene);
 #endif
         }
 

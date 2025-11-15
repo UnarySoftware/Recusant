@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System;
 
 #if UNITY_EDITOR
@@ -62,7 +63,7 @@ namespace Unary.Core
 
         public void Precache()
         {
-            if (Bootstrap.Instance == null)
+            if (Bootstrap.Instance == null || !LoadingAllowed)
             {
                 return;
             }
@@ -82,29 +83,36 @@ namespace Unary.Core
             }
         }
 
+        [JsonIgnore]
         public virtual T Value
         {
             get
             {
-                if (Bootstrap.Instance == null)
+                if (Bootstrap.Instance == null || !LoadingAllowed)
                 {
                     return null;
                 }
 
-                if (_value != null)
+                if (CachingAllowed && _value != null)
                 {
                     return _value;
                 }
 
-                _value = LoadValue();
+                T loadResult = LoadValue();
 
-                if (_value == null)
+                if (loadResult == null)
                 {
                     Logger.Instance.Error("Failed to resolve an asset reference with GUID \"" + AssetId.Value.ToString() + "\"");
+                    return loadResult;
+                }
+
+                if (CachingAllowed)
+                {
+                    _value = loadResult;
                     return _value;
                 }
 
-                return _value;
+                return loadResult;
             }
         }
     }

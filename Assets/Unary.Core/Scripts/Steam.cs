@@ -46,9 +46,9 @@ namespace Unary.Core
             }
         }
 
-        public static bool InitializeSteamWorks(bool playTime)
+        public static bool InitializeSteamWorks()
         {
-            if (!playTime || Initialized)
+            if (Initialized)
             {
                 return true;
             }
@@ -102,7 +102,7 @@ namespace Unary.Core
                 return false;
             }
 
-            if (playTime && Initialized)
+            if (Initialized)
             {
                 Initialized = SteamUser.BLoggedOn();
             }
@@ -127,7 +127,7 @@ namespace Unary.Core
             }
 #endif
 
-            if (!InitializeSteamWorks(true))
+            if (!InitializeSteamWorks())
             {
                 return false;
             }

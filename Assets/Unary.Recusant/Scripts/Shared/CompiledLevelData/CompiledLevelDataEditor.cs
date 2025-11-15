@@ -71,7 +71,7 @@ namespace Unary.Recusant
             string directory = Path.GetDirectoryName(scene.path);
             string name = Path.GetFileNameWithoutExtension(scene.path);
 
-            _data = AssetDatabase.LoadAssetAtPath<CompiledLevelData>(directory + '/' + name + "/Data.asset");
+            _data = AssetDatabase.LoadAssetAtPath<CompiledLevelData>(directory + '/' + name + "/CompiledLevelData.asset");
         }
     }
 }

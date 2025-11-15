@@ -1,0 +1,7 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:VisualElement name="LobbyEntry" enabled="true" style="flex-grow: 1; -unity-text-outline-color: rgb(107, 107, 107); background-color: rgba(99, 99, 99, 0.91); flex-direction: row; align-items: center; justify-content: flex-start; padding-left: 0; padding-right: 0;">
+        <engine:Label text="WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" name="HostName" picking-mode="Ignore" style="font-size: 30px; background-color: rgba(255, 255, 255, 0); color: rgb(255, 255, 255); flex-grow: 1;" />
+        <engine:Label text="WWWWWWWWWWW" name="Map" picking-mode="Ignore" style="font-size: 30px; color: rgb(255, 255, 255); padding-right: 8px;" />
+        <engine:Label text="WWWWWW" name="PlayerCount" picking-mode="Ignore" style="font-size: 30px; color: rgb(255, 255, 255);" />
+    </engine:VisualElement>
+</engine:UXML>

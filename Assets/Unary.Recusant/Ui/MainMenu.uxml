@@ -1,0 +1,12 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:VisualElement name="Background" style="flex-grow: 1; position: absolute; top: 0%; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0);" />
+    <engine:Label text="Current players in-game: 999" name="CurrentPlayers" style="left: 0; position: absolute; top: 0; right: 0; bottom: 0; font-size: 36px; color: rgb(255, 255, 255); -unity-text-outline-width: 0; -unity-text-outline-color: rgb(0, 0, 0); margin-left: 30px; text-shadow: 0 0 20px rgb(0, 0, 0);" />
+    <engine:VisualElement name="Root" style="flex-grow: 1; opacity: 1; background-color: rgba(255, 255, 255, 0); justify-content: center; align-content: auto; align-items: flex-start; flex-direction: column; padding-left: 45px;">
+        <engine:VisualElement name="Name" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Unary.Recusant/Textures/LogoCrop.png?fileID=2800000&amp;guid=8917eac31c52f52419e0ea19eddaa09e&amp;type=3#LogoCrop&quot;); flex-direction: column; -unity-background-scale-mode: stretch-to-fill; flex-shrink: 1; height: 250px; width: 850px; opacity: 0.85;" />
+        <engine:VisualElement name="Buttons" style="flex-grow: 0;">
+            <engine:Button text="Start Host" name="Host" style="font-size: 64px; padding-right: 24px; padding-left: 24px; background-color: rgba(188, 188, 188, 0); -unity-text-align: middle-left; color: rgb(255, 255, 255); -unity-text-outline-width: 0; text-shadow: 0 0 20px rgb(0, 0, 0); border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0;" />
+            <engine:Button text="Start Client" name="Client" style="font-size: 64px; padding-right: 24px; padding-left: 24px; background-color: rgba(188, 188, 188, 0); -unity-text-align: middle-left; color: rgb(255, 255, 255); text-shadow: 0 0 20px rgb(0, 0, 0); border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0;" />
+            <engine:Button text="Quit" name="Quit" style="font-size: 64px; padding-right: 24px; padding-left: 24px; background-color: rgba(188, 188, 188, 0); -unity-text-align: middle-left; color: rgb(255, 255, 255); text-shadow: 0 0 20px rgb(0, 0, 0); border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0;" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

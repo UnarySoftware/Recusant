@@ -17,7 +17,7 @@ namespace Unary.Recusant
 
         private bool OnLevelAwake(ref LevelManager.LevelEventData data)
         {
-            SteamFriends.SetRichPresence("text", data.LevelData.LevelName);
+            SteamFriends.SetRichPresence("text", data.LevelDefinition.FullName);
             SteamFriends.SetRichPresence("steam_display", "#Status");
             return true;
         }

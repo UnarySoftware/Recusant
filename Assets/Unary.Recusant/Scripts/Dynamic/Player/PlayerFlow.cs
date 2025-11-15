@@ -37,7 +37,7 @@ namespace Unary.Recusant
 
                 _Flags.Clear();
 
-                AiTriangleData triangle = LevelManager.Instance.LevelData.AiTriangles[_aiTriangle];
+                AiTriangleData triangle = LevelManager.Instance.CompiledLevelData.AiTriangles[_aiTriangle];
 
                 if (triangle.Markups == null)
                 {
@@ -46,7 +46,7 @@ namespace Unary.Recusant
 
                 foreach (var markupIndex in triangle.Markups)
                 {
-                    AiMarkup markup = LevelManager.Instance.LevelData.AiMarkups[markupIndex];
+                    AiMarkup markup = LevelManager.Instance.CompiledLevelData.AiMarkups[markupIndex];
 
                     if (markup == null)
                     {
@@ -134,7 +134,7 @@ namespace Unary.Recusant
             for (int i = 0; i < bound.Triangles.Length; i++)
             {
                 _triangleGlobalIndexBuffer[_triangleCount] = bound.Triangles[i];
-                _triangleBuffer[_triangleCount] = LevelManager.Instance.LevelData.AiTriangles[bound.Triangles[i]];
+                _triangleBuffer[_triangleCount] = LevelManager.Instance.CompiledLevelData.AiTriangles[bound.Triangles[i]];
                 _triangleCount++;
             }
         }
@@ -142,7 +142,7 @@ namespace Unary.Recusant
         public override void NetworkUpdate()
         {
             if (LevelManager.Instance == null ||
-                LevelManager.Instance.LevelData == null)
+                LevelManager.Instance.CompiledLevelData == null)
             {
                 return;
             }
@@ -151,13 +151,13 @@ namespace Unary.Recusant
             {
                 if (_triangleSelected == -1)
                 {
-                    if (LevelManager.Instance.LevelData != null)
+                    if (LevelManager.Instance.CompiledLevelData != null)
                     {
-                        input.AiTriangle = LevelManager.Instance.LevelData.AiTriangleStartIndex;
+                        input.AiTriangle = LevelManager.Instance.CompiledLevelData.AiTriangleStartIndex;
                     }
                     else
                     {
-                        Core.Logger.Instance.Error($"{nameof(LevelManager.Instance.LevelData)} was null");
+                        Core.Logger.Instance.Error($"{nameof(LevelManager.Instance.CompiledLevelData)} was null");
                         input.AiTriangle = -1;
                     }
                 }
@@ -175,14 +175,14 @@ namespace Unary.Recusant
         public override void NetworkFixedUpdate()
         {
             if (LevelManager.Instance == null ||
-                LevelManager.Instance.LevelData == null)
+                LevelManager.Instance.CompiledLevelData == null)
             {
                 return;
             }
 
             if (FetchInputServer(out PlayerNetworkInput input))
             {
-                AiTriangleData[] triangles = LevelManager.Instance.LevelData.AiTriangles;
+                AiTriangleData[] triangles = LevelManager.Instance.CompiledLevelData.AiTriangles;
 
                 AiTriangle = Mathf.Clamp(input.AiTriangle, 0, triangles.Length - 1);
             }
@@ -232,16 +232,16 @@ namespace Unary.Recusant
                         // We better check for distance first before doing heavy lifting
                         // with Triangle.HasPointInside
                         float distance = Triangle.GetPointDistance(
-                            LevelManager.Instance.LevelData.AiTriangleVertices[triangle.Indices[0]],
-                            LevelManager.Instance.LevelData.AiTriangleVertices[triangle.Indices[1]],
-                            LevelManager.Instance.LevelData.AiTriangleVertices[triangle.Indices[2]],
+                            LevelManager.Instance.CompiledLevelData.AiTriangleVertices[triangle.Indices[0]],
+                            LevelManager.Instance.CompiledLevelData.AiTriangleVertices[triangle.Indices[1]],
+                            LevelManager.Instance.CompiledLevelData.AiTriangleVertices[triangle.Indices[2]],
                             _position);
 
                         if (distance < _triangleDistance &&
                             Triangle.HasPointInside(
-                            LevelManager.Instance.LevelData.AiTriangleVertices[triangle.Indices[0]],
-                            LevelManager.Instance.LevelData.AiTriangleVertices[triangle.Indices[1]],
-                            LevelManager.Instance.LevelData.AiTriangleVertices[triangle.Indices[2]],
+                            LevelManager.Instance.CompiledLevelData.AiTriangleVertices[triangle.Indices[0]],
+                            LevelManager.Instance.CompiledLevelData.AiTriangleVertices[triangle.Indices[1]],
+                            LevelManager.Instance.CompiledLevelData.AiTriangleVertices[triangle.Indices[2]],
                             _position))
                         {
                             _triangleDistance = distance;
@@ -281,11 +281,11 @@ namespace Unary.Recusant
 
             Gizmos.color = Color.yellow;
 
-            AiTriangleData triangle = LevelManager.Instance.LevelData.AiTriangles[_triangleSelected];
+            AiTriangleData triangle = LevelManager.Instance.CompiledLevelData.AiTriangles[_triangleSelected];
 
-            Vector3 vertex1 = LevelManager.Instance.LevelData.AiTriangleVertices[triangle.Indices[0]] + AiBoundVisualizer.SlightlyUp;
-            Vector3 vertex2 = LevelManager.Instance.LevelData.AiTriangleVertices[triangle.Indices[1]] + AiBoundVisualizer.SlightlyUp;
-            Vector3 vertex3 = LevelManager.Instance.LevelData.AiTriangleVertices[triangle.Indices[2]] + AiBoundVisualizer.SlightlyUp;
+            Vector3 vertex1 = LevelManager.Instance.CompiledLevelData.AiTriangleVertices[triangle.Indices[0]] + AiBoundVisualizer.SlightlyUp;
+            Vector3 vertex2 = LevelManager.Instance.CompiledLevelData.AiTriangleVertices[triangle.Indices[1]] + AiBoundVisualizer.SlightlyUp;
+            Vector3 vertex3 = LevelManager.Instance.CompiledLevelData.AiTriangleVertices[triangle.Indices[2]] + AiBoundVisualizer.SlightlyUp;
 
             Gizmos.DrawLine(vertex1, vertex2);
             Gizmos.DrawLine(vertex2, vertex3);

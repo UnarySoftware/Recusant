@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 352f876dda78ea347986977c27173c54, type: 3}
+  m_Name: PerformanceManagerData
+  m_EditorClassIdentifier: Recusant::Recusant.PerformanceManagerData
+  ClientFpsAverageSample: 60
+  ClientFpsMediumThreshold: 55
+  ClientFpsHighThreshold: 30
+  BandwithMediumThreshold: 25
+  BandwithHighThreshold: 60
+  LatencyMediumThreshold: 100
+  LatencyHighThreshold: 175
+  PacketLossMediumThreshold: 3
+  PacketLossHighThreshold: 8

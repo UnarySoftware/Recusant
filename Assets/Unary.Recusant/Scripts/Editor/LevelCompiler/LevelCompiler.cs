@@ -167,12 +167,11 @@ namespace Unary.Recusant.Editor
                 Directory.CreateDirectory(LevelDataFolder);
             }
 
-            string levelData = LevelDataFolder + "/Data.asset";
+            string levelData = LevelDataFolder + "/CompiledLevelData.asset";
 
             if (!File.Exists(levelData))
             {
                 CompiledLevelData newLevelData = ScriptableObject.CreateInstance<CompiledLevelData>();
-                newLevelData.LevelName = name;
                 AssetDatabase.CreateAsset(newLevelData, levelData);
                 AssetDatabase.SaveAssets();
             }
@@ -207,9 +206,11 @@ namespace Unary.Recusant.Editor
 
         private static void FinishCompiling()
         {
-            LevelRoot.Data = LevelData;
+            LevelRoot.CompiledLevelData = LevelData;
 
             EditorUtility.SetDirty(LevelData);
+
+            string levelName = Path.GetFileNameWithoutExtension(activeScene.path);
 
             EditorSceneManager.SaveScene(activeScene);
 
@@ -217,7 +218,7 @@ namespace Unary.Recusant.Editor
 
             if (Result != string.Empty)
             {
-                EditorUtility.DisplayDialog("Successfully compiled " + LevelData.LevelName + "!", Result, "Ok");
+                EditorUtility.DisplayDialog("Successfully compiled " + levelName + "!", Result, "Ok");
             }
 
             LevelRoot = null;

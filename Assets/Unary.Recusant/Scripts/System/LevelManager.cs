@@ -4,14 +4,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Threading.Tasks;
 using System.IO;
-using UnityEngine.Rendering;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using System.Reflection;
-
-
-
-
 
 #if UNITY_EDITOR
 
@@ -21,29 +13,6 @@ using UnityEditor.SceneManagement;
 
 namespace Unary.Recusant
 {
-    public class MyContractResolver : DefaultContractResolver
-    {
-        private readonly HashSet<string> _ignoredProperties;
-
-        public MyContractResolver(IEnumerable<string> ignoredProperties)
-        {
-            _ignoredProperties = new HashSet<string>(ignoredProperties);
-        }
-
-        protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
-        {
-            JsonProperty property = base.CreateProperty(member, memberSerialization);
-
-            if (_ignoredProperties.Contains(property.PropertyName))
-            {
-                property.ShouldSerialize = instance => false;
-            }
-
-            return property;
-        }
-    }
-
-
     public class LevelManagerShared : SystemShared
     {
 
@@ -53,7 +22,7 @@ namespace Unary.Recusant
     {
         public struct LevelEventData
         {
-            public CompiledLevelData LevelData;
+            public LevelDefinition LevelDefinition;
             public LevelRoot LevelRoot;
         }
 
@@ -72,12 +41,18 @@ namespace Unary.Recusant
 
         public EventFunc<LevelTransitionInfo> OnTransitionRequest { get; } = new();
 
-        private List<string> _scenePaths;
+        private Dictionary<string, LevelDefinition> _levelDefinitions = new();
+        private List<string> _scenePaths = new();
         private Dictionary<string, int> _nameToId = new();
-        private Dictionary<int, string> _IdToName = new();
 
         public int GetSceneIndex(string scene)
         {
+            if (scene == null)
+            {
+                Core.Logger.Instance.Error("Tried calling GetSceneIndex with a null scene name");
+                return -1;
+            }
+
             scene = scene.ToLower();
 
             if (_nameToId.TryGetValue(scene, out int id))
@@ -92,6 +67,7 @@ namespace Unary.Recusant
         {
             if (index < 0 || index >= _scenePaths.Count)
             {
+                Core.Logger.Instance.Error($"Tried calling GetScenePath with an invalid scene index {index}");
                 return null;
             }
 
@@ -109,7 +85,7 @@ namespace Unary.Recusant
         private readonly Dictionary<Vector3Int, AiBoundData> _spatialBounds = new();
 
         public LevelRoot LevelRoot { get; private set; }
-        public CompiledLevelData LevelData
+        public CompiledLevelData CompiledLevelData
         {
             get
             {
@@ -117,28 +93,11 @@ namespace Unary.Recusant
                 {
                     return null;
                 }
-                return LevelRoot.Data;
+                return LevelRoot.CompiledLevelData;
             }
         }
 
-        public override void Initialize()
-        {
-            _scenePaths = ContentLoader.Instance.GetAssetPaths(typeof(Scene));
-
-            for (int i = 0; i < _scenePaths.Count; i++)
-            {
-                string path = _scenePaths[i];
-
-                if (!path.EndsWith(".unity"))
-                {
-                    continue;
-                }
-
-                string name = Path.GetFileNameWithoutExtension(path);
-                _nameToId[name] = i;
-                _IdToName[i] = name;
-            }
-        }
+        public LevelDefinition LevelDefinition { get; private set; }
 
         private Task<Dictionary<PackageIndexEntry, AssetBundle>> _dependencies;
         private AsyncOperation _operation;
@@ -147,7 +106,7 @@ namespace Unary.Recusant
         private Task _unloadDependencies;
         private ContentLoader.Progress _progress = new();
 
-        private async Task LoadAsyncWithDeps(string path, LoadSceneParameters parameters)
+        private async Task LoadAsyncWithDeps(string path)
         {
             _dependencies = ContentLoader.Instance.LoadDependenciesAsync(path, _progress);
 
@@ -163,7 +122,9 @@ namespace Unary.Recusant
 
             await _dependencies;
 
-            _operation = SceneManager.LoadSceneAsync(ContentLoader.Instance.GetBundlePath(path), parameters);
+            LoadSceneParameters loadParams = new() { loadSceneMode = LoadSceneMode.Single, localPhysicsMode = LocalPhysicsMode.Physics3D };
+
+            _operation = SceneManager.LoadSceneAsync(ContentLoader.Instance.GetBundlePath(path), loadParams);
             if (_operation != null)
             {
                 _operation.completed += (op) => { _sceneLoaded = OnLoadSceneAsyncWithDeps(op); };
@@ -205,9 +166,11 @@ namespace Unary.Recusant
 
 #if UNITY_EDITOR
 
-        private async Task LoadAsyncEditor(string path, LoadSceneParameters parameters)
+        private async Task LoadAsyncEditor(string path)
         {
-            _operation = EditorSceneManager.LoadSceneAsyncInPlayMode(ContentLoader.Instance.GetFullPath(path), parameters);
+            LoadSceneParameters loadParams = new() { loadSceneMode = LoadSceneMode.Single, localPhysicsMode = LocalPhysicsMode.Physics3D };
+
+            _operation = EditorSceneManager.LoadSceneAsyncInPlayMode(ContentLoader.Instance.GetFullPath(path), loadParams);
             if (_operation != null)
             {
                 LoadingManager.Instance.AddJob("Loading level", () =>
@@ -228,40 +191,66 @@ namespace Unary.Recusant
 
 #endif
 
-        public void LoadLevelNetworked(string levelName)
+        public void LoadLevelNetworked(string levelId)
         {
-            if (Loading)
+            if (_levelDefinitions.TryGetValue(levelId, out LevelDefinition definition))
             {
+                LoadLevelNetworked(definition);
                 return;
             }
-
-            Loading = true;
-
-            NetworkManager.Instance.Sandbox.LoadCustomSceneAsync(GetSceneIndex(levelName),
-                    new() { loadSceneMode = LoadSceneMode.Single, localPhysicsMode = LocalPhysicsMode.Physics3D });
+            Core.Logger.Instance.Error($"Failed to load networked level \"{levelId}\"");
         }
 
-        public void LoadLevelLocal(string path, LoadSceneParameters parameters)
+        public void LoadLevelNetworked(LevelDefinition level)
         {
+            if (level == null)
+            {
+                return;
+            }
+
             if (Loading)
             {
                 return;
             }
 
             Loading = true;
+
+            LevelDefinition = level;
+
+            NetworkManager.Instance.Sandbox.LoadCustomSceneAsync(GetSceneIndex(level.LevelId),
+                new() { loadSceneMode = LoadSceneMode.Single, localPhysicsMode = LocalPhysicsMode.Physics3D });
+        }
+
+        public void LoadLevelLocal(LevelDefinition levelDefinition)
+        {
+            if (levelDefinition == null)
+            {
+                Core.Logger.Instance.Error("Tried loading local level with a null LevelDefinition");
+                return;
+            }
+
+            if (Loading)
+            {
+                return;
+            }
+
+            Loading = true;
+
+            LevelDefinition = levelDefinition;
+
             LoadingManager.Instance.ShowLoading(typeof(MainMenuState));
 
 #if UNITY_EDITOR
-            if (ContentLoader.Instance.IsEditorPath(path))
+            if (ContentLoader.Instance.IsEditorPath(levelDefinition.ScenePath))
             {
-                _loadTask = LoadAsyncEditor(path, parameters);
+                _loadTask = LoadAsyncEditor(levelDefinition.ScenePath);
             }
             else
             {
-                _loadTask = LoadAsyncWithDeps(path, parameters);
+                _loadTask = LoadAsyncWithDeps(levelDefinition.ScenePath);
             }
 #else
-            _loadTask = LoadAsyncWithDeps(path, parameters);
+            _loadTask = LoadAsyncWithDeps(levelDefinition.ScenePath);
 #endif
         }
 
@@ -273,22 +262,22 @@ namespace Unary.Recusant
 
             LevelRoot = root;
 
-            if (LevelData == null || LevelData.AiTriangles == null)
+            if (CompiledLevelData == null || CompiledLevelData.AiTriangles == null)
             {
-                Core.Logger.Instance.Error($"{nameof(LevelData)} was null");
+                Core.Logger.Instance.Error($"{nameof(CompiledLevelData)} was null");
                 return;
             }
 
-            LevelData.AiMarkups = new AiMarkup[LevelData.AiMarkupSize];
+            CompiledLevelData.AiMarkups = new AiMarkup[CompiledLevelData.AiMarkupSize];
 
-            foreach (var bound in LevelData.AiBounds)
+            foreach (var bound in CompiledLevelData.AiBounds)
             {
                 _spatialBounds[bound.Position] = bound;
             }
 
             OnAwake.Publish(new()
             {
-                LevelData = LevelData,
+                LevelDefinition = LevelDefinition,
                 LevelRoot = root
             });
         }
@@ -302,17 +291,65 @@ namespace Unary.Recusant
             return null;
         }
 
+        public override void Initialize()
+        {
+            List<string> scenePaths = ContentLoader.Instance.GetAssetPaths(typeof(Scene));
+            List<string> definitionPaths = ContentLoader.Instance.GetAssetPaths(typeof(LevelDefinition));
+
+            List<LevelDefinition> definitions = new();
+
+            foreach (var definitionPath in definitionPaths)
+            {
+                if (ScriptableObjectRegistry.Instance.LoadObject(definitionPath, out LevelDefinition result))
+                {
+                    definitions.Add(result);
+                }
+                else
+                {
+                    Core.Logger.Instance.Error($"Failed to fetch LevelDefinition \"{definitionPath}\" from the ScriptableObjectRegistry");
+                }
+            }
+
+            for (int i = 0; i < definitionPaths.Count; i++)
+            {
+                string definitionPath = definitionPaths[i];
+                LevelDefinition definition = definitions[i];
+
+                string definitionName = Path.GetFileNameWithoutExtension(definitionPath).ToLower();
+
+                foreach (var scene in scenePaths)
+                {
+                    string sceneName = Path.GetFileNameWithoutExtension(scene).ToLower();
+
+                    if (definitionName == sceneName)
+                    {
+                        definition.LevelId = definitionName;
+                        definition.ScenePath = scene;
+                        _levelDefinitions[definition.LevelId] = definition;
+                        break;
+                    }
+                }
+            }
+
+            int counter = 0;
+
+            foreach (var define in _levelDefinitions)
+            {
+                _nameToId[define.Value.LevelId] = counter;
+                _scenePaths.Add(define.Value.ScenePath);
+                counter++;
+            }
+        }
+
         public override void PostInitialize()
         {
-            ProbeReferenceVolume.instance.loadMaxCellsPerFrame = true;
-
-            LoadSceneParameters parameters = new()
+            if (_levelDefinitions.TryGetValue(LoadingScreen.Instance.SelectedEntry.IdentifyingString, out LevelDefinition level))
             {
-                loadSceneMode = LoadSceneMode.Single,
-                localPhysicsMode = LocalPhysicsMode.Physics3D
-            };
-
-            LoadLevelLocal("levels/background1.unity", parameters);
+                if (level.Background)
+                {
+                    LoadLevelLocal(level);
+                }
+            }
         }
 
         public override void Deinitialize()

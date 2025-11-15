@@ -247,7 +247,14 @@ namespace Unary.Core.Editor
 
                             foreach (var dataFile in dataFiles)
                             {
-                                files.Add(dataFile.Replace('\\', '/').ToLower());
+                                string targetFile = dataFile.Replace('\\', '/').ToLower();
+
+                                if (ContentLoader.IsEditorOnlyAsset(targetFile))
+                                {
+                                    continue;
+                                }
+
+                                files.Add(targetFile);
                             }
 
                             definitions.Add(new()

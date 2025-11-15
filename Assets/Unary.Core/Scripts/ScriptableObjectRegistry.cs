@@ -45,12 +45,8 @@ namespace Unary.Core
 
         }
 
-        // This is used by the ScriptableObjectRef to resolve references
-        // We only ever load ScriptableObjects here and nowhere else
-        public bool LoadObject<T>(Guid guid, out T result) where T : BaseScriptableObject
+        public bool LoadObject<T>(string path, out T result) where T : BaseScriptableObject
         {
-            string path = ContentLoader.Instance.GetPathFromGuid(guid);
-
             if (!_pathToNetworkId.TryGetValue(path, out int networkId))
             {
                 Logger.Instance.Error($"Failed to resolve an unregistered asset \"{path}\"");
@@ -66,11 +62,20 @@ namespace Unary.Core
 
             T target = ContentLoader.Instance.LoadAsset<T>(path);
             target.NetworkId = networkId;
+            target.Precache();
 
             _objects[networkId] = target;
 
             result = target;
             return true;
+        }
+
+        public bool LoadObject<T>(Guid guid, out T result) where T : BaseScriptableObject
+        {
+            string path = ContentLoader.Instance.GetPathFromGuid(guid);
+            bool loadResult = LoadObject(path, out T outResult);
+            result = outResult;
+            return loadResult;
         }
 
         // This is only used by ScriptableObjectNetworkRef

@@ -68,18 +68,16 @@ namespace Unary.Recusant
                 return;
             }
 
-            if (LevelManager.Instance == null || LevelManager.Instance.LevelData == null)
+            if (LevelManager.Instance == null || LevelManager.Instance.LevelDefinition == null)
             {
                 return;
             }
 
-            string levelName = LevelManager.Instance.LevelData.NextLevelName;
+            LevelDefinition nextLevel = LevelManager.Instance.LevelDefinition.NextLevel.Value;
 
-            bool validLevel = !string.IsNullOrEmpty(levelName) && !string.IsNullOrWhiteSpace(levelName);
-
-            if (CurrentCount == TargetCount && validLevel)
+            if (CurrentCount == TargetCount && nextLevel != null)
             {
-                LevelManager.Instance.LoadLevelNetworked(levelName);
+                LevelManager.Instance.LoadLevelNetworked(nextLevel);
             }
         }
 

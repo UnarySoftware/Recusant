@@ -33,7 +33,7 @@ namespace Unary.Recusant
 
             HashSet<Vector3> _spawnPositions = new();
 
-            var data = LevelManager.Instance.LevelData;
+            var data = LevelManager.Instance.CompiledLevelData;
 
             List<Vector3> randomProbe = new();
             int addedCounter;

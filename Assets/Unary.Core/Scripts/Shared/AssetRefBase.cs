@@ -12,6 +12,9 @@ namespace Unary.Core
         [NonSerialized]
         public string AssetPath = null;
 
+        public bool CachingAllowed { get; set; } = true;
+        public bool LoadingAllowed { get; set; } = true;
+
 #if UNITY_EDITOR
 
         public abstract object GetValueInternal();

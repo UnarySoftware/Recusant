@@ -6,10 +6,5 @@ namespace Unary.Core
     public class UiStateAsset : BaseScriptableObject
     {
         public PrefabRef<UiState> State;
-
-        public override void Precache()
-        {
-
-        }
     }
 }

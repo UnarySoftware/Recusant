@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13d446b654a6f00409edf8b023a8ea75, type: 3}
+  m_Name: PlayerNetworkPhysicsData
+  m_EditorClassIdentifier: Recusant::Recusant.PlayerNetworkPhysicsData
+  OwnedPhysicsMassServer: 0.3
+  OwnedPhysicsMassClient: 0.075
+  PhysicsPingDeltaInputMin: 35
+  PhysicsPingDeltaInputMax: 250
+  PhysicsPingDeltaOutputMin: 2
+  PhysicsPingDeltaOutputMax: 2.5
+  PhysicsPingDeltaClampMin: 1.9
+  PhysicsPingDeltaClampMax: 2.6
+  PhysicsMagnitudeDeltaMultiplier: -1.5
+  PhysicsMagnitudeDeltaAddition: 0.33
+  PhysicsMagnitudeClampMin: 0.02
+  PhysicsMagnitudeClampMax: 1
