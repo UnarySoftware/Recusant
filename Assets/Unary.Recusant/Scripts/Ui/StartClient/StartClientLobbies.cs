@@ -16,7 +16,7 @@ namespace Unary.Recusant
         private Button _connectButton = null;
         private ScrollView _lobbies = null;
 
-        private Dictionary<string, CSteamID> _ownerToLobby = new();
+        private readonly Dictionary<string, CSteamID> _ownerToLobby = new();
 
         private string _selecterOwner = null;
         private VisualElement _selectedLobby = null;

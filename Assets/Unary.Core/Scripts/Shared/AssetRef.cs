@@ -102,7 +102,7 @@ namespace Unary.Core
 
                 if (loadResult == null)
                 {
-                    Logger.Instance.Error("Failed to resolve an asset reference with GUID \"" + AssetId.Value.ToString() + "\"");
+                    Logger.Instance.Error("Failed to resolve an asset reference with GUID \"" + AssetId.Value + "\"");
                     return loadResult;
                 }
 

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 namespace Unary.Core
@@ -82,14 +83,15 @@ namespace Unary.Core
 
             newCollection.WarmUp();
 
-            string prewarmInfo = $"Shader pre-warm results (using {collections.Count} collections):";
+            StringBuilder prewarmInfo = new();
+            prewarmInfo.Append("Shader pre-warm results (using ").Append(collections.Count).Append(" collections):");
 
             foreach (var entry in entries)
             {
-                prewarmInfo += $"\n\"{entry.Key}\": Variants warmed: {entry.Value.Warmed} Variants skipped: {entry.Value.Skipped}";
+                prewarmInfo.Append("\n\"").Append(entry.Key).Append("\": Variants warmed: ").Append(entry.Value.Warmed).Append(" Variants skipped: ").Append(entry.Value.Skipped);
             }
 
-            Core.Logger.Instance.Log(prewarmInfo);
+            Core.Logger.Instance.Log(prewarmInfo.ToString());
 
             return true;
 #endif

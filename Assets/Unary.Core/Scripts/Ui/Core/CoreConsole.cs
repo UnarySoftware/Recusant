@@ -17,7 +17,7 @@ namespace Unary.Core
 
         public int MaxConsoleLines = 128;
 
-        private StringBuilder _builder = new();
+        private readonly StringBuilder _builder = new();
 
         public override void Initialize()
         {
@@ -98,18 +98,18 @@ namespace Unary.Core
                 default:
                 case Logger.LogType.Log:
                     {
-                        OnPrint(data.Message, "No stacktrace available", Color.white, Color.black, Logger.LogType.Log);
+                        OnPrint(data.Message, "No stacktrace available", data.Color, Color.black, Logger.LogType.Log);
                         break;
                     }
                 case Logger.LogType.Warning:
                     {
                         if (string.IsNullOrEmpty(data.StackTrace) || string.IsNullOrWhiteSpace(data.StackTrace))
                         {
-                            OnPrint("Warning: \"" + data.Message, "No stacktrace available", Color.yellow, Color.black, Logger.LogType.Warning);
+                            OnPrint("Warning: \"" + data.Message, "No stacktrace available", data.Color, Color.black, Logger.LogType.Warning);
                         }
                         else
                         {
-                            OnPrint("Warning: \"" + data.Message, data.StackTrace, Color.yellow, Color.black, Logger.LogType.Warning);
+                            OnPrint("Warning: \"" + data.Message, data.StackTrace, data.Color, Color.black, Logger.LogType.Warning);
                         }
                         break;
                     }
@@ -117,11 +117,11 @@ namespace Unary.Core
                     {
                         if (string.IsNullOrEmpty(data.StackTrace) || string.IsNullOrWhiteSpace(data.StackTrace))
                         {
-                            OnPrint("Error: \"" + data.Message, "No stacktrace available", Color.red, Color.black, Logger.LogType.Error);
+                            OnPrint("Error: \"" + data.Message, "No stacktrace available", data.Color, Color.black, Logger.LogType.Error);
                         }
                         else
                         {
-                            OnPrint("Error: \"" + data.Message, data.StackTrace, Color.red, Color.black, Logger.LogType.Error);
+                            OnPrint("Error: \"" + data.Message, data.StackTrace, data.Color, Color.black, Logger.LogType.Error);
                         }
                         break;
                     }

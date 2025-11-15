@@ -76,20 +76,14 @@ namespace Unary.Recusant
                     Connected = true;
                 }
 
-                if (_connection == null)
+                if (_connection == null && InputSource is ServerConnection Connection)
                 {
-                    if (InputSource is ServerConnection Connection)
-                    {
-                        _connection = Connection;
-                    }
+                    _connection = Connection;
                 }
 
-                if (_peer == null)
+                if (_peer == null && InputSource is NetworkPeer Peer)
                 {
-                    if (InputSource is NetworkPeer Peer)
-                    {
-                        _peer = Peer;
-                    }
+                    _peer = Peer;
                 }
 
                 Fps = input.Fps;

@@ -57,6 +57,11 @@ namespace Unary.Recusant
 
         private void UpdateCounts()
         {
+            if (LevelManager.Instance == null || LevelManager.Instance.LevelDefinition == null)
+            {
+                return;
+            }
+
             LevelManager.Instance.OnTransitionRequest.Publish(new()
             {
                 CurrentCount = CurrentCount,
@@ -64,11 +69,6 @@ namespace Unary.Recusant
             });
 
             if (NetworkManager.Instance.IsClient)
-            {
-                return;
-            }
-
-            if (LevelManager.Instance == null || LevelManager.Instance.LevelDefinition == null)
             {
                 return;
             }

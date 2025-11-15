@@ -23,10 +23,6 @@ namespace Unary.Core
             {
                 return _instance;
             }
-            private set
-            {
-
-            }
         }
 
         public override void DeinitializeInternal()
@@ -75,7 +71,6 @@ namespace Unary.Core
 
                 return _instance;
             }
-            private set { }
         }
 
         public static bool Initialized
@@ -91,7 +86,6 @@ namespace Unary.Core
 
                 return systemsInstance.IsSystemInitialized(typeof(T));
             }
-            private set { }
         }
 
         public override void DeinitializeInternal()
@@ -165,7 +159,6 @@ namespace Unary.Core
 
                 return _instance;
             }
-            private set { }
         }
 
         public static bool Initialized
@@ -174,7 +167,6 @@ namespace Unary.Core
             {
                 return Systems.Instance.IsSystemInitialized(typeof(T));
             }
-            private set { }
         }
     }
 

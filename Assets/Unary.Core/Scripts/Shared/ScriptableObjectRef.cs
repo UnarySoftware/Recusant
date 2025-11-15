@@ -10,7 +10,7 @@ namespace Unary.Core
         {
             if (!ScriptableObjectRegistry.Instance.LoadObject(AssetId.Value, out T result))
             {
-                Logger.Instance.Error("Failed to resolve ScriptableObject reference with GUID \"" + AssetId.Value.ToString() + "\"");
+                Logger.Instance.Error("Failed to resolve ScriptableObject reference with GUID \"" + AssetId.Value + "\"");
                 return null;
             }
 

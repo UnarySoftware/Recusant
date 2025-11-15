@@ -27,7 +27,7 @@ namespace Unary.Recusant
         };
 
         [HideInInspector]
-        private Dictionary<NetworkPlayerId, PlayerData> _players = new();
+        private readonly Dictionary<NetworkPlayerId, PlayerData> _players = new();
 
         public Dictionary<NetworkPlayerId, PlayerData> Players
         {

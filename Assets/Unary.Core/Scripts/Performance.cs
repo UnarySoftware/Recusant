@@ -189,12 +189,9 @@ namespace Unary.Core
             {
                 PerformanceMetric metric = Metrics[i];
 
-                if (metric.ShouldPoll != null)
+                if (metric.ShouldPoll != null && !metric.ShouldPoll())
                 {
-                    if (!metric.ShouldPoll())
-                    {
-                        continue;
-                    }
+                    continue;
                 }
 
                 if (!metric.TextMetric)

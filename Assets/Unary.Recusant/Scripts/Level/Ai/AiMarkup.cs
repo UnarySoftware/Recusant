@@ -25,10 +25,6 @@ namespace Unary.Recusant
                 }
                 return _typeValues;
             }
-            set
-            {
-
-            }
         }
 
         // Serialized stuff used for runtime

@@ -14,10 +14,6 @@ namespace Unary.Recusant
             {
                 return Lobby != default;
             }
-            private set
-            {
-
-            }
         }
 
         public bool IsLobbyOwner { get; private set; } = false;
@@ -44,7 +40,7 @@ namespace Unary.Recusant
             }
         }
 
-        private byte[] _lobbyMessageBuffer = new byte[128];
+        private readonly byte[] _lobbyMessageBuffer = new byte[128];
 
         private Callback<LobbyChatUpdate_t> LobbyUpdateCallback;
         private Callback<LobbyChatMsg_t> LobbyChatCallback;

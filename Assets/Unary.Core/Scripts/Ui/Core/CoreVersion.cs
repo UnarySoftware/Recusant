@@ -7,14 +7,10 @@ namespace Unary.Core
 {
     public class CoreVersion : UiUnit
     {
-        public static CoreVersion Instance = null;
-
         private Label VersionLabel = null;
 
         public override void Initialize()
         {
-            Instance = this;
-
             var Document = GetComponent<UIDocument>();
 
             VersionLabel = Document.rootVisualElement.Q<Label>("VersionLabel");

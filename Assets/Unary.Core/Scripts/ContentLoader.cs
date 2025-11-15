@@ -355,12 +355,12 @@ namespace Unary.Core
 
             bool editor = false;
 
-            if (path.StartsWith("Assets"))
+            if (path != null && path.StartsWith("Assets"))
             {
                 editor = true;
             }
 
-            if (!Directory.Exists(path))
+            if (path != null && !Directory.Exists(path))
             {
                 return;
             }
@@ -798,7 +798,7 @@ namespace Unary.Core
         {
             path = path.ToLower();
 
-            Logger.Instance.Log($"LoadAsset: {path}");
+            //Logger.Instance.Log($"LoadAsset: {path}");
 
 #if UNITY_EDITOR
 

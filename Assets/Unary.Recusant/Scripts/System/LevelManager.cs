@@ -43,9 +43,9 @@ namespace Unary.Recusant
 
         public EventFunc<LevelTransitionInfo> OnTransitionRequest { get; } = new();
 
-        private Dictionary<string, LevelDefinition> _levelDefinitions = new();
-        private List<string> _scenePaths = new();
-        private Dictionary<string, int> _nameToId = new();
+        private readonly Dictionary<string, LevelDefinition> _levelDefinitions = new();
+        private readonly List<string> _scenePaths = new();
+        private readonly Dictionary<string, int> _nameToId = new();
 
         public int GetSceneIndex(string scene)
         {
@@ -107,7 +107,7 @@ namespace Unary.Recusant
         private Task _loadTask;
         private Task _sceneLoaded;
         private Task _unloadDependencies;
-        private ContentLoader.Progress _progress = new();
+        private readonly ContentLoader.Progress _progress = new();
 
         private async Task LoadAsyncWithDeps(string path)
         {
@@ -382,12 +382,9 @@ namespace Unary.Recusant
 
         public override void PostInitialize()
         {
-            if (_levelDefinitions.TryGetValue(LoadingScreen.Instance.SelectedEntry.IdentifyingString, out LevelDefinition level))
+            if (_levelDefinitions.TryGetValue(LoadingScreen.Instance.SelectedEntry.IdentifyingString, out LevelDefinition level) && level.Background)
             {
-                if (level.Background)
-                {
-                    LoadLevelLocal(level);
-                }
+                LoadLevelLocal(level);
             }
         }
 

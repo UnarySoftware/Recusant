@@ -58,7 +58,7 @@ namespace Unary.Core
             counts[changeType] = count;
         }
 
-        private static PackageIndexFile_v1 _dirFile = new();
+        private static readonly PackageIndexFile_v1 _dirFile = new();
 
         public static List<PackageIndexEntry> Read(string modId, string modFolder)
         {

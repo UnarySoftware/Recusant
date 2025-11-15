@@ -172,7 +172,7 @@ namespace Unary.Core
                 _debugString.Append(" (void):\n");
             }
 
-            foreach (var entry in _initQueue)
+            for (int i = 0; i < _initQueue.Count; i++)
             {
                 foreach (EmptyEventDelegate handler in _subscriberFuncs)
                 {

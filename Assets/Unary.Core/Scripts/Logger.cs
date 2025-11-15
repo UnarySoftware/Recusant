@@ -17,6 +17,7 @@ namespace Unary.Core
             public LogType Type;
             public string Message;
             public string StackTrace;
+            public Color Color;
         }
 
         public EventFunc<LogEventData> OnLog { get; } = new();
@@ -44,6 +45,7 @@ namespace Unary.Core
                             Type = LogType.Log,
                             Message = Message,
                             StackTrace = StackTrace,
+                            Color = _logColor
                         });
                         break;
                     }
@@ -56,6 +58,7 @@ namespace Unary.Core
                             Type = LogType.Warning,
                             Message = Message,
                             StackTrace = StackTrace,
+                            Color = _warningColor
                         });
                         break;
                     }
@@ -70,6 +73,7 @@ namespace Unary.Core
                             Type = LogType.Error,
                             Message = Message,
                             StackTrace = StackTrace,
+                            Color = _errorColor
                         });
                         break;
                     }
@@ -99,22 +103,48 @@ namespace Unary.Core
             OnCleanupStaticState();
         }
 
-        private Color _logColor = Color.white;
-        private Color _warningColor = Color.yellow;
-        private Color _errorColor = Color.red;
+        public static readonly Color LogDefault = Color.white;
+        private static Color _logColor = Color.white;
+
+        public static readonly Color WarningDefault = Color.yellow;
+        private static Color _warningColor = Color.yellow;
+
+        public static readonly Color ErrorDefault = Color.red;
+        private static Color _errorColor = Color.red;
 
         public void Log(string message)
         {
+            _logColor = LogDefault;
+            Debug.Log(message);
+        }
+
+        public void Log(string message, Color logColor)
+        {
+            _logColor = logColor;
             Debug.Log(message);
         }
 
         public void Warning(string warning)
         {
+            _warningColor = WarningDefault;
+            Debug.LogWarning(warning);
+        }
+
+        public void Warning(string warning, Color warningColor)
+        {
+            _warningColor = warningColor;
             Debug.LogWarning(warning);
         }
 
         public void Error(string error)
         {
+            _errorColor = ErrorDefault;
+            Debug.LogError(error);
+        }
+
+        public void Error(string error, Color errorColor)
+        {
+            _errorColor = errorColor;
             Debug.LogError(error);
         }
     }

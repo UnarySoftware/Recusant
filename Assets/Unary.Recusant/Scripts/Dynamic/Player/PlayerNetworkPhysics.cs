@@ -12,7 +12,9 @@ namespace Unary.Recusant
         private GameObject _rigidObject = null;
         private Rigidbody _rigid = null;
 
-        private bool _grounded = false;
+        // TODO Bring back "Grounded" into player input and connect this properly.
+        // I might have borked this code since it was rewritten multiple times.
+        private readonly bool _grounded = false;
         private Vector3 _previousPosition = Vector3.zero;
 
         private PlayerCharacterController _pawnController = null;

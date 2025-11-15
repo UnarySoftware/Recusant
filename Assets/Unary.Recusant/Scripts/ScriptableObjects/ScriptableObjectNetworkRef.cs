@@ -46,7 +46,7 @@ namespace Unary.Recusant
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override readonly int GetHashCode()
         {
-            return NetworkId.GetHashCode();
+            return NetworkId;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

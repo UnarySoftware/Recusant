@@ -10,8 +10,8 @@ namespace Unary.Recusant
         private VisualElement _infoList;
         private ProgressBar _globalProgress;
 
-        private Dictionary<string, VisualElement> _nameToElement = new();
-        private HashSet<string> _removeQueue = new();
+        private readonly Dictionary<string, VisualElement> _nameToElement = new();
+        private readonly HashSet<string> _removeQueue = new();
 
         public override void Initialize()
         {

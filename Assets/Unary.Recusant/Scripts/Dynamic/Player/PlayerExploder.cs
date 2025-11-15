@@ -25,7 +25,7 @@ namespace Unary.Recusant
         private LocalPrefabPool _explosionVisualPool;
 
         private Ray _ray = new();
-        private RaycastHit[] _hits = new RaycastHit[20];
+        private readonly RaycastHit[] _hits = new RaycastHit[20];
         private Vector3 _position = new();
 
         public override void NetworkStart()
@@ -88,14 +88,11 @@ namespace Unary.Recusant
 
         public override void NetworkUpdate()
         {
-            if (IsInputSource)
+            if (IsInputSource && GetInput(out PlayerNetworkInput input))
             {
-                if (GetInput(out PlayerNetworkInput input))
-                {
-                    input.Exploding |= Input.GetMouseButtonDown(1);
+                input.Exploding |= Input.GetMouseButtonDown(1);
 
-                    SetInput(input);
-                }
+                SetInput(input);
             }
         }
 

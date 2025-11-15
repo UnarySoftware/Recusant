@@ -35,14 +35,14 @@ namespace Unary.Core
 
         public void Show(string tooltipText, Color color)
         {
-            int screenWidth = Screen.width;
-            int screenHeight = Screen.height;
+            //int screenWidth = Screen.width;
+            //int screenHeight = Screen.height;
             float mouseXPosition = Input.mousePosition.x;
             float mouseYPosition = Input.mousePosition.y;
             //The below code calculates the size of the text in the tooltip.
             //Yes, the 'Undefined' MeasureMode below is correct.
             _tooltipLabel.BringToFront();
-            Vector2 textSize = _tooltipLabel.MeasureTextSize(tooltipText, 0, VisualElement.MeasureMode.Undefined, 0, VisualElement.MeasureMode.Undefined);
+            //Vector2 textSize = _tooltipLabel.MeasureTextSize(tooltipText, 0, VisualElement.MeasureMode.Undefined, 0, VisualElement.MeasureMode.Undefined);
             //_tooltipLabel.visible = true;
             /*
             if (mouseXPosition >= screenWidth - (textSize.x))

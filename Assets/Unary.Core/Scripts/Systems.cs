@@ -406,8 +406,6 @@ namespace Unary.Core
         {
             foreach (var mod in _modDictionary)
             {
-                string modId = mod.Key;
-
                 foreach (SystemEntry entry in mod.Value)
                 {
                     if (entry.EntryType == EntryType.NetworkPrefab)
@@ -431,8 +429,6 @@ namespace Unary.Core
         {
             foreach (var mod in _modDictionary)
             {
-                string modId = mod.Key;
-
                 foreach (SystemEntry entry in mod.Value)
                 {
                     if (entry.EntryType == EntryType.NetworkPrefab)
@@ -488,8 +484,6 @@ namespace Unary.Core
 
             foreach (var mod in _modDictionary)
             {
-                string modId = mod.Key;
-
                 foreach (SystemEntry entry in mod.Value)
                 {
                     if (entry.EntryType == EntryType.NetworkPrefab)

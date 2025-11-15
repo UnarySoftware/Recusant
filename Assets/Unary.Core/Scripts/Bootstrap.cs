@@ -125,7 +125,7 @@ namespace Unary.Core
             }
             else
             {
-                Logger.Instance.Log("Finished Unary.Core initialization successfully");
+                Logger.Instance.Log("Finished Unary.Core initialization successfully", Color.cyan);
             }
         }
 

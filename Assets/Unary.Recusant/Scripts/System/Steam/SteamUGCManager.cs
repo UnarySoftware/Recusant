@@ -11,7 +11,7 @@ namespace Unary.Recusant
         // If we have more entries than this number - randomly pick MaxStartPlaybackCount entries from the list to provide playtime.
         private const int MaxStartPlaybackCount = 100;
 
-        private List<ModManifestFile> _steamEntries = new();
+        private readonly List<ModManifestFile> _steamEntries = new();
 
         private CallResult<StartPlaytimeTrackingResult_t> StartPlaytimeCallback;
         private CallResult<StopPlaytimeTrackingResult_t> StopPlaytimeCallback;
@@ -53,8 +53,6 @@ namespace Unary.Recusant
 
             foreach (var manifest in manifests)
             {
-                string modId = manifest.Key;
-
                 if (manifest.Value.PublishedFileId == default)
                 {
                     continue;

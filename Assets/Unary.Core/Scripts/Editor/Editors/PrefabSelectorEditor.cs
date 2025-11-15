@@ -11,18 +11,18 @@ namespace Unary.Core.Editor
 
         public static Action<bool> OnSelected;
 
-        private List<Texture2D> _tempTextures = new();
-        private List<Texture2D> _textures = new();
+        private readonly List<Texture2D> _tempTextures = new();
+        private readonly List<Texture2D> _textures = new();
         private List<string> _paths = new();
-        private List<GameObject> _objects = new();
+        private readonly List<GameObject> _objects = new();
 
-        private int _scaleList = 28;
-        private int _scaleMin = 48;
-        private int _scaleMax = 128;
+        private const int _scaleList = 28;
+        private const int _scaleMin = 48;
+        private const int _scaleMax = 128;
         private int _scale = 85;
 
         private string _search = null;
-        private List<int> _searchIndexes = new();
+        private readonly List<int> _searchIndexes = new();
 
         private int _selectIndex = -1;
         private int _pingIndex = -1;
@@ -80,8 +80,7 @@ namespace Unary.Core.Editor
                 return;
             }
 
-            Texture2D target = _textures[index];
-            target = new(texture.width, texture.height, texture.format, false);
+            Texture2D target = new(texture.width, texture.height, texture.format, false);
             target.SetPixels32(texture.GetPixels32());
             target.Apply();
         }

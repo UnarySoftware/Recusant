@@ -1,7 +1,6 @@
-using Unary.Core;
 using Netick;
 using System;
-using System.Collections.Generic;
+using Unary.Core;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.AI;
@@ -15,8 +14,6 @@ namespace Unary.Recusant
         public NetworkBool Leader { get; set; } = false;
 
         public EventFunc<bool> OnLeaderChanged { get; } = new();
-
-        private List<Vector3> _enemySpawnLocations = new();
 
         [OnChanged(nameof(Leader))]
         public void OnLeader(OnChangedData _)

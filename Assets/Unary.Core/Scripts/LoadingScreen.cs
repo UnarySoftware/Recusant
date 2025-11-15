@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,7 +18,9 @@ namespace Unary.Core
             }
             set
             {
-                if (!value)
+                _enabled = value;
+
+                if (!_enabled)
                 {
                     Destroy(canvasGO);
                 }

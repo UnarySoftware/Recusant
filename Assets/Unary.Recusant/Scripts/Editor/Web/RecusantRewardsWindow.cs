@@ -23,21 +23,18 @@ public class RecusantRewardsWindow : EditorWindow
     {
         gotEntries = false;
 
-        if (Directory.Exists(WebDataFetcher.RepoFolder))
+        if (Directory.Exists(WebDataFetcher.RepoFolder) && File.Exists(TargetFile))
         {
-            if (File.Exists(TargetFile))
-            {
-                Type type = typeof(RecusantRewardsDataEntry[]);
+            Type type = typeof(RecusantRewardsDataEntry[]);
 
-                try
-                {
-                    _entries = (RecusantRewardsDataEntry[])JsonConvert.DeserializeObject(File.ReadAllText(TargetFile), type);
-                    gotEntries = true;
-                }
-                catch (Exception e)
-                {
-                    Debug.LogException(e);
-                }
+            try
+            {
+                _entries = (RecusantRewardsDataEntry[])JsonConvert.DeserializeObject(File.ReadAllText(TargetFile), type);
+                gotEntries = true;
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
             }
         }
     }

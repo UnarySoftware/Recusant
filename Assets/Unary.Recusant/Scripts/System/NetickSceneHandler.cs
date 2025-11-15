@@ -23,7 +23,7 @@ namespace Unary.Recusant
         private Task _unloadDependencies;
         private AsyncOperation _operation;
         private AsyncOperation _resourcesOperation;
-        private ContentLoader.Progress _progress = new();
+        private readonly ContentLoader.Progress _progress = new();
 
         public AssetBundleSceneOperation(string assetPath)
         {
@@ -172,20 +172,18 @@ namespace Unary.Recusant
         {
             sceneName = LevelManager.Instance.GetScenePath(index);
 
-            string selectedScene = LevelManager.Instance.GetScenePath(index);
-
 #if UNITY_EDITOR
 
-            if (ContentLoader.Instance.IsEditorPath(selectedScene))
+            if (ContentLoader.Instance.IsEditorPath(sceneName))
             {
-                return new BuildSceneOperation(EditorSceneManager.LoadSceneAsyncInPlayMode(ContentLoader.Instance.GetFullPath(selectedScene), loadSceneParameters));
+                return new BuildSceneOperation(EditorSceneManager.LoadSceneAsyncInPlayMode(ContentLoader.Instance.GetFullPath(sceneName), loadSceneParameters));
             }
             else
             {
-                return new AssetBundleSceneOperation(selectedScene);
+                return new AssetBundleSceneOperation(sceneName);
             }
 #else
-            return new AssetBundleSceneOperation(selectedScene);
+            return new AssetBundleSceneOperation(sceneName);
 #endif
         }
 
