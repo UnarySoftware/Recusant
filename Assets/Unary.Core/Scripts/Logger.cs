@@ -122,6 +122,7 @@ namespace Unary.Core
         {
             _logColor = logColor;
             Debug.Log(message);
+            _logColor = LogDefault;
         }
 
         public void Warning(string warning)
@@ -134,6 +135,7 @@ namespace Unary.Core
         {
             _warningColor = warningColor;
             Debug.LogWarning(warning);
+            _warningColor = WarningDefault;
         }
 
         public void Error(string error)
@@ -146,6 +148,7 @@ namespace Unary.Core
         {
             _errorColor = errorColor;
             Debug.LogError(error);
+            _errorColor = ErrorDefault;
         }
 
         public void Error(Exception exception)
@@ -158,6 +161,7 @@ namespace Unary.Core
         {
             _errorColor = errorColor;
             Debug.LogException(exception);
+            _errorColor = ErrorDefault;
         }
     }
 }

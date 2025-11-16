@@ -1,3 +1,11 @@
+#if !UNITY_EDITOR
+
+using System.Collections.Generic;
+using System.Text;
+using UnityEngine;
+
+#endif
+
 namespace Unary.Core
 {
 
@@ -27,6 +35,7 @@ namespace Unary.Core
 
             Core.Logger.Instance.Log("Shader manager is disabled in editor");
             return true;
+
 #else
 
             ShaderVariantCollection newCollection = new();
