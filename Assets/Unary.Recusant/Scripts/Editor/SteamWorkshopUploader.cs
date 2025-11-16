@@ -161,6 +161,13 @@ namespace Unary.Recusant.Editor
                 _updateThread.Join(1000);
             }
 
+            WorkshopEULACallback?.Dispose();
+            WorkshopEULACallback = null;
+            CreateItemCallback?.Dispose();
+            CreateItemCallback = null;
+            SubmitItemUpdateCallback?.Dispose();
+            SubmitItemUpdateCallback = null;
+
             if (_messageHook != null)
             {
                 SteamClient.SetWarningMessageHook(null);

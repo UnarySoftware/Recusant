@@ -14,17 +14,11 @@ namespace Unary.Recusant
         private readonly List<ModManifestFile> _steamEntries = new();
 
         private CallResult<StartPlaytimeTrackingResult_t> StartPlaytimeCallback;
-        private CallResult<StopPlaytimeTrackingResult_t> StopPlaytimeCallback;
         private CallResult<WorkshopEULAStatus_t> WorkshopEULACallback;
 
         public EventFunc<bool> EULAUpdate = new();
 
         private void OnStartPlaytime(StartPlaytimeTrackingResult_t data, bool failure)
-        {
-
-        }
-
-        private void OnStopPlaytime(StopPlaytimeTrackingResult_t data, bool failure)
         {
 
         }
@@ -67,7 +61,6 @@ namespace Unary.Recusant
             }
 
             StartPlaytimeCallback = CallResult<StartPlaytimeTrackingResult_t>.Create(OnStartPlaytime);
-            StopPlaytimeCallback = CallResult<StopPlaytimeTrackingResult_t>.Create(OnStopPlaytime);
             WorkshopEULACallback = CallResult<WorkshopEULAStatus_t>.Create(OnWorkshopEULA);
 
             WorkshopEULACallback.Set(SteamUGC.GetWorkshopEULAStatus());
@@ -146,7 +139,10 @@ namespace Unary.Recusant
                 return;
             }
 
-            StopPlaytimeCallback.Set(SteamUGC.StopPlaytimeTrackingForAllItems());
+            StartPlaytimeCallback?.Dispose();
+            StartPlaytimeCallback = null;
+            WorkshopEULACallback?.Dispose();
+            WorkshopEULACallback = null;
         }
     }
 }

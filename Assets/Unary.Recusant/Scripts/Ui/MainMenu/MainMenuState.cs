@@ -69,18 +69,24 @@ namespace Unary.Recusant
 
         private void OnNumberOfCurrentPlayers(NumberOfCurrentPlayers_t data, bool failure)
         {
-            if (data.m_bSuccess == 0 || failure)
+            if (Convert.ToBoolean(data.m_bSuccess) || failure)
             {
                 return;
             }
 
-            CurrentPlayers.text = $"Current players in-game: {data.m_cPlayers + 1}";
+            // Add 1 to the player count since current Steam player number is delayed with updates and wont include us
+            int playerCount = data.m_cPlayers == 0 ? 1 : data.m_cPlayers;
+
+            CurrentPlayers.text = $"Current players in-game: {playerCount}";
             CurrentPlayers.style.display = DisplayStyle.Flex;
         }
 
         public override void Deinitialize()
         {
             base.Deinitialize();
+
+            OnNumberOfCurrentPlayersCallback?.Dispose();
+            OnNumberOfCurrentPlayersCallback = null;
         }
 
         public override void Open()

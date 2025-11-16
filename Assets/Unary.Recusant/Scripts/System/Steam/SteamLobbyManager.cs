@@ -261,6 +261,18 @@ namespace Unary.Recusant
                 SteamMatchmaking.LeaveLobby(Lobby);
             }
 
+            LobbyUpdateCallback?.Dispose();
+            LobbyUpdateCallback = null;
+            LobbyChatCallback?.Dispose();
+            LobbyChatCallback = null;
+
+            LobbyCreatedResult?.Dispose();
+            LobbyCreatedResult = null;
+            LobbyEnterResult?.Dispose();
+            LobbyEnterResult = null;
+            LobbyMatchListResult?.Dispose();
+            LobbyMatchListResult = null;
+
             LevelManager.Instance.OnAwake.Unsubscribe(this);
         }
     }
