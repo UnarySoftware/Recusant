@@ -58,7 +58,7 @@ namespace Unary.Core
                 return 0;
             }
 
-            int toRead = (int)Math.Min(count, remaining);
+            int toRead = (int)System.Math.Min(count, remaining);
 
             _fileStream.Seek(_offset + _position, SeekOrigin.Begin);
 
