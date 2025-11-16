@@ -175,7 +175,7 @@ namespace Unary.Core
             double value = metric.Variable();
             double valuePrevious = _previousMetricValue[index];
 
-            if (value != valuePrevious)
+            if (System.Math.Abs(value - valuePrevious) > Math.Epsilon)
             {
                 metric.OnNumberMetricChange(value, index);
             }

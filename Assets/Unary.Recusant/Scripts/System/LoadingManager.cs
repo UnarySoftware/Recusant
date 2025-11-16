@@ -207,7 +207,7 @@ namespace Unary.Recusant
             }
 
             // Prevent division by zero and NAN% in loading as a result
-            if (calculatedMax == 0.0f)
+            if (Mathf.Abs(calculatedMax) <= Mathf.Epsilon)
             {
                 calculatedMax = 1.0f;
             }

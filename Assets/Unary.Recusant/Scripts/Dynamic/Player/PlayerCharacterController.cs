@@ -230,7 +230,7 @@ namespace Unary.Recusant
 
         private void AirMove(ref Vector3 playerVelocity, float deltaTime)
         {
-            if (rightMove != 0.0f)
+            if (Mathf.Abs(rightMove) > Mathf.Epsilon)
             {
                 forwardMove = 0.0f;
             }
@@ -256,8 +256,7 @@ namespace Unary.Recusant
             }
 
             // If the player is ONLY strafing left or right
-
-            if (forwardMove == 0.0f && rightMove != 0.0f)
+            if (Mathf.Abs(forwardMove) <= Mathf.Epsilon && Mathf.Abs(rightMove) > Mathf.Epsilon)
             {
                 if (wishspeed > _data.Value.SideStrafeSpeed)
                 {

@@ -98,7 +98,7 @@ namespace Unary.Recusant
             for (int i = 0; i < Units.Length; ++i)
             {
                 UpdaterUnit Target = Units[i];
-                if (Target.Interval == Interval)
+                if (Mathf.Abs(Target.Interval - Interval) < Mathf.Epsilon)
                 {
                     FoundUnit = true;
                     Target.Subscribe(Action);
