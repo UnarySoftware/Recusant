@@ -46,7 +46,7 @@ namespace Unary.Recusant
 
         private void OnRefreshPressed(MouseUpEvent _)
         {
-            _selectedOwner = string.Empty;
+            _selectedOwner = null;
             _selectedLobby = null;
 
             _ownerToLobby.Clear();
@@ -61,12 +61,7 @@ namespace Unary.Recusant
                 }
             }
 
-            if (_lobbies.childCount > 0)
-            {
-                _lobbies.RemoveAt(0);
-            }
-
-            _selectedLobby = null;
+            _lobbies.Clear();
 
             SteamMatchmaking.AddRequestLobbyListDistanceFilter(ELobbyDistanceFilter.k_ELobbyDistanceFilterWorldwide);
             SteamMatchmaking.AddRequestLobbyListFilterSlotsAvailable(1);
@@ -87,8 +82,13 @@ namespace Unary.Recusant
                 string lobbyOwnerName = SteamMatchmaking.GetLobbyData(lobby, "OwnerName");
                 ulong lobbyOwnerSteamId = 0;
 
-                // TODO Proper validation of the ID
-                lobbyOwnerSteamId = ulong.Parse(SteamMatchmaking.GetLobbyData(lobby, "OwnerId"));
+                string ownerIdStr = SteamMatchmaking.GetLobbyData(lobby, "OwnerId");
+
+                if (!ulong.TryParse(ownerIdStr, out lobbyOwnerSteamId))
+                {
+                    Logger.Instance.Warning($"Failed to parse ownerId '{ownerIdStr}' for lobby index {i}, skipping this lobby entry.");
+                    continue;
+                }
 
                 var resolvedOwner = new CSteamID(lobbyOwnerSteamId);
 
@@ -125,7 +125,7 @@ namespace Unary.Recusant
                 return;
             }
 
-            if (_selectedOwner == string.Empty)
+            if (string.IsNullOrEmpty(_selectedOwner))
             {
                 return;
             }
