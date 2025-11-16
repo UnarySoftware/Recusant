@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Unary.Core
@@ -145,6 +146,18 @@ namespace Unary.Core
         {
             _errorColor = errorColor;
             Debug.LogError(error);
+        }
+
+        public void Error(Exception exception)
+        {
+            _errorColor = ErrorDefault;
+            Debug.LogException(exception);
+        }
+
+        public void Error(Exception exception, Color errorColor)
+        {
+            _errorColor = errorColor;
+            Debug.LogException(exception);
         }
     }
 }

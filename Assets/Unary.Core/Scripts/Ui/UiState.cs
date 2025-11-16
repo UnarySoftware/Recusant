@@ -56,5 +56,10 @@ namespace Unary.Core
         }
 
         public abstract Type GetBackState();
+
+        public virtual CursorLockMode GetCursorMode()
+        {
+            return CursorLockMode.None;
+        }
     }
 }

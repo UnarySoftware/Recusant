@@ -29,54 +29,22 @@ namespace Unary.Recusant
         public bool Scripts = false;
         public bool Campaigns = false;
 
-        // TODO Simplify this code somehow
         public List<string> GetGameplayTags()
         {
             List<string> result = new();
 
-            if (Items)
-            {
-                result.Add(nameof(Items));
-            }
+            var fields = typeof(ContentManifest).GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
 
-            if (Players)
+            foreach (var field in fields)
             {
-                result.Add(nameof(Players));
-            }
-
-            if (Npcs)
-            {
-                result.Add(nameof(Npcs));
-            }
-
-            if (Gamemodes)
-            {
-                result.Add(nameof(Gamemodes));
-            }
-
-            if (Hub)
-            {
-                result.Add(nameof(Hub));
-            }
-
-            if (Weapons)
-            {
-                result.Add(nameof(Weapons));
-            }
-
-            if (Skins)
-            {
-                result.Add(nameof(Skins));
-            }
-
-            if (Scripts)
-            {
-                result.Add(nameof(Scripts));
-            }
-
-            if (Campaigns)
-            {
-                result.Add(nameof(Campaigns));
+                if (field.FieldType == typeof(bool))
+                {
+                    bool value = (bool)field.GetValue(this);
+                    if (value)
+                    {
+                        result.Add(field.Name);
+                    }
+                }
             }
 
             return result;

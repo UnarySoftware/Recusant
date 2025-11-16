@@ -110,21 +110,23 @@ namespace Unary.Recusant
                 return;
             }
 
-            int ParsedPort;
-
             uint messageId = data.m_iChatID;
 
             int written = SteamMatchmaking.GetLobbyChatEntry(Lobby, (int)messageId, out var messageSender, _lobbyMessageBuffer, _lobbyMessageBuffer.Length, out var messageType);
 
             string finalString = Encoding.UTF8.GetString(_lobbyMessageBuffer, 0, written);
 
-            // TODO Proper validation of the string id
-            ParsedPort = int.Parse(finalString);
-
-            if (ParsedPort != 0)
+            if (int.TryParse(finalString, out int parsedPort))
             {
-                NetworkManager.Instance.OnlineProviderPort = ParsedPort;
-                NetworkManager.Instance.StartClient();
+                if (parsedPort != 0)
+                {
+                    NetworkManager.Instance.OnlineProviderPort = parsedPort;
+                    NetworkManager.Instance.StartClient();
+                }
+            }
+            else
+            {
+                // TODO Disconnect if we fail to get proper data from the server
             }
         }
 

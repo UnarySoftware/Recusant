@@ -32,8 +32,6 @@ namespace Unary.Recusant
             {
                 return;
             }
-
-            Cursor.lockState = CursorLockMode.Locked;
         }
 
         public override void NetworkUpdate()
@@ -107,7 +105,7 @@ namespace Unary.Recusant
         {
             Vector2 inputVector = Vector2.zero;
 
-            if (AllowInputs && Cursor.lockState == CursorLockMode.Locked)
+            if (AllowInputs)
             {
                 float mouseLookAxisUp = Input.GetAxisRaw(MouseYInput);
                 float mouseLookAxisRight = Input.GetAxisRaw(MouseXInput);

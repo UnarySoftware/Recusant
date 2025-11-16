@@ -18,8 +18,6 @@ namespace Unary.Recusant
         public override void Open()
         {
             base.Open();
-
-            Cursor.lockState = CursorLockMode.None;
         }
 
         public override void Close()

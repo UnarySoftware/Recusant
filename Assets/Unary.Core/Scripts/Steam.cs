@@ -10,7 +10,7 @@ namespace Unary.Core
     public class Steam : CoreSystem<Steam>
     {
         // TODO Maybe convert to native AppId type
-        public const uint AppId = 1436420;
+        public static readonly AppId_t AppId = new(1436420);
 
         // Intentionnaly kept static and not cleaned up when runtime stops.
         // This way we are trying to lower times SteamWorks would unnecessarily reinitialize itself.

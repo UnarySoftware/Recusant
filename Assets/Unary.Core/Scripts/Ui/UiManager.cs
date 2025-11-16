@@ -119,6 +119,8 @@ namespace Unary.Core
             _currentState = targetState;
             _currentState.GetComponent<UIDocument>().rootVisualElement.style.visibility = Visibility.Visible;
             _currentState.Open();
+
+            UnityEngine.Cursor.lockState = _currentState.GetCursorMode();
         }
 
         public void GoBack()

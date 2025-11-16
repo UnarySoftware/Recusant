@@ -395,8 +395,7 @@ namespace Unary.Core
                 }
                 catch (Exception e)
                 {
-                    // TODO Add proper initialization error here
-                    Debug.LogError(e);
+                    Logger.Instance.Error(e);
                     continue;
                 }
 

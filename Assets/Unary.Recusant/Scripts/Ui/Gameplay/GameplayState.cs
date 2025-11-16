@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using UnityEngine;
 
 namespace Unary.Recusant
@@ -19,29 +18,21 @@ namespace Unary.Recusant
         public override void Open()
         {
             base.Open();
-
-            Cursor.lockState = CursorLockMode.Locked;
-
-            StartCoroutine(DelayProfiling());
-        }
-
-        IEnumerator DelayProfiling()
-        {
-            yield return new WaitForSeconds(4.0f);
-            // TODO Delay profiling here
-            //PerformanceManager.Instance.Profiling = true;
         }
 
         public override void Close()
         {
             base.Close();
-
-            //PerformanceManager.Instance.Profiling = false;
         }
 
         public override Type GetBackState()
         {
             return typeof(GameplayPauseState);
+        }
+
+        public override CursorLockMode GetCursorMode()
+        {
+            return CursorLockMode.Locked;
         }
     }
 }

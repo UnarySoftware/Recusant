@@ -239,7 +239,7 @@ namespace Unary.Recusant.Editor
 
             if (modManifest.PublishedFileId == default)
             {
-                CreateItemCallback.Set(SteamUGC.CreateItem(new(Steam.AppId), EWorkshopFileType.k_EWorkshopFileTypeCommunity), OnCreatedItem);
+                CreateItemCallback.Set(SteamUGC.CreateItem(Steam.AppId, EWorkshopFileType.k_EWorkshopFileTypeCommunity), OnCreatedItem);
             }
             else
             {
@@ -266,7 +266,7 @@ namespace Unary.Recusant.Editor
                 return;
             }
 
-            UGCUpdateHandle_t updateHandle = SteamUGC.StartItemUpdate(new(Steam.AppId), fileId);
+            UGCUpdateHandle_t updateHandle = SteamUGC.StartItemUpdate(Steam.AppId, fileId);
 
             string absoluteDirectory = Directory.GetCurrentDirectory().Replace('\\', '/');
 
@@ -393,7 +393,7 @@ namespace Unary.Recusant.Editor
                 return;
             }
 
-            UGCUpdateHandle_t updateHandle = SteamUGC.StartItemUpdate(new(Steam.AppId), data.m_nPublishedFileId);
+            UGCUpdateHandle_t updateHandle = SteamUGC.StartItemUpdate(Steam.AppId, data.m_nPublishedFileId);
 
             if (!SteamUGC.SetItemTitle(updateHandle, contentManifest.FullName))
             {
