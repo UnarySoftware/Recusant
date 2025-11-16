@@ -1,7 +1,5 @@
-using Unary.Core;
 using Steamworks;
-using System;
-using System.Collections.Generic;
+using Unary.Core;
 using UnityEngine.UIElements;
 
 namespace Unary.Recusant
@@ -14,21 +12,11 @@ namespace Unary.Recusant
         private Button _connectButton = null;
         private ScrollView _lobbies = null;
 
-        private readonly Dictionary<string, CSteamID> _ownerToLobby = new();
-
-        private string _selectedOwner = null;
-        private VisualElement _selectedLobby = null;
+        private Button _selectedLobby = null;
 
         private void OnLobbySelected(MouseUpEvent evt)
         {
-            VisualElement newSelectedLobby = (VisualElement)evt.target;
-
-            Label ownerLabel = newSelectedLobby.Q<Label>("HostName");
-
-            if (ownerLabel == null)
-            {
-                return;
-            }
+            Button newSelectedLobby = (Button)evt.target;
 
             if (_selectedLobby != newSelectedLobby)
             {
@@ -37,8 +25,6 @@ namespace Unary.Recusant
                     _selectedLobby.style.backgroundColor = UnityEngine.Color.gray4;
                 }
 
-                _selectedOwner = ownerLabel.text;
-
                 _selectedLobby = newSelectedLobby;
                 _selectedLobby.style.backgroundColor = UnityEngine.Color.darkGreen;
             }
@@ -46,10 +32,7 @@ namespace Unary.Recusant
 
         private void OnRefreshPressed(MouseUpEvent _)
         {
-            _selectedOwner = null;
             _selectedLobby = null;
-
-            _ownerToLobby.Clear();
 
             var children = _lobbies.Children();
 
@@ -92,6 +75,12 @@ namespace Unary.Recusant
 
                 var resolvedOwner = new CSteamID(lobbyOwnerSteamId);
 
+                if (!resolvedOwner.IsValid())
+                {
+                    Logger.Instance.Warning($"Failed to parse steamId '{lobbyOwnerSteamId}' for lobby index {i}, skipping this lobby entry.");
+                    continue;
+                }
+
                 if (SteamFriends.GetFriendRelationship(resolvedOwner) == EFriendRelationship.k_EFriendRelationshipFriend)
                 {
                     lobbyOwnerName = SteamFriends.GetFriendPersonaName(resolvedOwner);
@@ -109,10 +98,13 @@ namespace Unary.Recusant
                 newEntry.Q<Label>("Map").text = mapText;
 
                 newEntry.Q<Label>("PlayerCount").text = SteamMatchmaking.GetNumLobbyMembers(lobby) + "/" + SteamMatchmaking.GetLobbyMemberLimit(lobby);
-                _lobbies.Add(newEntry);
-                newEntry.RegisterCallback<MouseUpEvent>(OnLobbySelected);
 
-                _ownerToLobby[lobbyOwnerName] = lobby;
+                Button button = newEntry.Q<Button>("LobbyEntry");
+
+                button.RegisterCallback<MouseUpEvent>(OnLobbySelected);
+                button.userData = lobby;
+
+                _lobbies.Add(newEntry);
             }
 
             return true;
@@ -125,12 +117,7 @@ namespace Unary.Recusant
                 return;
             }
 
-            if (string.IsNullOrEmpty(_selectedOwner))
-            {
-                return;
-            }
-
-            CSteamID targetLobby = _ownerToLobby[_selectedOwner];
+            CSteamID targetLobby = (CSteamID)_selectedLobby.userData;
 
             SteamLobbyManager.Instance.EnterLobby(targetLobby);
         }
