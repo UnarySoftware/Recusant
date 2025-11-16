@@ -1,9 +1,9 @@
 #if UNITY_EDITOR
 
-using UnityEngine;
-using UnityEditor;
 using System;
 using System.Reflection;
+using UnityEditor;
+using UnityEngine;
 
 namespace Unary.Core.Editor
 {

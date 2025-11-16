@@ -1,5 +1,3 @@
-using System;
-
 namespace Unary.Core
 {
     public static class HumanReadableExtensions

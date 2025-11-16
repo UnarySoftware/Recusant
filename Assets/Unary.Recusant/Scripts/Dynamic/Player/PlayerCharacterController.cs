@@ -1,8 +1,8 @@
-using UnityEngine;
 using KinematicCharacterController;
-using Netick.Unity;
 using Netick;
+using Netick.Unity;
 using Unary.Core;
+using UnityEngine;
 
 namespace Unary.Recusant
 {

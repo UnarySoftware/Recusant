@@ -1,5 +1,5 @@
-using UnityEngine;
 using Unary.Core;
+using UnityEngine;
 
 namespace Unary.Recusant
 {

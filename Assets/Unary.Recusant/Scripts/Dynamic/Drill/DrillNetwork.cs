@@ -1,5 +1,5 @@
-using Unary.Core;
 using Netick;
+using Unary.Core;
 
 namespace Unary.Recusant
 {

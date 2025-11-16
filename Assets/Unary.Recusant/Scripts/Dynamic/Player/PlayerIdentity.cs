@@ -1,7 +1,7 @@
-using Unary.Core;
 using Netick;
 using Netick.Transports.Steamworks;
 using Steamworks;
+using Unary.Core;
 using UnityEngine;
 
 namespace Unary.Recusant

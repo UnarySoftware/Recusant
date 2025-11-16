@@ -1,5 +1,5 @@
-using Unary.Core;
 using HighlightPlus;
+using Unary.Core;
 
 namespace Unary.Recusant
 {

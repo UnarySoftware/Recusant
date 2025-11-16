@@ -1,6 +1,6 @@
+using KinematicCharacterController;
 using Unary.Core;
 using UnityEngine;
-using KinematicCharacterController;
 
 namespace Unary.Recusant
 {

@@ -1,7 +1,7 @@
+using Netick;
 using Unary.Core;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
-using Netick;
 
 namespace Unary.Recusant
 {

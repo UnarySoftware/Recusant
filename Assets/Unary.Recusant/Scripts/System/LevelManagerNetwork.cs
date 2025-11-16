@@ -1,7 +1,5 @@
-using Unary.Core;
 using Netick;
-using UnityEngine;
-using UnityEngine.SceneManagement;
+using Unary.Core;
 
 namespace Unary.Recusant
 {

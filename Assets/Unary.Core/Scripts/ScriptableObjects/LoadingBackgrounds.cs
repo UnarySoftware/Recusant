@@ -16,7 +16,7 @@ namespace Unary.Core
 
         public readonly bool Equals(LevelBackgroundEntry other)
         {
-            if(IdentifyingString == other.IdentifyingString)
+            if (IdentifyingString == other.IdentifyingString)
             {
                 return true;
             }

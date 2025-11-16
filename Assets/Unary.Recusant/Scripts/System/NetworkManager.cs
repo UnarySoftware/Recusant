@@ -1,4 +1,3 @@
-using Unary.Core;
 using Netick;
 using Netick.Transport;
 using Netick.Transports.Steamworks;
@@ -6,6 +5,7 @@ using Netick.Unity;
 using Steamworks;
 using System;
 using System.Collections.Generic;
+using Unary.Core;
 using UnityEngine;
 
 namespace Unary.Recusant

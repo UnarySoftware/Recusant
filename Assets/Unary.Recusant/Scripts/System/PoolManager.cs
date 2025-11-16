@@ -1,6 +1,6 @@
-using Unary.Core;
 using Netick.Unity;
 using System.Collections.Generic;
+using Unary.Core;
 using UnityEngine;
 
 namespace Unary.Recusant

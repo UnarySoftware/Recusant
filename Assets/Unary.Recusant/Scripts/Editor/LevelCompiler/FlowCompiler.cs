@@ -1,9 +1,9 @@
 #if UNITY_EDITOR
 
-using Unary.Core;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Unary.Core;
 using Unity.AI.Navigation;
 using UnityEditor;
 using UnityEngine;

@@ -1,10 +1,10 @@
 ﻿#if UNITY_EDITOR
 
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.AI;
 using Unity.AI.Navigation;
 using UnityEditor;
+using UnityEngine;
+using UnityEngine.AI;
 
 namespace Unary.Recusant.Editor
 {

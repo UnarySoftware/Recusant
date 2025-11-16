@@ -1,81 +1,81 @@
-using Unary.Core;
 using System;
 using System.Runtime.CompilerServices;
+using Unary.Core;
 using UnityEngine;
 
 namespace Unary.Recusant
 {
     public class UpdaterUnit
     {
-        private const byte PoolLimit = 3;
-        private byte PoolCounter = 0;
+        private const byte _poolLimit = 3;
+        private byte _poolCounter = 0;
 
         public readonly float Interval;
 
-        private readonly Action[] OnUpdate;
-        private readonly float[] OnTime;
+        private readonly Action[] _onUpdate;
+        private readonly float[] _onTime;
 
-        public UpdaterUnit(float Time, float Interval)
+        public UpdaterUnit(float time, float interval)
         {
-            this.Interval = Interval;
+            Interval = interval;
 
-            OnUpdate = new Action[PoolLimit];
-            OnTime = new float[PoolLimit];
+            _onUpdate = new Action[_poolLimit];
+            _onTime = new float[_poolLimit];
 
-            float Offset = Interval / PoolLimit;
+            float Offset = interval / _poolLimit;
 
-            for (int i = 0; i < PoolLimit; i++)
+            for (int i = 0; i < _poolLimit; i++)
             {
-                OnTime[i] = Time + (Offset * i);
+                _onTime[i] = time + (Offset * i);
             }
         }
 
-        public void Update(float Time)
+        public void Update(float time)
         {
-            for (int i = 0; i < PoolLimit; i++)
+            for (int i = 0; i < _poolLimit; i++)
             {
-                if (Time > OnTime[i])
+                if (time > _onTime[i])
                 {
-                    OnUpdate[i]?.Invoke();
-                    OnTime[i] = Time + Interval;
+                    _onUpdate[i]?.Invoke();
+                    _onTime[i] = time + Interval;
                 }
             }
         }
 
-        public void Subscribe(Action Update)
+        public void Subscribe(Action update)
         {
-            if (OnUpdate[PoolCounter] == null)
+            if (_onUpdate[_poolCounter] == null)
             {
-                OnUpdate[PoolCounter] = Update;
+                _onUpdate[_poolCounter] = update;
             }
             else
             {
-                OnUpdate[PoolCounter] += Update;
+                _onUpdate[_poolCounter] += update;
             }
 
-            PoolCounter++;
-            if (PoolCounter == PoolLimit)
+            _poolCounter++;
+            if (_poolCounter == _poolLimit)
             {
-                PoolCounter = 0;
+                _poolCounter = 0;
             }
         }
 
-        public void Unsubscribe(Action Update)
+        public void Unsubscribe(Action update)
         {
-            for (int i = 0; i < PoolLimit; i++)
+            for (int i = 0; i < _poolLimit; i++)
             {
-                OnUpdate[i] -= Update;
+                _onUpdate[i] -= update;
             }
         }
     }
 
     public class Updater : System<Updater>
     {
-        private UpdaterUnit[] FixedUpdateUnits = new UpdaterUnit[0];
-        private UpdaterUnit[] UpdateUnits = new UpdaterUnit[0];
-        private UpdaterUnit[] LateUpdateUnits = new UpdaterUnit[0];
+        private UpdaterUnit[] _fixedUpdateUnits = new UpdaterUnit[0];
+        private UpdaterUnit[] _updateUnits = new UpdaterUnit[0];
+        private UpdaterUnit[] _lateUpdateUnits = new UpdaterUnit[0];
 
-        private float Timer = 0.0f;
+        private float _timer = 0.0f;
 
         public override void Initialize()
         {
@@ -92,99 +92,99 @@ namespace Unary.Recusant
 
         }
 
-        private void Subscribe(ref UpdaterUnit[] Units, Action Action, float Interval)
+        private void Subscribe(ref UpdaterUnit[] units, Action action, float interval)
         {
-            bool FoundUnit = false;
+            bool foundUnit = false;
 
-            for (int i = 0; i < Units.Length; ++i)
+            for (int i = 0; i < units.Length; ++i)
             {
-                UpdaterUnit Target = Units[i];
-                if (Mathf.Abs(Target.Interval - Interval) < Mathf.Epsilon)
+                UpdaterUnit target = units[i];
+                if (Mathf.Abs(target.Interval - interval) < Mathf.Epsilon)
                 {
-                    FoundUnit = true;
-                    Target.Subscribe(Action);
+                    foundUnit = true;
+                    target.Subscribe(action);
                     break;
                 }
             }
 
-            if (!FoundUnit)
+            if (!foundUnit)
             {
-                UpdaterUnit[] NewUnits = new UpdaterUnit[Units.Length + 1];
-                Array.Copy(Units, NewUnits, Units.Length);
-                NewUnits[^1] = new UpdaterUnit(Timer, Interval);
-                Units = NewUnits;
-                Units[^1].Subscribe(Action);
+                UpdaterUnit[] newUnits = new UpdaterUnit[units.Length + 1];
+                Array.Copy(units, newUnits, units.Length);
+                newUnits[^1] = new UpdaterUnit(_timer, interval);
+                units = newUnits;
+                units[^1].Subscribe(action);
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SubscribeFixedUpdate(Action Action, float Interval = 0.0f)
+        public void SubscribeFixedUpdate(Action action, float interval = 0.0f)
         {
-            Subscribe(ref FixedUpdateUnits, Action, Interval);
+            Subscribe(ref _fixedUpdateUnits, action, interval);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SubscribeUpdate(Action Action, float Interval = 0.0f)
+        public void SubscribeUpdate(Action action, float interval = 0.0f)
         {
-            Subscribe(ref UpdateUnits, Action, Interval);
+            Subscribe(ref _updateUnits, action, interval);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SubscribeLateUpdate(Action Action, float Interval = 0.0f)
+        public void SubscribeLateUpdate(Action action, float interval = 0.0f)
         {
-            Subscribe(ref LateUpdateUnits, Action, Interval);
+            Subscribe(ref _lateUpdateUnits, action, interval);
         }
 
-        private void Unsubscribe(ref UpdaterUnit[] Units, Action Action)
+        private void Unsubscribe(ref UpdaterUnit[] units, Action action)
         {
-            for (int i = 0; i < Units.Length; i++)
+            for (int i = 0; i < units.Length; i++)
             {
-                UpdaterUnit Target = Units[i];
-                Target.Unsubscribe(Action);
+                UpdaterUnit target = units[i];
+                target.Unsubscribe(action);
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void UnsubscribeFixedUpdate(Action Action)
+        public void UnsubscribeFixedUpdate(Action action)
         {
-            Unsubscribe(ref FixedUpdateUnits, Action);
+            Unsubscribe(ref _fixedUpdateUnits, action);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void UnsubscribeUpdate(Action Action)
+        public void UnsubscribeUpdate(Action action)
         {
-            Unsubscribe(ref UpdateUnits, Action);
+            Unsubscribe(ref _updateUnits, action);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void UnsubscribeLateUpdate(Action Action)
+        public void UnsubscribeLateUpdate(Action action)
         {
-            Unsubscribe(ref LateUpdateUnits, Action);
+            Unsubscribe(ref _lateUpdateUnits, action);
         }
 
         private void FixedUpdate()
         {
-            Timer += Time.fixedDeltaTime;
+            _timer += Time.fixedDeltaTime;
 
-            for (int i = 0; i < FixedUpdateUnits.Length; ++i)
+            for (int i = 0; i < _fixedUpdateUnits.Length; ++i)
             {
-                FixedUpdateUnits[i].Update(Timer);
+                _fixedUpdateUnits[i].Update(_timer);
             }
         }
 
         private void Update()
         {
-            for (int i = 0; i < UpdateUnits.Length; ++i)
+            for (int i = 0; i < _updateUnits.Length; ++i)
             {
-                UpdateUnits[i].Update(Time.time);
+                _updateUnits[i].Update(Time.time);
             }
         }
 
         private void LateUpdate()
         {
-            for (int i = 0; i < LateUpdateUnits.Length; ++i)
+            for (int i = 0; i < _lateUpdateUnits.Length; ++i)
             {
-                LateUpdateUnits[i].Update(Time.time);
+                _lateUpdateUnits[i].Update(Time.time);
             }
         }
     }

@@ -1,6 +1,5 @@
-using Unary.Core;
 using Netick;
-using Netick.Unity;
+using Unary.Core;
 using UnityEngine;
 
 namespace Unary.Recusant

@@ -1,10 +1,10 @@
 #if UNITY_EDITOR
 
-using Unary.Core;
-using UnityEngine;
-using UnityEditor;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using Unary.Core;
+using UnityEditor;
+using UnityEngine;
 
 namespace Unary.Recusant.Editor
 {

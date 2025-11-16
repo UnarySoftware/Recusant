@@ -18,7 +18,7 @@ namespace Unary.Recusant
 
         private void Update()
         {
-            if(Lights.Count == 0 || OriginalIntensities.Count != Lights.Count)
+            if (Lights.Count == 0 || OriginalIntensities.Count != Lights.Count)
             {
                 return;
             }
