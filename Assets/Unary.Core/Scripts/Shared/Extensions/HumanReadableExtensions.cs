@@ -4,36 +4,36 @@ namespace Unary.Core
 {
     public static class HumanReadableExtensions
     {
-        public static string ToSizeString(this long l)
+        public static string ToSizeString(this long bytes)
         {
             long KB = 1024;
             long MB = KB * 1024;
             long GB = MB * 1024;
             long TB = GB * 1024;
-            double size = l;
-            if (l >= TB)
+            double size;
+            if (bytes >= TB)
             {
-                size = System.Math.Round((double)l / TB, 2);
+                size = System.Math.Round((double)bytes / TB, 2);
                 return $"{size} TB";
             }
-            else if (l >= GB)
+            else if (bytes >= GB)
             {
-                size = System.Math.Round((double)l / GB, 2);
+                size = System.Math.Round((double)bytes / GB, 2);
                 return $"{size} GB";
             }
-            else if (l >= MB)
+            else if (bytes >= MB)
             {
-                size = System.Math.Round((double)l / MB, 2);
+                size = System.Math.Round((double)bytes / MB, 2);
                 return $"{size} MB";
             }
-            else if (l >= KB)
+            else if (bytes >= KB)
             {
-                size = System.Math.Round((double)l / KB, 2);
+                size = System.Math.Round((double)bytes / KB, 2);
                 return $"{size} KB";
             }
             else
             {
-                return $"{size} Bytes";
+                return $"{bytes} Bytes";
             }
         }
     }

@@ -1,8 +1,8 @@
 {
   "ModId": "Unary.Recusant",
   "Version": "0.0.1",
-  "BuildNumber": 4900,
-  "BuildDate": "16.11.2025 16:53:18",
+  "BuildNumber": 4901,
+  "BuildDate": "16.11.2025 17:13:10",
   "Dependency": {
     "Unary.Core": "0.0.1"
   },

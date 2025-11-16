@@ -15,11 +15,6 @@ namespace Unary.Recusant
         private readonly Action[] OnUpdate;
         private readonly float[] OnTime;
 
-        public static void Dummy()
-        {
-
-        }
-
         public UpdaterUnit(float Time, float Interval)
         {
             this.Interval = Interval;
@@ -31,7 +26,6 @@ namespace Unary.Recusant
 
             for (int i = 0; i < PoolLimit; i++)
             {
-                OnUpdate[i] = Dummy;
                 OnTime[i] = Time + (Offset * i);
             }
         }
@@ -42,7 +36,7 @@ namespace Unary.Recusant
             {
                 if (Time > OnTime[i])
                 {
-                    OnUpdate[i]();
+                    OnUpdate[i]?.Invoke();
                     OnTime[i] = Time + Interval;
                 }
             }
@@ -50,7 +44,14 @@ namespace Unary.Recusant
 
         public void Subscribe(Action Update)
         {
-            OnUpdate[PoolCounter] += Update;
+            if (OnUpdate[PoolCounter] == null)
+            {
+                OnUpdate[PoolCounter] = Update;
+            }
+            else
+            {
+                OnUpdate[PoolCounter] += Update;
+            }
 
             PoolCounter++;
             if (PoolCounter == PoolLimit)
@@ -102,6 +103,7 @@ namespace Unary.Recusant
                 {
                     FoundUnit = true;
                     Target.Subscribe(Action);
+                    break;
                 }
             }
 

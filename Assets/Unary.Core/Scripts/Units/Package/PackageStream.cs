@@ -19,7 +19,7 @@ namespace Unary.Core
 
             if (filePath == null)
             {
-                Logger.Instance.Error("filePath is null!");
+                throw new ArgumentNullException(nameof(filePath));
             }
 
             _fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize);
