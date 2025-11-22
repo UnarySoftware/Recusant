@@ -56,6 +56,7 @@ namespace Unary.Core
             Steamworks_Dll_Check,
             Steamworks_Dll_Not_Found,
             Steamworks_Init_Failed,
+            Steamworks_Not_Launched,
             Steamworks_EnvironmentVariable_Failed,
             // Systems-specific
             System_Invalid_Namespace
@@ -127,6 +128,15 @@ namespace Unary.Core
                     "{0}\n" +
                     "Stack trace:\n" +
                     "{1}"
+                }
+            }
+        },
+        {
+            ErrorType.Steamworks_Not_Launched, new()
+            {
+                {
+                    SystemLanguage.English, "Steam is required to play this game.\n" +
+                    "Make sure that it is turned on and try launching the game again."
                 }
             }
         },

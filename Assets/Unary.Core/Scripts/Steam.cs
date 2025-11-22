@@ -128,6 +128,7 @@ namespace Unary.Core
 
             if (!InitializeSteamWorks())
             {
+                InitializationError.Show(InitializationError.ErrorType.Steamworks_Not_Launched);
                 return false;
             }
 

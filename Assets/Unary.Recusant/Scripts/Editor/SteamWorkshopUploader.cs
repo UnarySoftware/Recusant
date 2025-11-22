@@ -37,7 +37,7 @@ namespace Unary.Recusant.Editor
         private static readonly Dictionary<EResult, string> _createItemErrorLocales = new()
         {
             { EResult.k_EResultInsufficientPrivilege, "You are currently restricted from uploading content due to a hub ban, account lock, or community ban." },
-            { EResult.k_EResultBanned, "You doesn't have permission to upload content to this hub because they have an active VAC or Game ban." },
+            { EResult.k_EResultBanned, "You don't have permission to upload content to this hub because you have an active VAC or Game ban." },
             { EResult.k_EResultTimeout, "The operation took longer than expected. You have to retry the creation process." },
             { EResult.k_EResultNotLoggedOn, "You are not currently logged into Steam." },
             { EResult.k_EResultServiceUnavailable, "The workshop server hosting the content is having issues. Retry again later." },
@@ -56,7 +56,7 @@ namespace Unary.Recusant.Editor
             { EResult.k_EResultInvalidParam, "Either the provided app ID is invalid or doesn't match the consumer app ID of the item." },
             { EResult.k_EResultAccessDenied, "You dont own a license for the game." },
             { EResult.k_EResultFileNotFound, "Failed to get the workshop info for the item or failed to read the preview file." },
-            { EResult.k_EResultLockingFailed, "Failed to aquire UGC Lock." },
+            { EResult.k_EResultLockingFailed, "Failed to acquire UGC Lock." },
             { EResult.k_EResultLimitExceeded, "The preview image is too large, it must be less than 1 Megabyte; or there is not enough space available on your Steam Cloud." }
         };
 
@@ -142,7 +142,7 @@ namespace Unary.Recusant.Editor
                             _progressId = Progress.Start($"Uploading \"{_submittedMod}\" to Steam Workshop", options: Progress.Options.Indefinite);
                         }
 
-                        Progress.Report(_progressId, (float)entryTotal / (float)entryProcessed);
+                        Progress.Report(_progressId, (float)entryProcessed / (float)entryTotal);
                     }
                 }
             }

@@ -1,6 +1,8 @@
 using Netick.Unity;
 using Unary.Core;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.SceneManagement;
 
 namespace Unary.Recusant
 {
@@ -8,6 +10,7 @@ namespace Unary.Recusant
     public class LevelRoot : NetworkBehaviourExtended
     {
         public CompiledLevelData CompiledLevelData;
+        public ProbeVolumeBakingSet ProbeVolumeBakingSet;
 
 #if UNITY_EDITOR
         public void Destroy(GameObject target)
@@ -18,6 +21,10 @@ namespace Unary.Recusant
 
         public void Awake()
         {
+            //BakingSetHelper.SetupScene(SceneManager.GetActiveScene());
+
+
+
             LevelManager.Instance.LevelLoaded(this);
         }
 
@@ -51,6 +58,26 @@ namespace Unary.Recusant
                 LevelDefinition = LevelManager.Instance.LevelDefinition,
                 LevelRoot = this
             });
+        }
+
+        bool firstFrame = true;
+        bool updated = false;
+
+        public void Update()
+        {
+            if (firstFrame)
+            {
+                firstFrame = false;
+                return;
+            }
+
+            if (!updated)
+            {
+                //ProbeVolumeBakingSet.use
+                //ProbeReferenceVolume.instance.SetActiveBakingSet(ProbeVolumeBakingSet);
+                //ProbeReferenceVolume.instance.lightingScenario = "Default";
+                updated = true;
+            }
         }
 
         public void OnDestroy()

@@ -5,6 +5,7 @@ using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
 namespace Unary.Recusant.Editor
@@ -168,6 +169,21 @@ namespace Unary.Recusant.Editor
             }
 
             string levelData = LevelDataFolder + "/CompiledLevelData.asset";
+
+            string[] files = Directory.GetFiles(LevelDataFolder, "*.asset");
+
+            foreach (var file in files)
+            {
+                if (AssetDatabase.GetMainAssetTypeAtPath(file) == typeof(ProbeVolumeBakingSet))
+                {
+                    ProbeVolumeBakingSet bakingSet = AssetDatabase.LoadAssetAtPath<ProbeVolumeBakingSet>(file);
+
+                    if (bakingSet != null)
+                    {
+                        LevelRoot.ProbeVolumeBakingSet = bakingSet;
+                    }
+                }
+            }
 
             if (!File.Exists(levelData))
             {

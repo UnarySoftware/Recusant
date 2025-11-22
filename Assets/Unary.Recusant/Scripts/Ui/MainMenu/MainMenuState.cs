@@ -69,13 +69,13 @@ namespace Unary.Recusant
 
         private void OnNumberOfCurrentPlayers(NumberOfCurrentPlayers_t data, bool failure)
         {
-            if (Convert.ToBoolean(data.m_bSuccess) || failure)
+            if (!Convert.ToBoolean(data.m_bSuccess) || failure)
             {
                 return;
             }
 
             // Add 1 to the player count since current Steam player number is delayed with updates and wont include us
-            int playerCount = data.m_cPlayers == 0 ? 1 : data.m_cPlayers;
+            int playerCount = data.m_cPlayers + 1;
 
             CurrentPlayers.text = $"Current players in-game: {playerCount}";
             CurrentPlayers.style.display = DisplayStyle.Flex;
